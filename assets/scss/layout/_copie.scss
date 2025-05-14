@@ -1,0 +1,301 @@
+@use '../abstracts/index' as *;
+
+//Header for Index page
+
+.header-index{
+    height: 100vh;
+    background-image: url(../assets/img/shiretoko1.jpg);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+
+    p{
+        color: white;
+    }
+}
+
+header.header-index{
+    section:first-of-type{
+        width: 100%;
+        height: 12.5vh;
+        background: linear-gradient(
+            to bottom,
+            rgba(46, 125, 50, 0.7) 0%,      // Opaque au début
+            rgba(46, 125, 50, 0.3) 80%,    // Encore opaque à ~10vh
+            rgba(46, 125, 50, 0) 100%    // Complètement transparent à la fin
+        );
+        @include flex(row, space-between);
+
+        #logo{
+            line-height: 100%;
+            // width: 20%;
+            margin-left: 5%;
+            display: flex;
+            align-items: center;
+            gap: clamp(1rem, 1vw, 2rem);
+
+            img{
+                width: auto;
+                height: 5vh;
+                padding-bottom: 0.5rem;
+            }
+        }
+
+        nav{
+            width: 60%;
+            margin-right: 5%;
+            @media (max-width: 992px) {
+                display: none;
+            }
+
+            
+            #navID{
+                @include flex(row, flex-end);
+                width: 100%;
+                gap : clamp(2rem, 6vw, 8rem);
+            
+                li{
+                line-height: 100%;
+                }
+            }
+                
+        }
+
+        #login{
+            padding: 0.5rem 1rem;
+            border: 2px solid white;
+            border-radius: 50px;
+            text-decoration: none;
+
+            &:hover{
+                border: 2px solid black;
+            }
+        }
+
+        a:hover {
+            color: black;
+        }
+
+        
+    }
+
+    section:last-of-type{
+        width: 100%;
+        height: 47.5vh;
+        @include flex(column, space-between, center);
+
+            h1{
+                margin-top: 10vh;
+            }
+
+            h1, h2{
+                font-size: clamp(3rem, 4vw ,6rem);
+                text-align: center;
+                font-weight: 800;
+                text-shadow:
+                    0px 4px 8px  $box-shadow-blue,  /* ombre principale */
+                    0 0px 0px  $box-shadow-blue;     /* glow externe*/
+                // 0 0 20px rgba(0, 240, 255, 0.8);      /* glow plus large */
+                margin-bottom: 5vw;
+            }
+
+            h2{
+                font-size: clamp(2.5rem, 3.5vw ,4rem);
+            }
+        
+
+            a {
+                width: 30%;
+                padding: 0 32px;
+                border: 2px solid $button-border-blue;
+                border-radius: 50px;
+                background-color: $button-blue;
+                color: white;
+                text-decoration: none;
+                box-shadow: 0 0 24px  $box-shadow-blue;
+                transition: transform 0.3s ease;
+                gap: 1rem;
+                @include flex-center;
+
+
+                img{
+                    width: 20%;
+                    height: auto;
+
+                }
+
+                div{
+                    @include flex(column, flex-start, center);
+
+                    p:first-of-type{
+                        font-size: clamp(1.5rem, 3vw ,3rem);
+                    }
+
+                    p{
+                        font-size: clamp(1rem, 2vw, 2rem);
+                    }
+                }
+            }
+            
+            @media (min-width: 0px) and (max-width: $breakpoint-sm) {
+                h1 {
+                    font-size: clamp(1.75rem, 8vw, 2.5rem);
+                }
+
+                h2 {
+                    font-size: clamp(1.325rem, 5vw, 1.75rem);
+                }
+
+                
+                a {
+                    width: 50%;
+                    padding: 0 16px;
+    
+                    img{
+                        width: 30%;
+                    }
+
+                    div{
+                        p:first-of-type{
+                            font-size: clamp(1.325rem, 4vw ,2rem);
+                        }
+
+                        p:nth-of-type(2){
+                        display: none;
+                        }
+                    }
+                }
+            }
+
+            @media (min-width: calc($breakpoint-sm + 1px)) and (max-width: $breakpoint-md) {
+                h1 {
+                    font-size: clamp(1.75rem, 8vw, 2.5rem);
+                }
+
+                h2 {
+                    font-size: clamp(1.5rem, 6vw, 2rem);
+                }
+
+                a {
+                    width: 40%;
+                    padding: 0 16px;
+    
+                    img{
+                        width: 25%;
+                    }
+
+                    div{
+                        p:first-of-type{
+                            font-size: clamp(1.325rem, 4vw ,2rem);
+                        }
+
+                        p:nth-of-type(2){
+                        display: none;
+                        }
+                    }
+                }
+            }
+
+            @media (min-width: calc($breakpoint-md + 1px)) and (max-width: $breakpoint-lg) {
+                a {
+                    width: 35%;
+                    padding: 0 16px;
+    
+                    img{
+                        width: 20%;
+                    }
+                }
+            }
+
+            @media (min-width: calc($breakpoint-lg + 1px)) and (max-width: $breakpoint-xl) {
+                a {
+                    width: 30%;
+                    padding: 0 24px;
+    
+                    img{
+                        width: 25%;
+                    }
+                }
+            }
+            
+            a:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 0 48px rgba(30, 136, 229, 0.8);
+                animation: pulse 2s infinite alternate; /* Animation pulsée */
+            }
+}
+}
+
+//Header for Login page
+
+.header-login{
+    height: 12.5vh;
+}
+
+
+header.header-login{
+    section.flex-between{
+        width: 100%;
+        height: 12.5vh;
+        background:  rgba(46, 125, 50, 1);
+        
+        #logo{
+            line-height: 100%;
+            // width: 20%;
+            margin-left: 5%;
+            display: flex;
+            align-items: center;
+            gap: clamp(1rem, 1vw, 2rem);
+
+            img{
+                width: auto;
+                height: 7.5vh;
+                padding-bottom: 0.5rem;
+            }
+
+            h1{
+                @media (max-width: $breakpoint-sm) {
+                    display: none;
+                }
+            }
+
+        }
+        
+        nav{
+            width: 60%;
+            margin-right: 5%;
+            @media (max-width: $breakpoint-lg) {
+                display: none;
+            }
+
+            
+            #navID{
+                @include flex(row, flex-end);
+                width: 100%;
+                gap : clamp(2rem, 6vw, 8rem);
+            
+                li{
+                line-height: 100%;
+                }
+            }
+        }
+        
+        #login{
+            padding: 0.5rem 1rem;
+            border: 2px solid white;
+            border-radius: 50px;
+            text-decoration: none;
+
+            &:hover{
+                border: 2px solid black;
+            }
+        }
+
+        a:hover {
+            color: black;
+        }               
+    }   
+}
+
+
+

@@ -1,0 +1,49 @@
+@use '../abstracts/index' as *;
+
+body{
+    background-color: rgba(246, 237, 229, 1);
+}
+
+main{
+    background-color: rgba(246, 237, 229, 1);
+}
+
+img{
+    width:100%;
+    height: auto;
+}
+
+iframe {
+    width: 100%;
+    border: none;
+    display: block; // Évite les marges indésirables des inline elements
+}
+
+button{
+    all: unset;
+    cursor: pointer; // Permet de conserver l'interaction utilisateur
+    display: inline-block; // Évite les comportements étranges selon le navigateur
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+// Display flex variantes
+.flex-center { @include flex-center; }
+.flex-between { @include flex(row, space-between); }
+.flex-between-top { @include flex(row, space-between, flex-start); }
+.flex-around { @include flex(row, space-around); }
+.flex-evenly { @include flex(row, space-evenly); }
+.flex-start { @include flex(row, flex-start); }
+.flex-end { @include flex(row, flex-end); }
+.flex-cl-center { @include flex-center($direction: column); }
+.flex-cl-between { @include flex(column, space-between, center); }
+.flex-cl-around { @include flex(column, center, space-around); }
+.flex-cl-evenly { @include flex(column, center, space-evenly); }
+.flex-cl-start { @include flex(column, center, flex-start); }
+.flex-cl-end { @include flex(column, center, flex-end); }
+
+/* technical class */
+
+

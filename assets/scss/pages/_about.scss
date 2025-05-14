@@ -1,0 +1,45 @@
+main.about {
+    h2{
+        line-height: 10%;
+        color:black;
+    }
+    
+    section{
+        margin-bottom: 10vh;
+
+        .container-type-3 {
+            &:hover {
+                background-color: rgba(46, 125, 50, 1);
+
+                p {
+                    color: white;
+                }
+            }
+
+            div.w50{
+                width: 100%;
+            }
+        
+            @media (min-width: 768px) {
+                flex-direction: row;
+        
+                div.w50{
+                    width: 50%;
+                }
+            }
+        }
+    }
+
+    div.w50{
+            height: 100%;
+            border-radius: 25px;
+            
+            p{
+                padding-top: 1.5rem;
+                display: block;
+                width: 90%;
+                text-align: justify;
+                margin: 0 auto;
+            }
+    }
+}

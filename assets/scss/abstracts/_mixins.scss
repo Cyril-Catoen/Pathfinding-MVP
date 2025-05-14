@@ -1,0 +1,86 @@
+/* typography mixins */
+@mixin BasicText{
+    color: white;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 2rem;
+}
+
+/* layout mixins */
+@mixin container-main($width: 80%, $margin: 0 auto) {
+    width: $width;
+    max-width: 95%;
+    margin: $margin;
+}
+
+@mixin container-rect($height: 60vh, $width:60vw, $margin: 0 auto) {
+    height: $height;
+    width: $width;
+    margin: $margin;
+}
+
+@mixin container-shape($size: 80vh, $margin: 0 auto, $shape: square) {
+    width: $size;
+    height: $size;
+    margin: $margin;
+
+    @if $shape == rectangle-vertic {
+        height: calc(#{$size} * 2); // ou une autre proportion
+      }
+    
+    @if $shape == rectangle-horz {
+        height: calc(#{$size} *0.30); // ou une autre proportion
+      }
+    
+    @if $shape == circle {
+        border-radius: 50%;
+        overflow: hidden;
+      }
+}
+
+@mixin flex($direction: row, $justify: center, $align: center) {
+    display: flex;
+    flex-direction: $direction;
+    justify-content: $justify;
+    align-items: $align;
+}
+
+@mixin flex-center($direction: row) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: $direction;
+}
+
+/* define components related mixins */
+@mixin button-type ($width: 30%, $font-size: 2rem, $padding: 0 32px, $border-radius: 50px, $transition: none, $gap: 1rem){
+    width: $width;
+    font-size: $font-size;
+    padding: $padding;
+    border-radius: $border-radius;
+    color: white;
+    text-decoration: none;
+    transition: $transition;
+    gap: $gap;
+}
+
+@mixin button-color($color) {
+    border: 2px solid $color;
+    background-color: $color;
+  }
+
+@mixin button-color-shadow($color, $color-2: null, $shadow-size: 0 0 24px, $shadow-color: null) {
+border: 2px solid $color;
+// Si une couleur est définie pour $color-2/$shadow-color, on l’utilise, sinon on reprend la couleur principale
+background-color: #{if($color-2 != null, $color-2, $color)};
+box-shadow: $shadow-size  #{if($shadow-color != null, $shadow-color, $color)};
+}
+
+/* define the  separators */
+
+@mixin separator($height: 2px, $back-color : black, $margin: 2rem 0 0.5rem 0, $border-radius: 4px){
+    height: $height;
+    background-color: $back-color;
+    margin: $margin;
+    border-radius: $border-radius;
+  }
+

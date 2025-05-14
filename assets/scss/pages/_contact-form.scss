@@ -1,0 +1,97 @@
+@use '../abstracts/index' as *;
+
+main.contact-form {
+    h2{
+        line-height: 4vh;
+        color:black;
+    }
+
+    input[type="checkbox"] {
+        display: block;
+    }
+
+    label{
+        span{
+            @media (max-width: $breakpoint-sm) {
+                display: none;
+            }  
+        }
+    }
+    
+    section{
+        min-height: 100vh;  
+
+        .button-type-4{
+            width: 40%;
+            @include button-color-shadow($button-border-green, $button-green, 0 0 24px, $box-shadow-green);
+            transition: scale 0.1s ease-out;
+      
+            &:hover{
+                @include button-color-shadow($button-border-blue, $button-blue, 0 0 24px, $box-shadow-blue);
+                scale: 1.1;
+                transition: scale 0.2s ease-in;
+            }
+          }
+
+        div.w25, div.w80{
+            @include flex(column, center, flex-start);
+        }
+
+        div.w80:last-of-type{
+            @include flex(row, space-between, flex-end);
+            @media (max-width: $breakpoint-sm) {
+                @include flex(column, flex-end, center);
+            }
+
+            div{
+                @media (max-width: $breakpoint-sm) {
+                    width: 100%;
+                    padding-top: 2rem;
+                    input{
+                        width: 20%;
+                    }
+                    button{
+                        width: 20%;
+                    }
+                }
+            }
+        }
+
+        div.w25{
+            @media (max-width: $breakpoint-sm) {
+                width: 100%;
+            }
+            @media (min-width: calc($breakpoint-sm + 1px)) and (max-width: $breakpoint-lg) {
+                width: 33%;
+            }
+        }
+
+        div.w80{
+            @media (max-width: $breakpoint-sm) {
+                width: 100%;
+            }
+            @media (min-width: calc($breakpoint-sm + 1px)) and (max-width: $breakpoint-lg) {
+                width: 90%;
+            }
+        }
+
+        select{
+            width: 70%;
+            @media (max-width: $breakpoint-sm) {
+                width: 100%;
+            }
+            @media (min-width: calc($breakpoint-sm + 1px)) and (max-width: $breakpoint-lg) {
+                width: 80%;
+            }
+        }
+        textarea{
+            height: 30vh;
+            padding-top: 1rem;
+        }
+    }
+
+    div.pdt-2{
+         display: flex;
+         justify-content: flex-end;
+    }
+}

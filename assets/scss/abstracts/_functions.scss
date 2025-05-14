@@ -1,0 +1,3 @@
+@function dynamic-width-1($min, $max, $min-vw, $max-vw) {
+    @return "calc(#{$min} + (#{$max} - #{$min}) * ((100vw - #{$min-vw}) / (#{$max-vw} - #{$min-vw})))";
+  }

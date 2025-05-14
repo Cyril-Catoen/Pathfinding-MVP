@@ -1,0 +1,86 @@
+@use '../abstracts/index' as *;
+
+main.login {
+    h3{
+        line-height: 4vh;
+        color:black;
+    }
+    
+    section{
+
+        form {
+            margin: 0 auto 10vh;
+        }
+        
+        // button{
+        //         width: 35%;
+        //         font-size: 2rem;
+        //         padding: 4px 32px;
+        //         border: 2px solid rgba(46, 125, 50, 1);
+        //         border-radius: 50px;
+        //         background-color: rgba(46, 125, 50, 1);
+        //         color: white;
+        //         text-decoration: none;
+        //         gap: 1rem;
+        //         display: flex;
+        //         justify-content: center;
+        //         align-items: center;
+        // }
+
+        div.w45{
+            @include flex(column, center, flex-start);
+        }
+
+        form{
+            width: 70%;
+
+            button {
+                width: 35%;
+            }
+
+            @media (max-width: $breakpoint-md) {
+                width: 95%;
+            }
+
+            @media (min-width: calc($breakpoint-md + 1px)) and (max-width: $breakpoint-xl) {
+                width: 80%;
+
+       
+            }
+
+            @media (min-width: calc($breakpoint-xl + 1px)) and (max-width: $breakpoint-xxl) {
+                width: 75%;
+            }
+        }
+
+        div.flex-center, div.flex-cl-start {
+            flex-wrap: wrap;
+
+            @media (max-width: $breakpoint-sm) {
+            gap: 1rem;
+
+            div.w45 {
+                width: 100%;
+            }
+        }
+        }
+
+        label {
+            padding: 1rem 0 0.5rem 1rem;
+        }
+
+        input {
+            font-size: 1.325rem;
+            padding-left: 1rem;
+            height: 2.65rem;
+            width: 100%;
+            border: 1px solid grey;
+            border-radius: 25px;
+        }
+    }
+
+    section div div.w45.pdt-2{
+         display: flex;
+         align-items: flex-end;
+    }
+}

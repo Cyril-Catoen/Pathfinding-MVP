@@ -1,0 +1,10 @@
+@use '../abstracts/index' as *;
+
+// separators
+.line-x-separator {
+    @include separator(2px, black);
+}
+
+.footer-separator {
+    @include separator(8px, white);
+  }

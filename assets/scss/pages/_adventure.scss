@@ -1,0 +1,93 @@
+@use '../abstracts/index' as *;
+@use '../base/globals' as global;
+
+main.adv-main {
+    width: 100%;
+
+    h2, h3, h4 {
+        color: black;
+        font-size: 2rem;
+        padding-left: 1rem;
+    }
+
+    h4 {
+        font-size: 1.325rem;
+        padding: 1rem 0 0.5rem 1rem;
+
+    }
+
+    //component ???
+    .container-circle-2 {
+        background-color: $white-color;
+        box-shadow: 0 4px 8px $box-shadow-black;
+        @include flex-center;
+
+        i {
+          font-size: 5vh; // icône très visible
+          color: $secondary-color; // ou une autre couleur verte si tu veux
+        }
+      
+        &:hover {
+          i {
+            transform: scale(1.1);
+            transition: transform 0.2s ease;
+            color: $primary-color;
+          }
+          p{ color: $primary-color;}
+        }
+    }
+
+    .button-type-3 {
+      color: black;
+      font-size: 1.325rem;
+      transition: transform 0.2s ease;
+
+      &:hover {
+          transform: scale(1.1);
+          transition: transform 0.2s ease;
+          color: $primary-color;
+      }
+    }
+
+    .button-type-4{
+      width: 10%;
+      border: 2px solid $button-border-green;
+      background-color: $button-green;
+      box-shadow: 0 0 24px $box-shadow-green;
+      transition: scale 0.1s ease-out;
+
+      &:hover{
+          border: 2px solid $button-border-blue;
+          background-color: $button-blue;
+          box-shadow: 0 0 24px $box-shadow-blue;
+          scale: 1.1;
+          transition: scale 0.2s ease-in;
+      }
+    }
+
+    .upload-container{
+      margin: 1rem 0;
+      width: 25vh;
+    }
+
+    .pdt-1.pdb-1.flex-end {
+        label {
+          padding: 12px 32px;
+        }
+    }
+
+    .upload-label{
+      min-height: 5vh;
+    }
+
+    label {
+      padding:0 0 0 1rem;
+    }
+}
+
+#GPSTrack {
+    h2 {
+        margin-left: 1rem;
+        margin-bottom: 1.5rem;
+    }
+}

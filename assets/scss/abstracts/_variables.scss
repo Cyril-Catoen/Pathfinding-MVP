@@ -1,0 +1,37 @@
+/* Responsive - breakpoints */
+$breakpoint-xs: 0px;
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;
+$breakpoint-xxl: 1400px;
+
+/* define colors */
+    $primary-color: rgba(30, 136, 229, 1);
+    $secondary-color: rgba(46, 125, 50, 1);
+    $white-color: rgba(255, 255, 255, 1);
+
+    /* for buttons*/
+    $button-border-blue: rgba(30, 136, 229, 1);
+    $button-border-green: rgba(46, 125, 50, 1);
+    $button-border-red: rgba(255, 0, 0, 1);
+    $button-blue: rgba(30, 136, 229, 0.8);
+    $button-green: rgba(46, 125, 50, 0.8);
+    $button-red: rgba(255, 0, 0, 0.8);
+    $button-white: rgba(255, 255, 255, 1);
+
+    /* for shadows */
+    $box-shadow-black: rgba(0, 0, 0, 0.5);
+    $box-shadow-blue: rgba(30, 136, 229, 0.5);
+    $box-shadow-green: rgba(46, 125, 50, 0.5);
+    $box-shadow-red: rgba(255, 0, 0, 0.5);
+
+// Dropdown
+$dropdown-bg: #ffffff;
+$dropdown-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+$dropdown-padding: 0.35rem 0rem;
+$dropdown-li-padding: 1rem 0.75rem;
+$dropdown-link-color: #2e7d32;
+$dropdown-link-hover-bg: #f5f5f5c3;
+$dropdown-link-hover-color: #1e88e5;
+$z-index-dropdown: 1000;

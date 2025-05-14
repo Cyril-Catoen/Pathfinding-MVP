@@ -1,0 +1,112 @@
+@use '../abstracts/index' as *;
+
+.button-type-1 {
+    @include button-type (30%, clamp(1.5rem, 3vw, 2rem), 0 32px, 50px, transform 0.3s ease, 1rem);
+    @include flex-center;
+}
+
+.button-type-2 {
+    @include button-type (100%, clamp(1.5rem, 3vw, 2rem), 12px 32px, 50px, none, 1rem);
+    box-sizing: border-box;
+    @include flex-center;
+}
+
+.button-type-3 {
+    @include button-type (25vh, 1.325rem, 12px 32px, 25px, none, 1rem);
+    box-sizing: border-box;
+    box-shadow: 0 0 12px  $box-shadow-black;
+    @include flex-center;
+}
+
+.button-type-4 {
+    @include button-type (20%, clamp(1.5rem, 3vw, 2rem), 0 32px, 50px, transform 0.3 ease, 1rem);
+    @include flex-center;
+    
+}
+
+.manage-btn {
+    @include flex-center;
+    width: 100%;
+    gap: 1rem;
+    font-size: 2rem; // taille du texte (facultatif)
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.shadow-black{ box-shadow: 0 0 24px  $box-shadow-black; }
+.shadow-blue{ box-shadow: 0 0 24px  $box-shadow-blue; }
+.shadow-green{ box-shadow: 0 0 24px  $box-shadow-green; }
+.shadow-red{ box-shadow: 0 0 24px  $box-shadow-red; }
+
+.button-blue{ @include button-color($button-blue); }
+.button-green{ @include button-color($button-green); }
+.button-red{ @include button-color($button-red); }
+.button-white{ @include button-color($button-white); }
+
+/* Styles pour le bouton */
+.toggle-btn {
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+}
+
+.toggle-btn input[type="checkbox"] {
+    display: none;
+}
+
+.slider {
+    position: relative;
+    background-color: red;
+    border-radius: 2.5vh;
+    width: 9vh;
+    height: 2.5vh;
+    transition: background-color 0.3s ease;
+    overflow: hidden;
+}
+
+.ball {
+    position: absolute;
+    top: 0;
+    width: 2.5vh;
+    height: 2.5vh;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+}
+
+/* Position du texte */
+.btn-text {
+    position: absolute;
+    top: 50%;
+    font-size: 1.325rem;
+    font-weight: bold;
+    color: white;
+    width: 100%;
+    text-align: center;
+    pointer-events: none; /* pour ne pas bloquer les clics */
+    transition: transform 0.3s ease;
+}
+
+/* Quand le bouton est activé */
+.toggle-btn input[type="checkbox"]:checked + .slider {
+    background-color: green;
+}
+
+/* Mouvement de la balle */
+.toggle-btn input[type="checkbox"] + .slider .ball {
+    left: 0;
+}
+.toggle-btn input[type="checkbox"]:checked + .slider .ball {
+    transform: translateX(6.5vh); /* 9vh - 2.5vh = 6.5vh pour aller à droite */
+}
+
+/* Mouvement du texte */
+.toggle-btn input[type="checkbox"] + .slider .btn-text {
+    transform: translateX(0vh) translateY(-50%); /* pour aller à gauche */
+}
+.toggle-btn input[type="checkbox"]:checked + .slider .btn-text {
+    transform: translateX(-2vh) translateY(-50%); /* pour aller à gauche */
+}

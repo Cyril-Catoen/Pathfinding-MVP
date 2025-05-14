@@ -1,0 +1,11 @@
+@forward 'variables';
+@forward 'mixins';
+@forward 'utilities';
+@forward 'animations';
+@forward 'functions';
+
+// _index.scss + @forward allows us to bridge mixins/utilities/variables stylesheet 
+// through one intermediate stylesheet. 
+// _index.scss centralizes the abstracts files.
+// we only need to import it through @use command in other files, example :
+// @use '../abstracts/index' as *; in case of the three @use variable ; mixins ; utilities

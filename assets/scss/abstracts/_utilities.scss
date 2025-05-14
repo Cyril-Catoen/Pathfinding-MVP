@@ -1,0 +1,67 @@
+// Margin + Padding + Gap helpers : m = margin ; pd = padding ; gap = gap
+// t = top ; r = right ; b = bottom ; l = left
+@for $i from 1 through 8 {
+  .mt-#{$i} { margin-top: $i * 0.5rem; }
+  .mb-#{$i} { margin-bottom: $i * 0.5rem; }
+  .ml-#{$i} { margin-left: $i * 0.5rem; }
+  .mr-#{$i} { margin-right: $i * 0.5rem; }
+  .pdt-#{$i} { padding-top: $i * 0.5rem; }
+  .pdb-#{$i} { padding-bottom: $i * 0.5rem; }
+  .pdl-#{$i} { padding-left: $i * 0.5rem; }
+  .pdr-#{$i} { padding-right: $i * 0.5rem; }
+  .gap-#{$i} { gap: $i * 0.5rem; }
+}
+
+// Text align
+@each $align in center, right, left, justify { // @each permet d'éviter de répéter sur plusieurs lignes .text-nomDirection
+  .text-#{$align} { text-align: $align; }}
+
+// Justify 
+.just-space-btw { justify-content: space-between; }
+
+// Align items (i) and content (ct)
+.align-i-flex-start { align-items: flex-start; }
+
+// Rounded
+.rounded-sm { border-radius: 4px; }
+.rounded-md { border-radius: 8px; }
+.rounded-lg { border-radius: 16px; }
+
+// Display helpers
+.d-flex  { display: flex; }
+.d-block { display: block; }
+.d-none  { display: none; }
+
+// wrap / nowrap
+.wrap   { flex-wrap: wrap; }
+.nowrap { flex-wrap: nowrap; }
+
+// Accessibility
+.visually-hidden {
+    position: absolute;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+// Predifined width
+// Using a @for loop allows us to create a lot of utilities class with few line
+@for $i from 10 through 100 {
+  @if ($i % 5 == 0) {
+    .w#{$i}  { width: $i * 1%; }
+    .wvh#{$i} { width: $i * 1vh; }
+  }
+}
+
+// Predifined height
+@for $i from 10 through 100 {
+  @if ($i % 5 == 0) {
+    .h#{$i}  { height: $i * 1%; }
+    .vh#{$i} { height: $i * 1vh; }
+  }
+}
+
+.vh150{ height: 150vh }

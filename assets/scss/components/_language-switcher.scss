@@ -1,0 +1,21 @@
+#language-switcher {
+    select {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background-color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+  
+      &:hover {
+        border-color: #aaa;
+      }
+  
+      &:focus {
+        outline: none;
+        border-color: #007BFF;
+        box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
+      }
+    }
+  }

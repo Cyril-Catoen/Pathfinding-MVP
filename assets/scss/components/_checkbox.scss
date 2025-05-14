@@ -1,0 +1,65 @@
+@use '../abstracts/index' as *;
+
+// checkbox
+
+.checkbox-grid {
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(6vh, 1fr));
+    gap: 1rem;
+}
+
+.box-content {
+    background: #f5f5f5;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    height: 6vh;
+    width: 6vh;
+    @include flex-center($direction: column); 
+    box-shadow: 0 0 0 transparent;
+    cursor: pointer; 
+
+    i {
+        font-size: 2rem;
+        color: #555;
+    }
+
+    img{
+        width: 150%;
+        height: auto;
+    }
+}
+
+input[type="checkbox"] {
+    display: none;
+}
+
+label.adventure-box {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+        
+    p {
+        width: 100%;
+        font-size: 1rem;
+        text-align: center;
+        color: #333;
+    }
+    
+    input[type="checkbox"]:checked + .box-content {
+            border-color: #4CAF50;
+            background: #e8f5e9;
+            transform: scale(1.05);
+            box-shadow: 0 0 10px #4CAF50;
+    }
+}
+    
+/* Glow subtil au hover */
+label:hover .box-content {
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.5); /* Vert un peu diffus */
+}

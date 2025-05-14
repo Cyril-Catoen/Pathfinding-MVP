@@ -1,0 +1,12 @@
+/* Animation pulsée */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 24px rgba(30, 136, 229, 0.5); /* Ombre légère */
+    }
+    50% {
+        box-shadow: 0 0 48px rgba(30, 136, 229, 0.8); /* Ombre intense */
+    }
+    100% {
+        box-shadow: 0 0 24px rgba(30, 136, 229, 0.5); /* Retour à l'ombre légère */
+    }
+}

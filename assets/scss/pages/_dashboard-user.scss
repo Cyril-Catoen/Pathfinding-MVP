@@ -1,0 +1,167 @@
+@use '../abstracts/index' as *;
+@use '../base/globals' as global;
+
+main.dashboard{
+    width: 100%;
+    h2{ color:black; }
+
+    section{
+    min-height: 100vh;
+
+    div.flex-between{
+        gap: clamp(1rem, 4vw, 3rem);
+    }
+
+    div.w35 {
+        div.flex-start {
+            gap: 2rem;
+        }
+        img{
+            width: 24px;
+            height: 18px;
+        }
+    }
+    }
+}
+
+div.container-dash-1 {
+    h2 {
+        padding-left: 1rem;
+        margin: 2rem 0 3rem 0;
+    }
+
+    .adventure-card{
+        height: 15vw;
+        width: 15vw;
+    }
+}
+
+div.container-dash-2 {
+    h2 {
+    padding-left: 1rem;
+    margin: 2rem 0 2rem 0;
+    }
+
+    // div{
+    //     width: 100%;
+    // }
+
+    li{
+        @extend .flex-start;
+        padding-left: 1rem;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .container-circle-2{
+        width:  clamp(2rem, 5vw, 6rem);
+        height: clamp(2rem, 5vw, 6rem);
+    }
+}
+
+a.manage-btn {
+    i {
+      font-size: 5vh; // icône très visible
+      color: $secondary-color; // ou une autre couleur verte si tu veux
+    }
+  
+    &:hover {
+      i {
+        transform: scale(1.1);
+        transition: transform 0.2s ease;
+        color: $primary-color;
+      }
+      p{ color: $primary-color;}
+    }
+}
+
+#newAdv{
+    h2 {
+        margin-left: 2rem;
+        margin-bottom: 1.5rem;
+    }
+
+    h3{
+        font-size: 2rem;
+        line-height: 3vh;
+        color:black;
+    }
+    
+    form{
+        display: flex;
+        align-items: top;
+        justify-content: space-evenly;
+    }
+
+    .button-type-4{
+        border: 2px solid $button-border-green;
+        background-color: $button-green;
+        box-shadow: 0 0 24px $box-shadow-green;
+        transition: scale 0.1s ease-out;
+
+        &:hover{
+            border: 2px solid $button-border-blue;
+            background-color: $button-blue;
+            box-shadow: 0 0 24px $box-shadow-blue;
+            scale: 1.1;
+            transition: scale 0.2s ease-in;
+        }
+    }
+
+    div.w25, div.w80{
+        @include flex(column, center, flex-start);
+    }
+
+    div.w100 label {
+        font-size: 1.5rem;
+        padding: 1rem 0 0.5rem 1rem;
+    }
+
+    div.w100.d-flex div.w45 label, div.w100.d-flex div.w45 span {
+        font-size: 1.325rem;
+        padding: 0.5rem 0 0.5rem 1rem;
+    }
+
+    div.w100.d-flex {
+        gap: 10%
+    }
+    
+    select, textarea {
+        font-size: 1.325rem;
+        padding-left: 1rem;
+        height: 2.65rem;
+        width: 100%;
+        border-radius: 25px;
+    }
+
+    textarea{
+        height: 30vh;
+        padding-top: 1rem;
+    }
+
+}
+
+    #adventureInputWrapper {
+        margin-top: 1rem;
+    }
+
+    #otherInputWrapper {
+        display: flex;
+        align-items: center;
+        width: 300%;
+        line-height: 1.325rem;
+    }
+
+    #otherInputWrapper input[type="text"] {
+        width: 100%;
+        padding: 0.5rem;
+        border: 2px solid #ccc;
+        border-radius: 10px;
+        margin-top: 0.5rem;
+    }
+
+
+div.w50.pdt-2{
+    display: flex;
+    justify-content: flex-end;
+}

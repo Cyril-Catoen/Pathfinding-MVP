@@ -1,0 +1,29 @@
+@use '../abstracts/index' as *;
+
+// form general style
+form{
+    label {
+    padding: 1rem 0 0.5rem 1rem;
+    }
+
+    input {
+    padding-left: 1rem;
+    height: clamp(2rem, 5vw, 3rem);
+    width: 100%;
+    border: 1px solid grey;
+    border-radius: 25px;
+    }
+
+    input[type="number"] {
+        height: clamp(2rem, 5vw, 3rem);
+        width: 60%;
+        min-width: 5rem;
+    }
+
+    select, textarea {
+    padding-left: 1rem;
+    height: clamp(2rem, 5vw, 3rem);
+    width: 100%;
+    border-radius: 25px;
+    }
+}
