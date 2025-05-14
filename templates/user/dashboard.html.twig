@@ -1,0 +1,308 @@
+{% extends 'user/base.html.twig' %}
+
+        {% block metatitle %}
+        <title>Pathfinder - Dashboard</title>
+        {% endblock metatitle %}
+
+{% block main %}
+
+<main class="dashboard">
+        <section class="container">
+            <div class="flex-between pdt-8">
+                <div class="container-circle-1">
+                    <img src="../assets/img/LiveTrack.jpeg" alt="">
+                </div> 
+                <div class="w35">
+                    <div class="flex-start"><h2>Cyril CATOEN</h2>
+                    <img src="https://flagcdn.com/24x18/fr.png" alt="France" width="24px" height="18px">
+                    </div>
+                    <p class="pdt-1 text-justify">Outdoors and tech entoushiat. Transitioning into Web Develoment to build an international company using React, React Native, PostGres, Symfony and more. Let’s go !   
+                    </p>
+                </div>
+                <div class="w40 vh30 flex-cl-between pdt-2 pdb-2">
+                    <a class="button-type-2 button-green" href="dashboard-user.controller.php#newAdv">Create a new Adventure</a>
+                    <button class="button-type-2 button-red">Reset Safety Alert</button>
+                    <p>08.04.2025 14:06 (UTC+2)</p>
+                </div>
+            </div>
+
+            <div class="w100 vh60 flex-between mt-8">
+                <div class="container-dash-1">
+                    <h2 class="w100">LAST ADVENTURES</h2>
+                    <div class="adventure-cards w100">
+                        <div>
+                            <div class="adventure-card">
+                            <img src="../assets/img/shiretoko3.jpg" alt="">
+                            </div>
+                            <div>
+                                <p class="bold">Shiretoko National Park</p>
+                                <p>Achieved</p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="adventure-card">
+                            <img src="../assets/img/akanMashu4.jpg" alt="">
+                            </div>
+                            <div>
+                                <p class="bold">Into the Georgian Wild</p>
+                                <p>Preparation</p>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="adventure-card">
+                            <img src="../assets/img/rishiri_island2.jpg" alt="">
+                            </div>
+                            <div>
+                                <p class="bold">Entrepreneurship</p>
+                                <p>In progress</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="container-dash-2">
+                    <h2 class="w100">SAFETY CONTACTS</h2>
+                    <div>
+                        <ul>
+                            <li>
+                                <img class="container-circle-2" src="../assets/img/Natsuka.png" alt="">
+                                <p>Natsuka SUZUKI</p>
+                            </li>
+                            <li>
+                                <img class="container-circle-2" src="../assets/img/aurelien.png" alt="">
+                                <p>Aurélien CATOEN</p>
+                            </li>
+                            <li>
+                                <img class="container-circle-2" src="../assets/img/Anton.png" alt="">
+                                <p>Anton SMITH</p>
+                            </li>
+                        </ul>
+                    </div>
+                    <a class="manage-btn" href="contact-manager.controller.php">
+                            <i class="fas fa-users-gear"></i>
+                            <p>Manage Contacts<p>
+                    </a>
+                </div>
+            </div>
+
+        </section>
+        <section id="newAdv" class="container">
+            <h2>NEW ADVENTURE</h2>
+            <div class="container-type-3 shadow-black">
+                <form class="w100" action="submit.php" method="post">
+                    <div class="w40">
+                        <h3 class="pdt-4">GENERAL</h3>
+
+                        <div class="w100">
+                            <div class="w100">
+                                <label class="d-block" for="title">TITLE</label>
+                                <input type="text" id="title" name="title" placeholder="" required>
+                            </div>
+                        </div>
+
+                        <div class="w100">
+                            <div class="w100">
+                                <label class="d-block" for="description">DESCRIPTION</label>
+                                <input type="textarea" id="description" name="description" placeholder="" required>
+                            </div>
+                        </div>
+
+                        <div class="w100 d-flex">
+                            <div class="w45">
+                                <label class="d-block" for="status">STATUS</label>
+                                    <select name="status" id="status" required>
+                                        <option value="status1" selected>Preparation</option>
+                                        <option value="status3">Achieved</option>
+                                    </select>
+                            </div>
+                            <div class="w45">
+                                <label class="d-block" for="visibility">VISIBILITY</label>
+                                <select name="visibility" id="visibility" required>
+                                    <option value="privacy1" selected>Private</option>
+                                    <option value="privacy2">Public</option>
+                                    <option value="privacy_list1">Private list 1</option>
+                                    <option value="privacy_list2">Private list 2</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="w100 d-flex">
+                            <div class="w45">
+                                <label class="d-block" for="start_date">START DATE</label>
+                                <input type="datetime-local" id="start_date" name="start_date" placeholder="" required>
+                            </div>
+                            <div class="w45">
+                                <label class="d-block" for="end_date">END DATE</label>
+                                <input type="datetime-local" id="end_date" name="end_date" placeholder="" required>
+                            </div>
+                        </div>
+                        <!-- Checkbox for adventure type -->
+                        <div id="#checkbox-adv" class="checkbox-grid w90">
+                            <label class="adventure-box">
+                                <input type="checkbox" name="adventures[]" value="hiking">
+                                    <div class="box-content">
+                                        <i class="fas fa-person-hiking"></i>
+                                    </div>
+                                    <p>Hiking</p>
+                            </label>
+                            <label class="adventure-box">
+                                <input type="checkbox" name="adventures[]" value="whitewater">
+                                    <div class="box-content">
+                                        <i class="fas fa-campground"></i>
+                                    </div>
+                                    <p>Camping</p>
+                            </label>
+                            <label class="adventure-box">
+                                <input type="checkbox" name="adventures[]" value="whitewater">
+                                    <div class="box-content">
+                                        <img src="../assets/img/icon_ice_axe.png" alt=""></i>
+                                    </div>
+                                    <p>Alpinism</p>
+                            </label>
+                            <label class="adventure-box">
+                                <input type="checkbox" name="adventures[]" value="climbing">
+                                    <div class="box-content">
+                                        <img src="../assets/img/icon_climber.png" alt=""></i>
+                                    </div>
+                                    <p>Climbing</p>
+                            </label>
+                            <label class="adventure-box">
+                                <input type="checkbox" name="adventures[]" value="whitewater">
+                                    <div class="box-content">
+                                        <i class="fas fa-water"></i>
+                                    </div>
+                                    <p>Whitewater</p>
+                            </label>
+                            <label class="adventure-box">
+                                <input type="checkbox" name="adventures[]" value="skiing">
+                                    <div class="box-content">
+                                        <i class="fas fa-person-skiing"></i>
+                                    </div>
+                                    <p>Skiing</p>
+                            </label>
+                            <label class="adventure-box">
+                                <input type="checkbox" name="adventures[]" value="skiing">
+                                    <div class="box-content">
+                                        <img src="../assets/img/icon_cave2.png"></i>
+                                    </div>
+                                    <p>Caving</p>
+                            </label>
+                            <label class="adventure-box">
+                                <input type="checkbox" name="adventures[]" value="whitewater">
+                                    <div class="box-content">
+                                        <i class="fas fa-crosshairs"></i>
+                                    </div>
+                                    <p>Hunting</p>
+                            </label>
+                            <label class="adventure-box">
+                                <input type="checkbox" name="adventures[]" value="skiing">
+                                    <div class="box-content">
+                                        <img src="../assets/img/icon_fishing.svg"></i>
+                                    </div>
+                                    <p>Fishing</p>
+                            </label>
+                            <label class="adventure-box">
+                                <input type="checkbox" name="adventures[]" value="motorbiking">
+                                    <div class="box-content">
+                                        <i class="fas fa-motorcycle"></i>
+                                    </div>
+                                    <p>Off road</p>
+                            </label>
+                            <label class="adventure-box">
+                                <input type="checkbox" name="adventures[]" value="motorbiking">
+                                    <div class="box-content">
+                                        <i class="fas fa-bicycle"></i>
+                                    </div>
+                                    <p>Biking</p>
+                            </label>
+                            <label class="adventure-box">
+                            </label>
+                            <!-- Other Adventure -->
+                            <label class="adventure-box">
+                                <input type="checkbox" id="otherCheckbox" name="adventures[]" value="other">
+                                    <div class="box-content">
+                                        <i class="fas fa-pen"></i>
+                                    </div>
+                                    <p>Other(s)</p>
+                            </label>
+                            <div id="otherInputWrapper">
+                                <input type="text" id="otherText" name="otherText" placeholder="Example1, ex2, ...">
+                            </div>
+                    </div>
+                        
+
+                    </div>
+                    <div class="w40">
+                        <h3 class="pdt-4 pdb-4">FILES</h3>
+
+                        <!-- Champ de glisser-déposer -->
+                        <div class="upload-container">
+                            <label for="file-upload" class="upload-label">
+                                Glissez-déposez vos fichiers ici ou cliquez pour les sélectionner
+                            </label>
+                            <input type="file" id="file-upload" name="files" multiple class="upload-input" />
+                        </div>
+
+                        <!-- Affichage des fichiers uploadés -->
+                        <div class="uploaded-files" id="uploaded-files-container">
+                        <!-- Les fichiers téléchargés seront affichés ici -->
+                        </div>
+
+                        <h3 class="mt-2 mb-2">FEATURES</h3>
+                        
+                        <div class="w100 d-flex">
+                            <div class="flex-start w45">
+                                <span>Safety Alert</span>
+                                <label class="toggle-btn">
+                                    <input type="checkbox" id="toggleButtonSafety" name="statusSafety">
+                                    <div class="slider">
+                                    <div class="ball"></div>
+                                    <span class="btn-text"></span>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="flex-start w45">
+                                <span>Live Track</span>
+                                <label class="toggle-btn">
+                                    <input type="checkbox" id="toggleButtonLive" name="statusLive">
+                                    <div class="slider">
+                                    <div class="ball"></div>
+                                    <span class="btn-text"></span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="w100 d-flex mt-2">
+                            <div class="w45">
+                                <label for="timerAlert">Timer Alert</label>
+                                <!-- Formulaire pour définir la durée -->
+                                <div class="timer-container">
+                                    <input type="number" id="hours" name="hours" placeholder="hrs." min="0">
+                                    <input type="number" id="minutes" name="minutes" placeholder="min." min="0" max="59">
+                                    <input type="number" id="seconds" name="seconds" placeholder="sec." min="0" max="59">
+                                </div>
+                            </div>
+                            <div class="w45">
+                                    <label for="objet">Contact list</label>
+                                    <select class="mt-1" name="objet" id="objet" required>
+                                        <option value="" selected>Default list</option>
+                                        <option value="object1">List 1</option>
+                                        <option value="object1">List 2</option>
+                                        <option value="object2">List 3</option>
+                                    </select>
+                            </div>
+                        </div>
+                        
+
+                        <div class="w100 pdt-4 flex-end">
+                        <button id="submit" class="button-type-4" type="submit">CREATE</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+</main>
+
+{% endblock main %}

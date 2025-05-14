@@ -1,0 +1,10 @@
+{% include 'guest/partials/_header.html.twig' with { 'currentRoute': app.request.attributes.get('_route') } %}
+
+    {% block metatitle %}
+    {% endblock metatitle %}
+
+    {% block main %}
+    {% endblock main %}
+
+      
+{% include 'guest/partials/_footer.html.twig' %}

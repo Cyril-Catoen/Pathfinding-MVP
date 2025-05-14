@@ -1,0 +1,99 @@
+<footer>
+    <section class="container">
+        <div class="flex-between">
+            <a href="{{ path('home') }}" class="logo">
+                <div>
+                    <img src="../assets/img/LogoPathWhite.png" alt="Logo">
+                    <h1>Pathfinding<h1>
+                </div>
+            </a>
+            <form id="language-switcher" method="get">
+                <label for="lang-select" class="visually-hidden">Choose language</label>
+                <select id="lang-select" name="lang">
+                    <option value="/fr/">Français</option>
+                    <option value="/en/">English</option>
+                </select>
+            </form>
+        </div>
+        <div class="d-flex pdt-2 pdb-2">
+            <div>
+                <h2>Features</h2>
+                <nav>
+                    <ul>
+                        <li><a href="{{ path('home') }}#features">Adventure</a></li>
+                        <li><a href="{{ path('home') }}#features">Live Track</a></li>
+                        <li><a href="{{ path('home') }}#features">Safety Alert</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <div>
+                <h2>Community</h2>
+                <nav>
+                    <ul>
+                        <li><a href="{{ path('register') }}">Become a Pathfinder</a></li>
+                        <li><a href="{{ path('contact-form') }}">Be our Partner</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <div>
+                <h2>About us</h2>
+                <nav>
+                    <ul>
+                        <li><a href="{{ path('about') }}#story">A short story</a></li>
+                        <li><a href="{{ path('contact-form') }}">Contact</a></li>
+                        <li><a href="{{ path('about') }}#roadmap">Roadmap</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        <div class="social-links">
+            <h3>Connect with us</h3>
+            <h3>MEDIA</h3>
+            <div class="icons">
+                <a href="https://x.com/yourpage" target="_blank" aria-label="X (Twitter)">
+                <i class="fab fa-x-twitter"></i>
+                </a>
+                <a href="https://youtube.com/yourchannel" target="_blank" aria-label="YouTube">
+                <i class="fab fa-youtube"></i>
+                </a>
+                <a href="https://instagram.com/yourprofile" target="_blank" aria-label="Instagram">
+                <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://tiktok.com/@yourhandle" target="_blank" aria-label="TikTok">
+                <i class="fab fa-tiktok"></i>
+                </a>
+                <a href="https://facebook.com/yourpage" target="_blank" aria-label="Facebook">
+                <i class="fab fa-facebook"></i>
+                </a>
+                <a href="https://linkedin.com/in/yourprofile" target="_blank" aria-label="LinkedIn">
+                <i class="fab fa-linkedin"></i>
+                </a>
+            </div>
+        </div>
+        <div class="footer-separator"></div>
+        <div class="footer-legal">
+            <div class="footer-text">
+                <p class="copyright">© 2025 Pathfinding, LLC</p>
+                <p class="trademark">Pathfinding || Safety & Adventures is a registered trademark of Pathfinding, LLC in Europe as well as certain other jurisdictions.</p>
+            </div>
+            <a href="#home" class="back-to-top" aria-label="Back to top">
+                <i class="fa-solid fa-arrow-up"></i>
+            </a>
+            <a href="#home" class="logo">
+                <div>
+                    <img src="../assets/img/LogoPathWhite.png" alt="Logo">
+                </div>
+            </a>
+        </div>
+
+    </section>
+</footer>
+
+    <script src="../js/main.js" defer></script>
+    <script src="../js/menu.js" defer></script>
+
+    {% block script %}
+    {% endblock script %}
+
+</body>
+</html>

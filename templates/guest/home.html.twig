@@ -1,0 +1,74 @@
+{% extends 'guest/base.html.twig' %}
+
+        {% block metatitle %}
+        <title>Pathfinding - Home</title>
+        {% endblock metatitle %}
+
+{% block main %}
+
+    <main class="index">
+        <section id="features" class="container">
+            <h2 class="mt-4">DISCOVER OUR FEATURES</h2>
+            <div class="flex-evenly">
+                <div class="container-type-1">
+                    <div class="w30">
+                        <img src="../assets/img/Hiking.png" alt=''>
+                        <h4>ADVENTURE</h4>
+                    </div>
+                    <div>
+                        <p>Plan your journey, set your route, upload key documents (maps, PDFs, GPS tracks), and share everything with your trusted contacts.
+                        </p>
+                    </div>
+                </div>
+                <div class="container-type-1">
+                    <div class="w30">
+                        <img src="../assets/img/LiveTrack.jpeg" alt=''>
+                        <h4>LIVE TRACK</h4>
+                    </div>
+                    <div>
+                        <p>Activate Live Track before you head out—your location is recorded even without signal, then synced automatically. Friends and family can follow your journey in real time, step by step.
+                        </p>
+                    </div>
+                </div>
+                <div class="container-type-1">
+                    <div class="w30">
+                        <img src="../assets/img/SafeAlert.jpeg" alt=''>
+                        <h4>SAFETY ALERT</h4>
+                    </div>
+                    <div>
+                        <p>If you're overdue or hit SOS, Safety Alert kicks in. Your location is instantly sent to your emergency contacts via SMS, email, and push notifications. Help gets to you faster.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+        <section class="container">
+            <h2>JOIN THE COMMUNITY</h2>
+            <div class="flex-cl-evenly gap-8">
+                <div class="container-type-2">
+                    <a href="login.controller.php"><div>
+                        <img src="../assets/img/group.jpeg" alt=''>
+                        <span>CREATE YOUR ACCOUNT</span>
+                    </div></a>
+                    <div class="flex-cl-center">
+                        <h5>Join Us — Together, We Are the Pathfinders</h5>
+                        <p>Every adventure you live strengthens the journey for all. Stay safe, share the moment, and keep the spirit alive.
+                        </p>
+                    </div>
+                </div>
+                <div class="container-type-2">
+                    <div class="flex-cl-center">
+                        <h5>We Keep Building — Discover What's Next</h5>
+                        <p>Pathfinding is just getting started. Explore our roadmap to see the features we're unlocking as our community grows.
+                        </p>
+                    </div>
+                    <a href="about.controller.php#roadmap"><div>
+                        <img src="../assets/img/glasses.webp" alt=''>
+                        <span>EXPLORE</span>
+                    </div></a>
+                </div>
+        </section>
+    </main>
+
+{% endblock main %}

@@ -1,0 +1,29 @@
+{% extends 'guest/base.html.twig' %}
+
+        {% block metatitle %}
+        <title>Pathfinding - Login</title>
+        {% endblock metatitle %}
+
+{% block main %}
+
+<main class="login">
+        <section class="container">
+            <form class ="pdt-8 pdb-2" action="submit.php" method="post">
+                <div class="flex-cl-start gap-2">
+                    <div class="w45">
+                        <label for="name">USER E-MAIL</label>
+                        <input type="text" id="username" name="username" placeholder="" required>
+                    </div>
+                    <div class="w45">
+                        <label for="email">PASSWORD</label>
+                        <input type="text" id="password" name="password" placeholder="" required>
+                    </div>  
+                    <div class="w45 pdt-2">
+                        <button class="button-type-1 button-green" id="login" type="submit">LOG IN</button>
+                    </div>
+                </div>
+            </form>
+        </section>
+</main>
+
+{% endblock main %}

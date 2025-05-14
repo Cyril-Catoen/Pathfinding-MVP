@@ -905,7 +905,7 @@ header.header-login section.flex-between {
 
 .header-index {
   height: 100vh;
-  background-image: url(../assets/img/shiretoko1.jpg);
+  background-image: url(../../assets/img/shiretoko1.jpg);
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
@@ -1041,77 +1041,77 @@ header.header-index section:last-of-type a:hover {
   }
 }
 
-.footer-index {
+footer {
   width: 100%;
   min-height: 50vh;
   max-height: 100vh;
   background-color: rgb(46, 125, 50);
 }
 @media (max-width: 768px) {
-  .footer-index .container {
+  footer .container {
     width: 90%;
     display: flex;
     flex-direction: column;
     justify-content: space-around;
   }
 }
-.footer-index section {
+footer section {
   height: 100%;
 }
-.footer-index section a.logo {
+footer section a.logo {
   margin-left: 0;
   width: 25%;
 }
-.footer-index section a.logo div {
+footer section a.logo div {
   padding-top: 1rem;
 }
 @media (max-width: 576px) {
-  .footer-index section a.logo:first-of-type {
+  footer section a.logo:first-of-type {
     display: none;
   }
 }
-.footer-index section a.logo:nth-of-type(2) {
+footer section a.logo:nth-of-type(2) {
   width: auto;
   margin: 0;
 }
 @media (min-width: 577px) {
-  .footer-index section a.logo:nth-of-type(2) {
+  footer section a.logo:nth-of-type(2) {
     display: none;
   }
 }
 @media (max-width: 576px) {
-  .footer-index section div.flex-between {
+  footer section div.flex-between {
     justify-content: flex-end;
     padding: 5vw 5vw 0 0;
   }
 }
-.footer-index section div.d-flex {
+footer section div.d-flex {
   width: 100%;
   height: 30vh;
   gap: 5vw;
 }
 @media (max-width: 576px) {
-  .footer-index section div.d-flex {
+  footer section div.d-flex {
     display: none;
   }
 }
 @media (min-width: 577px) and (max-width: 992px) {
-  .footer-index section div.d-flex {
+  footer section div.d-flex {
     width: 100%;
     justify-content: space-between;
   }
 }
-.footer-index section nav ul {
+footer section nav ul {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   align-items: flex-start;
   gap: 1.5rem;
 }
-.footer-index section nav ul li:first-of-type {
+footer section nav ul li:first-of-type {
   margin-top: 2rem;
 }
-.footer-index section nav ul li {
+footer section nav ul li {
   line-height: 100%;
 }
 

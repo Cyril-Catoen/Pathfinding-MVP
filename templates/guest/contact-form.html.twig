@@ -1,0 +1,64 @@
+{% extends 'guest/base.html.twig' %}
+
+        {% block metatitle %}
+        <title>Pathfinding - Contact form</title>
+        {% endblock metatitle %}
+
+{% block main %}
+
+<main class="contact-form">
+        <section class="container">
+            <h2 class="pdt-8 pdb-2">CONTACT FORM</h2>
+            <form action="submit.php" method="post">
+                <div class="d-flex gap-4">
+                    <div class="w25">
+                        <label for="name">NAME</label>
+                        <input type="text" id="name" name="name" placeholder="" required>
+                    </div>
+                    <div class="w25">
+                        <label for="email">E-MAIL <span>ADRESS</span></label>
+                        <input type="text" id="email" name="email" placeholder="" required>
+                    </div>  
+                </div>
+
+                <div class="d-flex gap-4">
+                    <div class="w25">
+                        <label for="surname">SURNAME</label>
+                        <input type="text" id="surname" name="surname" placeholder="" required>
+                    </div>
+                    <div class="w25">
+                        <label for="phone">PHONE <span>NUMBER</span></label>
+                        <input type="text" id="phone" name="phone" placeholder="starting by +" required>
+                    </div>
+                </div>
+
+                <div class="w80">
+                    <label for="objet">PURPOSE</label>
+                    <select name="objet" id="objet" required>
+                        <option value="" disabled selected>Select the purpose of contact</option>
+                        <option value="object1">Informations</option>
+                        <option value="object1">Report an issue</option>
+                        <option value="object2">Becoming partners</option>
+                        <option value="object3">Others</option>
+                    </select>
+                </div>
+
+                <div class="w80">
+                    <label for="message">MESSAGE</label>
+                    <textarea id="message" name="message" placeholder="Write your message here..." rows="5" required></textarea>
+                </div>
+
+                <div class="w80">
+                    <div class="flex-between">
+                        <label for="conditionsG">Prove that your are human by checking the box</label>
+                        <input type="checkbox" id="conditionsG" name="conditionsG" required>
+                    </div>
+                    <div class="pdt-2">
+                        <button id="submit" class="button-type-4" type="submit">Submit</button>
+                    </div>
+                </div>
+        </form>
+        </section>
+</main>
+
+{% endblock main %}
