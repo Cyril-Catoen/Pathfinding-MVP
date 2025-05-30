@@ -26,4 +26,23 @@ form{
     width: 100%;
     border-radius: 25px;
     }
+
+    label.field-error {
+  color: #D84315;
+    }
+
+    .field-error {
+    border: 2px solid #D84315;
+    background-color: #ffe6e6;
+    transition: all 0.3s ease;
+    }
+
+    .error-message {
+    color: #D84315;
+    font-size: 0.9rem;
+    margin-top: 0.3rem;
+    margin-left: 1rem;
 }
+}
+
+

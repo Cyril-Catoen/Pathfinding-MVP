@@ -1,0 +1,133 @@
+{% extends 'user/base.html.twig' %}
+
+{% block metatitle %}
+    <title>Pathfinder - Contact editor</title>
+{% endblock metatitle %}
+
+{% block main %}
+<main class="update-contact">
+    <section class="container">
+        <div class="flex-start gap-2 pdt-8 pdb-2">
+            <a class="arrow-return-button" href="{{ path('contacts-manager')}}">
+                <i class="fas fa-arrow-left"></i>
+            </a> 
+            <h2>EDIT CONTACT INFORMATIONS</h2>
+        </div>
+        
+        <div class="container-type-3 shadow-black">
+            <form action="{{ path('update-contact', { id: safetyContact.id }) }}" method="post" enctype="multipart/form-data">
+                <div class="container-90 flex-cl-evenly gap-4">   
+                    <div class="flex-between-top wrap gap-2" id="updateContact">
+                        <div class="w40 flex-cl-start gap-2">
+                            <div class="w90">
+                                <label for="name">NAME</label>
+                                <input type="text" id="name" name="name" value="{{ safetyContact.firstName }}" required>
+                            </div>
+
+                            <div class="w90">
+                                <label for="surname">SURNAME</label>
+                                <input type="text" id="surname" name="surname" value="{{ safetyContact.lastName }}" required>
+                            </div>
+
+                            <div class="w90">
+                                <label for="email">E-MAIL <span>ADDRESS</span></label>
+                                <input type="email" id="email" name="email" value="{{ safetyContact.email }}" required>
+                            </div>
+
+                            <div class="w90">
+                                <label for="phone">PHONE <span>NUMBER</span></label>
+                                <input type="text" id="phone" name="phone" value="{{ safetyContact.phoneNumber }}" placeholder="starting with +" pattern="/^\+[\d\s\-()]{10,}$/" inputmode="tel" required>
+                            </div>
+                            <div class="w90">
+                                <label for="country">COUNTRY</label>
+                                <select class="mt-1" name="country" id="country">
+                                    <option value="">Select a country</option>
+                                    {% for code, name in countries %}
+                                        <option value="{{ code }}" {% if code == safetyContact.country %}selected{% endif %}>{{ name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="w40 flex-cl-start gap-2">
+                            <div class="w90">
+                                <label for="isFavorite">Favorite contact</label>
+                                <select name="isFavorite" id="isFavorite" required>
+                                    <option value="1" {% if safetyContact.isFavorite %}selected{% endif %}>Yes</option>
+                                    <option value="0" {% if not safetyContact.isFavorite %}selected{% endif %}>No</option>
+                                </select>
+                            </div>
+                            <div class="w90">
+                                <p class="bold pdl-2">Contact lists</p>
+                                <div class="checkbox-group mt-1">
+                                    {% for list in contactLists %}
+                                    <div class="flex-between">
+                                        <label class="checkbox-inline">
+                                            {{ list.isDefault ? 'Default List' : list.name }}
+                                        </label>
+                                        <input type="checkbox" name="contactLists[]" value="{{ list.id }}"
+                                        {% if list in safetyContact.contactLists %}checked{% endif %}>
+
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <div class="flex-cl-start gap-2">
+                            <p>PICTURE</p>
+                            <div class="adventure-card">
+                                {% set pictureUrl = asset('uploads/contact-picture/' ~ safetyContact.picturePath)|e('css') %}
+                                <label for="picture-contact" id="uploadLabel" class="upload-label"
+                                    {% if safetyContact.picturePath %}
+                                        style="background-image: url('{{ pictureUrl }}');"
+                                    {% endif %}>
+                                    {% if not safetyContact.picturePath %}
+                                        Click here to add a profile picture
+                                    {% endif %}
+                                </label>
+                                <input type="file" id="picture-contact" name="picture-contact" class="upload-input" accept="image/*" />
+                            </div>
+                        </div>
+                    </div>                
+
+                    <div class="flex-end pdt-2">
+                        <button id="submitBtn" class="button-type-4" type="submit">Update</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+</main>
+{% endblock main %}
+
+{% block script %}
+<script src="{{ asset('js/validatorForm.js') }}" defer></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const fileInput = document.getElementById('picture-contact');
+    const label = document.getElementById('uploadLabel');
+
+    fileInput.addEventListener('change', function () {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                label.style.backgroundImage = `url('${e.target.result}')`;
+                label.textContent = ""; // Enlève le texte une fois l'image chargée
+            };
+
+            reader.readAsDataURL(file);
+        } else {
+            label.style.backgroundImage = 'none';
+            label.textContent = "Click here to add a profile picture";
+        }
+    });
+});
+</script>
+{% endblock script %}
+

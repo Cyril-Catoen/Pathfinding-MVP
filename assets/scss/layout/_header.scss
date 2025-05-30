@@ -37,7 +37,7 @@ header {
       }
     }
 
-    a:hover {
+    a:hover, h3:hover {
       color: black;
     }
   }
@@ -53,7 +53,7 @@ header.header-login {
 // Header pour la page d'accueil / Index
 .header-index {
   height: 100vh;
-  background-image: url(../../assets/img/shiretoko1.jpg);
+  background-image: url('../assets/img/shiretoko1.jpg');
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;

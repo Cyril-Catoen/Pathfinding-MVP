@@ -697,6 +697,7 @@ body {
 
 main {
   background-color: rgb(246, 237, 229);
+  min-height: 50vh;
 }
 
 img {
@@ -755,11 +756,25 @@ html {
   align-items: center;
 }
 
+.flex-evenly-top {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: flex-start;
+}
+
 .flex-start, div.container-dash-2 li {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
+}
+
+.flex-start-top {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
 }
 
 .flex-end {
@@ -783,6 +798,13 @@ html {
   align-items: center;
 }
 
+.flex-cl-between-start {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
 .flex-cl-around {
   display: flex;
   flex-direction: column;
@@ -795,6 +817,13 @@ html {
   flex-direction: column;
   justify-content: center;
   align-items: space-evenly;
+}
+
+.flex-cl-evenly-end {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: flex-end;
 }
 
 .flex-cl-start {
@@ -851,7 +880,7 @@ label, input, button, select, textarea {
 }
 
 p, span {
-  color: black;
+  color: rgb(38, 50, 56);
 }
 
 .bold {
@@ -895,7 +924,7 @@ header section a.login {
 header section a.login:hover {
   border: 2px solid black;
 }
-header section a:hover {
+header section a:hover, header section h3:hover {
   color: black;
 }
 
@@ -905,7 +934,7 @@ header.header-login section.flex-between {
 
 .header-index {
   height: 100vh;
-  background-image: url(../../assets/img/shiretoko1.jpg);
+  background-image: url("../assets/img/shiretoko1.jpg");
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
@@ -1232,7 +1261,7 @@ footer section nav ul li {
   background-color: rgb(255, 255, 255);
 }
 
-.container-dash-2, .container-dash-1, .container-type-4, .container-type-3, .container-type-1 {
+.container-dash-2, .container-dash-1, .container-type-5, .container-type-4, .container-type-3, .container-type-1 {
   border-radius: 25px;
   background-color: rgb(255, 255, 255);
   box-shadow: 0 0 24px rgba(0, 0, 0, 0.5);
@@ -1327,6 +1356,13 @@ footer section nav ul li {
   padding: 0rem 1rem 1.5rem 1rem;
 }
 
+.container-type-5 {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 80vh;
+}
+
 .container-dash-1 {
   height: 50vh;
   width: 55vw;
@@ -1358,8 +1394,8 @@ footer section nav ul li {
 
 .adventure-card, .adventure-card-xl {
   flex: 1 1 0;
-  max-width: 25vh;
-  height: 25vh;
+  width: 25vw;
+  height: 25vw;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -1373,6 +1409,12 @@ footer section nav ul li {
 }
 .adventure-card .adventure-info, .adventure-card-xl .adventure-info {
   display: none;
+}
+@media (min-width: 992px) {
+  .adventure-card, .adventure-card-xl {
+    max-width: 25vh;
+    height: 25vh;
+  }
 }
 
 .adventure-card-xl {
@@ -1462,7 +1504,6 @@ footer section nav ul li {
   flex-direction: column;
   justify-content: space-between;
   align-items: flex-start;
-  flex-wrap: wrap;
   height: 100%;
   width: 50%;
   gap: 0.5rem;
@@ -1492,6 +1533,34 @@ footer section nav ul li {
 .timer-container input {
   padding: 0.5rem;
   min-width: 5rem;
+}
+
+#adventure-popup {
+  display: none;
+  position: absolute;
+  background: #fff;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  z-index: 1000;
+  border-radius: 10px;
+  margin-top: 0.5rem;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+#adventure-popup.visible {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.adventure-selector {
+  position: relative;
+}
+.adventure-selector label {
+  display: block;
+}
+
+#adventure-input {
+  cursor: pointer;
 }
 
 .button-type-1 {
@@ -1572,6 +1641,36 @@ footer section nav ul li {
   transition: all 0.2s ease;
 }
 
+.arrow-return-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  width: 8vh;
+  height: 8vh;
+  margin: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  -o-object-fit: cover;
+     object-fit: cover;
+  -o-object-position: top;
+     object-position: top;
+  background-color: rgb(255, 255, 255);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+.arrow-return-button i {
+  font-size: 5vh;
+  color: rgb(46, 125, 50);
+}
+.arrow-return-button:hover i {
+  transform: scale(1.1);
+  transition: transform 0.2s ease;
+  color: rgb(30, 136, 229);
+}
+.arrow-return-button:hover p {
+  color: rgb(30, 136, 229);
+}
+
 .shadow-black {
   box-shadow: 0 0 24px rgba(0, 0, 0, 0.5);
 }
@@ -1585,7 +1684,7 @@ footer section nav ul li {
 }
 
 .shadow-red {
-  box-shadow: 0 0 24px rgba(255, 0, 0, 0.5);
+  box-shadow: 0 0 24px rgba(216, 67, 21, 0.5);
 }
 
 .button-blue {
@@ -1599,8 +1698,8 @@ footer section nav ul li {
 }
 
 .button-red {
-  border: 2px solid rgba(255, 0, 0, 0.8);
-  background-color: rgba(255, 0, 0, 0.8);
+  border: 2px solid rgba(216, 67, 21, 0.8);
+  background-color: rgba(216, 67, 21, 0.8);
 }
 
 .button-white {
@@ -1675,22 +1774,15 @@ footer section nav ul li {
   transform: translateX(-2vh) translateY(-50%); /* pour aller à gauche */
 }
 
-.checkbox-grid {
-  margin-top: 2rem;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(6vh, 1fr));
-  gap: 1rem;
-}
-
 .box-content {
   background: #f5f5f5;
   border: 2px solid transparent;
   border-radius: 50%;
-  padding: 1rem;
+  padding: clamp(0.5rem, 1vw, 1rem);
   text-align: center;
   transition: all 0.3s ease;
-  height: 6vh;
-  width: 6vh;
+  height: 7vw;
+  width: 7vw;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1699,12 +1791,18 @@ footer section nav ul li {
   cursor: pointer;
 }
 .box-content i {
-  font-size: 2rem;
+  font-size: clamp(0.75rem, 2.5vw, 2rem);
   color: #555;
 }
 .box-content img {
   width: 150%;
   height: auto;
+}
+@media (min-width: 992px) {
+  .box-content {
+    height: 8vh;
+    width: 8vh;
+  }
 }
 
 input[type=checkbox] {
@@ -1718,7 +1816,7 @@ label.adventure-box {
   justify-content: center;
   align-items: center;
 }
-label.adventure-box p {
+label.adventure-box p, label.adventure-box span {
   width: 100%;
   font-size: 1rem;
   text-align: center;
@@ -1734,6 +1832,109 @@ label.adventure-box input[type=checkbox]:checked + .box-content {
 /* Glow subtil au hover */
 label:hover .box-content {
   box-shadow: 0 0 8px rgba(76, 175, 80, 0.5); /* Vert un peu diffus */
+}
+
+.tab-header {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+  border-radius: 25px 25px 0 0;
+  overflow: hidden;
+  border-bottom: 2px solid rgb(46, 125, 50);
+  position: relative;
+}
+.tab-header .tab-button {
+  width: 25%;
+  text-align: center;
+  padding: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  font-size: clamp(1rem, 3vw, 1.75rem);
+}
+.tab-header .tab-button:first-child {
+  border-radius: 25px 0px 0 0;
+}
+.tab-header .active-tab {
+  background-color: rgb(46, 125, 50);
+  font-weight: bold;
+  color: white;
+}
+
+.tab-wrapper {
+  width: 100%;
+}
+
+.tab-content {
+  background-color: rgb(255, 255, 255);
+  padding: 1rem 2rem;
+  border-radius: 0 0 25px 25px;
+}
+.tab-content.d-none {
+  display: none;
+}
+.tab-content form {
+  min-height: 60vh;
+}
+
+.contacts-table, .adventures-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.contacts-table th, .contacts-table td, .adventures-table th, .adventures-table td {
+  border: 1px solid #ccc;
+  padding: 0.75rem;
+  text-align: center;
+}
+.contacts-table th i, .contacts-table td i, .adventures-table th i, .adventures-table td i {
+  color: rgb(46, 125, 50);
+}
+@media (max-width: 576px) {
+  .contacts-table th:nth-of-type(4), .contacts-table td:nth-of-type(4), .adventures-table th:nth-of-type(4), .adventures-table td:nth-of-type(4) {
+    display: none;
+  }
+}
+@media (max-width: 768px) {
+  .contacts-table th:nth-of-type(3), .contacts-table td:nth-of-type(3), .adventures-table th:nth-of-type(3), .adventures-table td:nth-of-type(3) {
+    display: none;
+  }
+}
+.contacts-table .checkbox-item, .adventures-table .checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.contact-toolbar {
+  gap: 1rem;
+  margin: 1rem 0 2rem 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+.contact-toolbar input {
+  border: 1px solid #aaa;
+  flex: 1;
+}
+.contact-toolbar .sort-buttons button {
+  margin-left: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid #aaa;
+  border-radius: 8px;
+  background-color: #f2f2f2;
+}
+.contact-toolbar .sort-buttons button:hover {
+  background-color: #ddd;
+}
+
+.table-wrapper {
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
+.red-alert {
+  color: rgb(216, 67, 21); /* ← remplace par ta couleur rouge Pathfinding si différente */
+  font-weight: bold;
 }
 
 .dropdown {
@@ -1780,6 +1981,22 @@ label:hover .box-content {
   transform: translateY(0);
   pointer-events: auto;
 }
+.dropdown .dropdown-sub {
+  position: relative;
+}
+.dropdown .dropdown-sub .dropdown-menu--left {
+  top: 0;
+  left: -100%;
+  transform: translateX(-10px);
+  transition: opacity 0.5s ease, transform 0.2s ease;
+  opacity: 0;
+  pointer-events: none;
+}
+.dropdown .dropdown-sub:hover .dropdown-menu--left {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
 
 form label {
   padding: 1rem 0 0.5rem 1rem;
@@ -1801,6 +2018,20 @@ form select, form textarea {
   height: clamp(2rem, 5vw, 3rem);
   width: 100%;
   border-radius: 25px;
+}
+form label.field-error {
+  color: #D84315;
+}
+form .field-error {
+  border: 2px solid #D84315;
+  background-color: #ffe6e6;
+  transition: all 0.3s ease;
+}
+form .error-message {
+  color: #D84315;
+  font-size: 0.9rem;
+  margin-top: 0.3rem;
+  margin-left: 1rem;
 }
 
 #language-switcher select {
@@ -1906,6 +2137,36 @@ header .overlay {
   z-index: 999;
 }
 
+.search-all-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.search-all-wrapper input {
+  padding-left: 1rem;
+  height: clamp(2rem, 5vw, 3rem);
+  width: 100%;
+  border: 1px solid grey;
+  border-radius: 25px;
+}
+
+#search-all-contacts, #search-safety-contacts {
+  padding-right: 24px; /* espace pour la croix */
+}
+
+.clear-search {
+  position: absolute;
+  right: 1rem;
+  font-size: 2rem;
+  color: #888;
+  cursor: pointer;
+  display: none;
+}
+
+.clear-search:hover {
+  color: #333;
+}
+
 .line-x-separator {
   height: 2px;
   background-color: black;
@@ -1918,6 +2179,56 @@ header .overlay {
   background-color: white;
   margin: 2rem 0 0.5rem 0;
   border-radius: 4px;
+}
+
+.duration-wrapper {
+  position: relative;
+  max-width: 300px;
+}
+
+.duration-display {
+  width: 100%;
+  cursor: pointer;
+}
+
+.duration-picker {
+  display: none;
+  position: absolute;
+  top: 110%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  max-height: 200px;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.picker-column {
+  flex: 1;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  -webkit-overflow-scrolling: touch;
+  height: 200px;
+}
+
+.picker-option {
+  text-align: center;
+  padding: 0.75rem 0;
+  scroll-snap-align: center;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.picker-option:hover {
+  background: #f0f0f0;
+}
+
+.divider {
+  width: 1px;
+  background: #ccc;
 }
 
 main.index h2 {
@@ -2276,51 +2587,74 @@ main.login h3 {
   line-height: 4vh;
   color: black;
 }
-main.login section form {
-  margin: 0 auto 10vh;
+main.login section.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
-main.login section div.w45 {
+main.login section.container #register {
+  margin: 1rem 0 10vh 0;
+}
+main.login section.container a {
+  color: rgb(30, 136, 229);
+}
+main.login section.container div.w100 {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
 }
-main.login section form {
-  width: 70%;
+main.login section.container form {
+  width: 80%;
+  margin-top: 10vh;
+  justify-content: center;
+  align-items: center;
 }
-main.login section form button {
-  width: 35%;
+main.login section.container form button {
+  width: 45%;
 }
-@media (max-width: 768px) {
-  main.login section form {
+@media (max-width: 576px) {
+  main.login section.container form {
     width: 95%;
+  }
+  main.login section.container form .w50 {
+    width: 90%;
+  }
+}
+@media (min-width: 577px) and (max-width: 768px) {
+  main.login section.container form {
+    width: 95%;
+  }
+  main.login section.container form .w50 {
+    width: 70%;
   }
 }
 @media (min-width: 769px) and (max-width: 1200px) {
-  main.login section form {
+  main.login section.container form {
     width: 80%;
   }
 }
 @media (min-width: 1201px) and (max-width: 1400px) {
-  main.login section form {
+  main.login section.container form {
     width: 75%;
   }
 }
-main.login section div.flex-center, main.login section div.flex-cl-start {
+main.login section.container div.flex-center, main.login section.container div.flex-cl-start {
   flex-wrap: wrap;
 }
 @media (max-width: 576px) {
-  main.login section div.flex-center, main.login section div.flex-cl-start {
+  main.login section.container div.flex-center, main.login section.container div.flex-cl-start {
     gap: 1rem;
   }
-  main.login section div.flex-center div.w45, main.login section div.flex-cl-start div.w45 {
+  main.login section.container div.flex-center div.w100, main.login section.container div.flex-cl-start div.w100 {
     width: 100%;
   }
 }
-main.login section label {
+main.login section.container label {
   padding: 1rem 0 0.5rem 1rem;
 }
-main.login section input {
+main.login section.container input {
   font-size: 1.325rem;
   padding-left: 1rem;
   height: 2.65rem;
@@ -2328,7 +2662,83 @@ main.login section input {
   border: 1px solid grey;
   border-radius: 25px;
 }
-main.login section div div.w45.pdt-2 {
+main.login section div div.w100.pdt-2 {
+  display: flex;
+  align-items: flex-end;
+}
+
+main.register h3 {
+  line-height: 4vh;
+  color: black;
+}
+main.register section.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+main.register section.container div.w100 {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+main.register section.container form {
+  width: 80%;
+  margin: 10vh 0 10vh 0;
+  justify-content: center;
+  align-items: center;
+}
+main.register section.container form button {
+  width: 45%;
+}
+@media (max-width: 576px) {
+  main.register section.container form {
+    width: 95%;
+  }
+  main.register section.container form label {
+    padding: 1rem 0 0.5rem 0.5rem;
+    font-size: clamp(0.725rem, 3vw, 1.5rem);
+  }
+  main.register section.container form input {
+    padding-left: 0.5rem;
+    font-size: clamp(0.725rem, 2.5vw, 1.5rem);
+    height: clamp(1.5rem, 5vw, 3rem);
+  }
+  main.register section.container form .w50 {
+    width: 90%;
+  }
+}
+@media (min-width: 577px) and (max-width: 768px) {
+  main.register section.container form {
+    width: 95%;
+  }
+  main.register section.container form .w50 {
+    width: 70%;
+  }
+}
+@media (min-width: 769px) and (max-width: 1200px) {
+  main.register section.container form {
+    width: 80%;
+  }
+}
+@media (min-width: 1201px) and (max-width: 1400px) {
+  main.register section.container form {
+    width: 75%;
+  }
+}
+main.register section.container div.flex-center, main.register section.container div.flex-cl-start {
+  flex-wrap: wrap;
+}
+@media (max-width: 576px) {
+  main.register section.container div.flex-center, main.register section.container div.flex-cl-start {
+    gap: 1rem;
+  }
+  main.register section.container div.flex-center div.w100, main.register section.container div.flex-cl-start div.w100 {
+    width: 100%;
+  }
+}
+main.register section div div.w100.pdt-2 {
   display: flex;
   align-items: flex-end;
 }
@@ -2389,86 +2799,6 @@ a.manage-btn:hover p {
   color: rgb(30, 136, 229);
 }
 
-#newAdv h2 {
-  margin-left: 2rem;
-  margin-bottom: 1.5rem;
-}
-#newAdv h3 {
-  font-size: 2rem;
-  line-height: 3vh;
-  color: black;
-}
-#newAdv form {
-  display: flex;
-  align-items: top;
-  justify-content: space-evenly;
-}
-#newAdv .button-type-4 {
-  border: 2px solid rgb(46, 125, 50);
-  background-color: rgba(46, 125, 50, 0.8);
-  box-shadow: 0 0 24px rgba(46, 125, 50, 0.5);
-  transition: scale 0.1s ease-out;
-}
-#newAdv .button-type-4:hover {
-  border: 2px solid rgb(30, 136, 229);
-  background-color: rgba(30, 136, 229, 0.8);
-  box-shadow: 0 0 24px rgba(30, 136, 229, 0.5);
-  scale: 1.1;
-  transition: scale 0.2s ease-in;
-}
-#newAdv div.w25, #newAdv div.w80 {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-}
-#newAdv div.w100 label {
-  font-size: 1.5rem;
-  padding: 1rem 0 0.5rem 1rem;
-}
-#newAdv div.w100.d-flex div.w45 label, #newAdv div.w100.d-flex div.w45 span {
-  font-size: 1.325rem;
-  padding: 0.5rem 0 0.5rem 1rem;
-}
-#newAdv div.w100.d-flex {
-  gap: 10%;
-}
-#newAdv select, #newAdv textarea {
-  font-size: 1.325rem;
-  padding-left: 1rem;
-  height: 2.65rem;
-  width: 100%;
-  border-radius: 25px;
-}
-#newAdv textarea {
-  height: 30vh;
-  padding-top: 1rem;
-}
-
-#adventureInputWrapper {
-  margin-top: 1rem;
-}
-
-#otherInputWrapper {
-  display: flex;
-  align-items: center;
-  width: 300%;
-  line-height: 1.325rem;
-}
-
-#otherInputWrapper input[type=text] {
-  width: 100%;
-  padding: 0.5rem;
-  border: 2px solid #ccc;
-  border-radius: 10px;
-  margin-top: 0.5rem;
-}
-
-div.w50.pdt-2 {
-  display: flex;
-  justify-content: flex-end;
-}
-
 main.adv-main {
   width: 100%;
 }
@@ -2480,26 +2810,6 @@ main.adv-main h2, main.adv-main h3, main.adv-main h4 {
 main.adv-main h4 {
   font-size: 1.325rem;
   padding: 1rem 0 0.5rem 1rem;
-}
-main.adv-main .container-circle-2 {
-  background-color: rgb(255, 255, 255);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: row;
-}
-main.adv-main .container-circle-2 i {
-  font-size: 5vh;
-  color: rgb(46, 125, 50);
-}
-main.adv-main .container-circle-2:hover i {
-  transform: scale(1.1);
-  transition: transform 0.2s ease;
-  color: rgb(30, 136, 229);
-}
-main.adv-main .container-circle-2:hover p {
-  color: rgb(30, 136, 229);
 }
 main.adv-main .button-type-3 {
   color: black;
@@ -2544,57 +2854,384 @@ main.adv-main label {
   margin-bottom: 1.5rem;
 }
 
-main.contact-manager-main h2, main.contact-manager-main h3 {
+main.adventures-manager h2, main.adventures-manager h3 {
   color: black;
 }
-main.contact-manager-main h2, main.contact-manager-main h3, main.contact-manager-main p {
+main.adventures-manager h2, main.adventures-manager h3, main.adventures-manager p {
   padding-left: 1rem;
 }
-main.contact-manager-main h3 {
-  margin-bottom: 0.5rem;
-}
-main.contact-manager-main .container-circle-2 {
-  background-color: rgb(255, 255, 255);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: row;
-}
-main.contact-manager-main .container-circle-2 i {
-  font-size: 5vh;
-  color: rgb(46, 125, 50);
-}
-main.contact-manager-main .container-circle-2:hover i {
-  transform: scale(1.1);
-  transition: transform 0.2s ease;
-  color: rgb(30, 136, 229);
-}
-main.contact-manager-main .container-circle-2:hover p {
-  color: rgb(30, 136, 229);
-}
-main.contact-manager-main .container-type-3 {
-  height: 75vh;
-  padding-top: 5vh;
+main.adventures-manager .container-type-5 {
   margin-bottom: 10vh;
 }
-main.contact-manager-main .checkbox-grid {
-  grid-template-columns: repeat(auto-fill, minmax(12vh, 1fr));
-}
-main.contact-manager-main .button-type-4 {
+main.adventures-manager .button-type-4 {
   border: 2px solid rgb(46, 125, 50);
   background-color: rgba(46, 125, 50, 0.8);
   box-shadow: 0 0 24px rgba(46, 125, 50, 0.5);
   transition: scale 0.1s ease-out;
 }
-main.contact-manager-main .button-type-4:hover {
+main.adventures-manager .button-type-4:hover {
   border: 2px solid rgb(30, 136, 229);
   background-color: rgba(30, 136, 229, 0.8);
   box-shadow: 0 0 24px rgba(30, 136, 229, 0.5);
   scale: 1.1;
   transition: scale 0.2s ease-in;
 }
-main.contact-manager-main .upload-label {
+main.adventures-manager .upload-label {
   width: 100%;
   height: 100%;
+}
+main.adventures-manager input[type=checkbox] {
+  display: flex;
+}
+main.adventures-manager .adventures-table td:last-of-type i {
+  color: rgb(216, 67, 21);
+  font-size: 2rem;
+}
+
+main.newAdv h2, main.newAdv h3 {
+  color: black;
+}
+main.newAdv h3 {
+  font-size: 2rem;
+  line-height: 3vh;
+}
+main.newAdv form {
+  display: flex;
+  align-items: top;
+  justify-content: space-evenly;
+}
+@media (max-width: 576px) {
+  main.newAdv form {
+    flex-direction: column;
+  }
+  main.newAdv form div.w40, main.newAdv form div.w45, main.newAdv form div.w70 {
+    width: 90%;
+  }
+  main.newAdv form div.w40 {
+    margin: 0 auto;
+  }
+  main.newAdv form div.w100.d-flex.mt-2 {
+    flex-direction: column;
+  }
+}
+main.newAdv .button-type-4 {
+  border: 2px solid rgb(46, 125, 50);
+  background-color: rgba(46, 125, 50, 0.8);
+  box-shadow: 0 0 24px rgba(46, 125, 50, 0.5);
+  transition: scale 0.1s ease-out;
+}
+main.newAdv .button-type-4:hover {
+  border: 2px solid rgb(30, 136, 229);
+  background-color: rgba(30, 136, 229, 0.8);
+  box-shadow: 0 0 24px rgba(30, 136, 229, 0.5);
+  scale: 1.1;
+  transition: scale 0.2s ease-in;
+}
+main.newAdv div.w100.d-flex {
+  gap: 10%;
+}
+
+main.contacts-manager h2, main.contacts-manager h3 {
+  color: black;
+}
+main.contacts-manager h2, main.contacts-manager h3, main.contacts-manager p {
+  padding-left: 1rem;
+}
+main.contacts-manager .container-type-5 {
+  margin-bottom: 10vh;
+}
+main.contacts-manager .button-type-4 {
+  border: 2px solid rgb(46, 125, 50);
+  background-color: rgba(46, 125, 50, 0.8);
+  box-shadow: 0 0 24px rgba(46, 125, 50, 0.5);
+  transition: scale 0.1s ease-out;
+}
+main.contacts-manager .button-type-4:hover {
+  border: 2px solid rgb(30, 136, 229);
+  background-color: rgba(30, 136, 229, 0.8);
+  box-shadow: 0 0 24px rgba(30, 136, 229, 0.5);
+  scale: 1.1;
+  transition: scale 0.2s ease-in;
+}
+main.contacts-manager .upload-label {
+  width: 100%;
+  height: 100%;
+}
+main.contacts-manager input[type=checkbox] {
+  display: flex;
+}
+main.contacts-manager .contacts-table td:last-of-type i {
+  color: rgb(216, 67, 21);
+  font-size: 2rem;
+}
+
+main.create-contact h2, main.create-contact h3 {
+  color: black;
+}
+main.create-contact h2, main.create-contact h3 {
+  padding-left: 1rem;
+}
+main.create-contact h3 {
+  margin-bottom: 0.5rem;
+}
+main.create-contact form {
+  display: flex;
+  flex-direction: column;
+  padding: 0 2vw 0 2vw;
+}
+main.create-contact label, main.create-contact span {
+  font-size: clamp(1rem, 2vw, 1.5rem);
+}
+@media (max-width: 992px) {
+  main.create-contact span {
+    display: none;
+  }
+}
+main.create-contact .container-type-3 {
+  min-height: 60vh;
+  padding: 5vh 0vh 5vh 0;
+  margin-bottom: 10vh;
+}
+main.create-contact .adventure-card {
+  flex: none;
+}
+main.create-contact .checkbox-grid {
+  margin-top: 0;
+  grid-template-columns: repeat(auto-fill, minmax(clamp(2rem, 10vw, 6rem), 1fr));
+}
+main.create-contact .checkbox-grid span {
+  font-size: 1rem;
+}
+@media (max-width: 576px) {
+  main.create-contact .checkbox-grid {
+    grid-template-columns: repeat(auto-fill, minmax(clamp(6rem, 25vw, 8rem), 1fr));
+  }
+  main.create-contact .checkbox-grid .adventure-box {
+    flex-direction: row-reverse;
+  }
+}
+main.create-contact .button-type-4 {
+  width: 30%;
+  border: 2px solid rgb(46, 125, 50);
+  background-color: rgba(46, 125, 50, 0.8);
+  box-shadow: 0 0 24px rgba(46, 125, 50, 0.5);
+  transition: scale 0.1s ease-out;
+}
+main.create-contact .button-type-4:hover {
+  border: 2px solid rgb(30, 136, 229);
+  background-color: rgba(30, 136, 229, 0.8);
+  box-shadow: 0 0 24px rgba(30, 136, 229, 0.5);
+  scale: 1.1;
+  transition: scale 0.2s ease-in;
+}
+main.create-contact .upload-label {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  background-color: #f0f0f0;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #555;
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+main.create-contact .upload-label:hover {
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+}
+main.create-contact .upload-label::after {
+  content: "Click to change picture";
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.4);
+  padding: 4px 8px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+main.create-contact .upload-label:hover::after {
+  opacity: 1;
+}
+main.create-contact .upload-input {
+  display: none;
+}
+main.create-contact #Majority input[type=checkbox] {
+  display: block;
+}
+
+@media (max-width: 576px) {
+  #createContact div.w40 {
+    width: 70%;
+  }
+  #createContact .adventure-card {
+    max-width: 20vh;
+    height: 20vh;
+  }
+}
+@media (min-width: 577px) and (max-width: 992px) {
+  #createContact div.w40 {
+    width: 45%;
+  }
+}
+@media (min-width: 993px) and (max-width: 1200px) {
+  #createContact div.w40 {
+    width: 40%;
+  }
+}
+@media (min-width: 1201px) {
+  #createContact div.w40 {
+    width: 35%;
+  }
+}
+
+main.update-contact h2, main.update-contact h3 {
+  color: black;
+}
+main.update-contact h2, main.update-contact h3 {
+  padding-left: 1rem;
+}
+main.update-contact h3 {
+  margin-bottom: 0.5rem;
+}
+main.update-contact form {
+  display: flex;
+  flex-direction: column;
+  padding: 0 2vw 0 2vw;
+}
+main.update-contact label, main.update-contact span {
+  font-size: clamp(1rem, 2vw, 1.5rem);
+}
+@media (max-width: 992px) {
+  main.update-contact span {
+    display: none;
+  }
+}
+main.update-contact .container-type-3 {
+  min-height: 60vh;
+  padding: 5vh 0vh 5vh 0;
+  margin-bottom: 10vh;
+}
+main.update-contact .adventure-card {
+  flex: none;
+}
+main.update-contact .button-type-4 {
+  width: 20%;
+  border: 2px solid rgb(46, 125, 50);
+  background-color: rgba(46, 125, 50, 0.8);
+  box-shadow: 0 0 24px rgba(46, 125, 50, 0.5);
+  transition: scale 0.1s ease-out;
+}
+main.update-contact .button-type-4:hover {
+  border: 2px solid rgb(30, 136, 229);
+  background-color: rgba(30, 136, 229, 0.8);
+  box-shadow: 0 0 24px rgba(30, 136, 229, 0.5);
+  scale: 1.1;
+  transition: scale 0.2s ease-in;
+}
+main.update-contact .checkbox-group {
+  display: flex;
+  flex-direction: column;
+}
+main.update-contact .checkbox-group div.flex-between {
+  padding: 0.5rem 0 0.5rem 0;
+}
+main.update-contact .checkbox-group input {
+  width: 25%;
+}
+main.update-contact .upload-label {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  background-color: #f0f0f0;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  text-align: center;
+  color: #555;
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+main.update-contact .upload-label:hover {
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+}
+main.update-contact .upload-label::after {
+  content: "Click to change picture";
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.4);
+  padding: 4px 8px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+main.update-contact .upload-label:hover::after {
+  opacity: 1;
+}
+main.update-contact .upload-input {
+  display: none;
+}
+
+#updateContact input[type=checkbox] {
+  display: block;
+}
+@media (max-width: 576px) {
+  #updateContact div.w40 {
+    width: 70%;
+  }
+  #updateContact .adventure-card {
+    width: 20vh;
+    height: 20vh;
+  }
+}
+@media (min-width: 577px) and (max-width: 992px) {
+  #updateContact div.w40 {
+    width: 45%;
+  }
+}
+@media (min-width: 993px) and (max-width: 1200px) {
+  #updateContact div.w40 {
+    width: 40%;
+  }
+}
+@media (min-width: 1201px) {
+  #updateContact div.w40 {
+    width: 35%;
+  }
+}
+
+.swal2-popup svg,
+.swal2-popup .swal2-success-ring,
+.swal2-popup .swal2-success-line-tip,
+.swal2-popup .swal2-success-line-long {
+  all: unset;
+  animation: initial;
+  transform: initial;
+}
+
+.swal2-popup span {
+  all: unset;
 }/*# sourceMappingURL=main.css.map */

@@ -6,40 +6,46 @@ main.login {
         color:black;
     }
     
-    section{
+    section.container{
+        @include flex(column);
 
-        form {
-            margin: 0 auto 10vh;
+        #register{
+            margin: 1rem 0 10vh 0;
         }
-        
-        // button{
-        //         width: 35%;
-        //         font-size: 2rem;
-        //         padding: 4px 32px;
-        //         border: 2px solid rgba(46, 125, 50, 1);
-        //         border-radius: 50px;
-        //         background-color: rgba(46, 125, 50, 1);
-        //         color: white;
-        //         text-decoration: none;
-        //         gap: 1rem;
-        //         display: flex;
-        //         justify-content: center;
-        //         align-items: center;
-        // }
 
-        div.w45{
+        a{
+                color: $primary-color;
+        }
+
+
+        div.w100{
             @include flex(column, center, flex-start);
         }
 
         form{
-            width: 70%;
+            width: 80%;
+            margin-top: 10vh;
+            justify-content: center;
+            align-items: center;
 
             button {
-                width: 35%;
+                width: 45%;
             }
 
-            @media (max-width: $breakpoint-md) {
+            @media (max-width: $breakpoint-sm) {
                 width: 95%;
+
+                .w50{
+                    width: 90%;
+                }
+            }
+
+            @media (min-width: calc($breakpoint-sm + 1px)) and (max-width: $breakpoint-md) {
+                width: 95%;
+
+                .w50{
+                    width: 70%;
+                }
             }
 
             @media (min-width: calc($breakpoint-md + 1px)) and (max-width: $breakpoint-xl) {
@@ -59,7 +65,7 @@ main.login {
             @media (max-width: $breakpoint-sm) {
             gap: 1rem;
 
-            div.w45 {
+            div.w100 {
                 width: 100%;
             }
         }
@@ -79,7 +85,7 @@ main.login {
         }
     }
 
-    section div div.w45.pdt-2{
+    section div div.w100.pdt-2{
          display: flex;
          align-items: flex-end;
     }

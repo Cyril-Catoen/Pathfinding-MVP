@@ -1,14 +1,21 @@
 {
-    "liveSassCompile.settings.formats": [
-      {
-        "format": "expanded",
-        "extensionName": ".css",
-        "savePath": "/public/css"
-      }
-    ],
-    "liveSassCompile.settings.generateMap": true,
-    "liveSassCompile.settings.excludeList": [
-      "/node_modules/**",
-      "/.vscode/**"
-    ]
+  "liveSassCompile.settings.formats": [
+    {
+      "format": "expanded",
+      "extensionName": ".css",
+      "savePath": "/public/css"
+    }
+  ],
+  "liveSassCompile.settings.generateMap": true,
+  "liveSassCompile.settings.excludeList": [
+    "/node_modules/**",
+    "/.vscode/**"
+  ],
+  "files.associations": {
+    "*.twig": "twig",
+    "*.html.twig": "html"
+  },
+  "emmet.includeLanguages": {
+    "twig": "html"
   }
+}

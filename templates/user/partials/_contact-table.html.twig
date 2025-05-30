@@ -1,0 +1,55 @@
+<tbody id="safety-contact-table">
+
+    {% if members is empty and nonMembers is empty %}
+        <tr>
+            <td colspan="5">Aucun contact trouvé pour cette liste.</td>
+        </tr>
+    {% else %}
+
+        {% if members is empty and nonMembers is not empty %}
+            <tr>
+                <td colspan="5">La liste ne contient aucun contact.</td>
+            </tr>
+        {% endif %}
+
+        {% for contact in members %}
+            <tr>
+                <td>{{ contact.firstName }}</td>
+                <td>{{ contact.lastName }}</td>
+                <td>{{ contact.phoneNumber }}</td>
+                <td>{{ contact.email }}</td>
+                <td>
+                    <div class="checkbox-item">
+                        <input type="checkbox"
+                            name="contacts[]"
+                            value="{{ contact.id }}"
+                            checked>
+                        <label></label>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+
+        {% if members and nonMembers %}
+            <tr><td colspan="5"><hr></td></tr>
+        {% endif %}
+
+        {% for contact in nonMembers %}
+            <tr class="non-member">
+                <td>{{ contact.firstName }}</td>
+                <td>{{ contact.lastName }}</td>
+                <td>{{ contact.phoneNumber }}</td>
+                <td>{{ contact.email }}</td>
+                <td>
+                    <div class="checkbox-item">
+                        <input type="checkbox"
+                            name="contacts[]"
+                            value="{{ contact.id }}">
+                        <label></label>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+
+    {% endif %}
+</tbody>

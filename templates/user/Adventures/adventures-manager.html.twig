@@ -1,0 +1,268 @@
+{% extends 'user/base.html.twig' %}
+
+        {% block metatitle %}
+        <title>Pathfinder - Adventure Manager</title>
+        {% endblock metatitle %}
+
+{% block main %}
+
+<main class="adventures-manager">
+    <section class="container">
+        <div class="flex-start gap-2 pdt-8 pdb-2">
+            <a class="arrow-return-button" href="{{ path('dashboard')}}">
+                        <i class="fas fa-arrow-left" src="../../assets/img/LiveTrack.jpeg" alt=""></i>
+            </a> 
+            <h2>ADVENTURES MANAGER</h2>
+        </div>
+    
+    <div class="container-type-5">
+        <div class="tab-wrapper">
+            <div class="tab-content" id="tab-contacts">
+                <div class="flex-between mb-3 mt-2">
+                    <h3>All Adventures</h3>
+                    <a href="{{ path('create-adventure') }}" class="button-type-4">+ Add</a>
+                </div>
+
+                <div class="contact-toolbar">
+                    <div class="search-all-wrapper">
+                        <input type="text" id="search-safety-contacts" placeholder="Search an adventure..." />
+                        <span class="clear-search" id="clear-search-safety" title="Clear">&times;</span>
+                    </div>
+                    <div class="sort-buttons">
+                        <button type="button" class="sort-az">Z-A</button>
+                        <button type="button" class="sort-recent">Recent</button>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="adventures-table">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Status</th>
+                                <th>Start</th>
+                                <th>End</th>
+                                <th>Timer</th>
+                                <th>Display & Edit</th>
+                                <th>Remove</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adventure-list">
+                            {% if ongoingAdventure %}
+                                <tr class="ongoing-highlight">
+                                    <td>{{ ongoingAdventure.title }}</td>
+                                    <td>{{ ongoingAdventure.status.value }}</td>
+                                    <td>{{ ongoingAdventure.startDate|date('Y-m-d') }}</td>
+                                    <td>{{ ongoingAdventure.endDate|date('Y-m-d') }}</td>
+                                    <td>
+                                        {% if ongoingAdventure.timerAlert %}
+                                            {% if ongoingAdventure.status.value == 'ongoing' and ongoingAdventure.timerAlert.isActive %}
+                                                <span 
+                                                    class="timer-countdown" 
+                                                    data-alert-time="{{ ongoingAdventure.timerAlert.alertTime|date('Y-m-d H:i:s') }}">
+                                                    ⏳ Chargement...
+                                                </span>
+                                            {% else %}
+                                                <span title="Timer programmé">
+                                                    {{ ongoingAdventure.timerAlert.alertTime|date('d/m/Y H:i') }}
+                                                </span>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="text-muted">⏱️ Off</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        <a href="{{ path('adventure', {'id': ongoingAdventure.id}) }}">
+                                            <i class="fas fa-pen"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="{{ path('delete-adventure', {'id': ongoingAdventure.id}) }}" class="delete-adventure-btn">
+                                            <i class="fas fa-times"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center">Il n'y a pas d'aventure en cours.</td>
+                                </tr>
+                            {% endif %}
+
+                            {% if otherAdventures is not empty %}
+                                <tr><td colspan="7"><hr></td></tr>
+                            {% endif %}
+
+                            {% for adventure in otherAdventures %}
+                                <tr>
+                                    <td>{{ adventure.title }}</td>
+                                    <td>{{ adventure.status.value }}</td>
+                                    <td>{{ adventure.startDate|date('Y-m-d') }}</td>
+                                    <td>{{ adventure.endDate|date('Y-m-d') }}</td>
+                                    <td>
+                                        {% if adventure.timerAlert %}
+                                            <span>
+                                                {{ adventure.timerAlert.alertTime|date('d/m/Y H:i') }}
+                                            </span>
+                                        
+                                        {% else %}
+                                            <span>⏱️ Off</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ path('adventure', {'id': adventure.id}) }}">
+                                            <i class="fas fa-pen"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="{{ path('delete-adventure', {'id': adventure.id}) }}" class="delete-adventure-btn">
+                                            <i class="fas fa-times"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </section>
+</main>
+{% endblock main %}
+{% block script %}
+
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <script>
+            Swal.fire({
+                title: "{{ message|e('js') }}",
+                icon: "{{ label == 'error' ? 'error' : 'success' }}",
+                timer: 2000,
+                timerProgressBar: true,
+                showConfirmButton: false
+            });
+        </script>
+    {% endfor %}
+{% endfor %}
+
+<script>
+const ajaxUrl = "{{ path('contacts-ajax') }}";
+const listSelector = document.getElementById('list-selector');
+const sortAzButton = document.querySelector('.sort-az');
+const sortRecentButton = document.querySelector('.sort-recent');
+let currentSort = 'az';
+
+function loadSafetyList(listId, sort = 'az') {
+    fetch(`${ajaxUrl}?list=${listId}&sort=${sort}`)
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById('safety-contact-table').outerHTML = html;
+            // Réappliquer le filtre après rechargement
+            setupSearchBar('search-safety-contacts', 'clear-search-safety', '#safety-contact-table tr.non-member');
+        });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // 🔁 Onglets dynamiques avec hash
+    const hash = window.location.hash;
+    if (hash === '#tab-safety' || hash === '#tab-contacts') {
+        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active-tab'));
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('d-none'));
+
+        const tabKey = hash.replace('#tab-', '');
+        const btn = document.querySelector(`.tab-button[data-tab="${tabKey}"]`);
+        const content = document.getElementById(`tab-${tabKey}`);
+        if (btn && content) {
+            btn.classList.add('active-tab');
+            content.classList.remove('d-none');
+        }
+    }
+
+    // 🖱️ Écouteur sur les onglets pour mettre à jour le hash
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', () => {
+            const tab = button.dataset.tab;
+            history.replaceState(null, null, `#tab-${tab}`);
+
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active-tab'));
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('d-none'));
+
+            button.classList.add('active-tab');
+            document.getElementById(`tab-${tab}`).classList.remove('d-none');
+        });
+    });
+
+    // 🎯 Listeners pour chargement dynamique de safety tab
+    listSelector?.addEventListener('change', () => {
+        currentSort = 'az';
+        sortAzButton.textContent = 'Z-A';
+        sortRecentButton.textContent = 'Recent';
+        loadSafetyList(listSelector.value, currentSort);
+    });
+
+    sortAzButton?.addEventListener('click', () => {
+        const listId = listSelector.value;
+        currentSort = currentSort === 'az' ? 'za' : 'az';
+        sortAzButton.textContent = currentSort === 'az' ? 'Z-A' : 'A-Z';
+        sortRecentButton.textContent = 'Recent';
+        loadSafetyList(listId, currentSort);
+    });
+
+    sortRecentButton?.addEventListener('click', () => {
+        const listId = listSelector.value;
+        currentSort = currentSort === 'recent' ? 'old' : 'recent';
+        sortRecentButton.textContent = currentSort === 'recent' ? 'Old' : 'Recent';
+        sortAzButton.textContent = 'Z-A';
+        loadSafetyList(listId, currentSort);
+    });
+});
+</script>
+
+<script src="{{ asset('js/components/searchBar.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    setupSearchBar('search-all-contacts', 'clear-search-all', '#tab-contacts tbody tr');
+    setupSearchBar('search-safety-contacts', 'clear-search-safety', '#safety-contact-table tr.non-member');
+});
+</script>
+
+<!-- Countdown script -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const countdownElements = document.querySelectorAll('.timer-countdown');
+
+    countdownElements.forEach(el => {
+        const alertTime = new Date(el.dataset.alertTime);
+
+        const interval = setInterval(() => {
+            const now = new Date();
+            const diff = alertTime - now;
+
+            if (diff <= 0) {
+                el.textContent = "🔔 Alerte déclenchée";
+                clearInterval(interval);
+                return;
+            }
+
+            const h = Math.floor(diff / (1000 * 60 * 60));
+            const m = Math.floor((diff / (1000 * 60)) % 60);
+            const s = Math.floor((diff / 1000) % 60);
+
+            // Appliquer ou retirer la classe rouge selon le temps restant
+            if (h < 1) {
+                el.classList.add('red-alert');
+            } else {
+                el.classList.remove('red-alert');
+            }
+
+            el.textContent = `${h}h ${m}m ${s}s`;
+        }, 1000);
+    });
+});
+</script>
+
+
+
+
+{% endblock %}

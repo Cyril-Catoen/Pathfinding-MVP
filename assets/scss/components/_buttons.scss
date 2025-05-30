@@ -36,6 +36,30 @@
     transition: all 0.2s ease;
 }
 
+.arrow-return-button{
+    @include flex-center;
+    @include container-shape($size:8vh, $margin:0, $shape: circle); 
+    object-fit: cover; 
+    object-position: top;
+    background-color: $white-color;
+    box-shadow: 0 4px 8px $box-shadow-black;
+    
+    i {
+        font-size: 5vh; // icône très visible
+        color: $secondary-color; // ou une autre couleur verte si tu veux
+    }
+    
+    &:hover {
+        i {
+        transform: scale(1.1);
+        transition: transform 0.2s ease;
+        color: $primary-color;
+        }
+        p{ color: $primary-color;}
+    }
+}
+
+
 .shadow-black{ box-shadow: 0 0 24px  $box-shadow-black; }
 .shadow-blue{ box-shadow: 0 0 24px  $box-shadow-blue; }
 .shadow-green{ box-shadow: 0 0 24px  $box-shadow-green; }

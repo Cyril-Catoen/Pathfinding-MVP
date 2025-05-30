@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Enum\Status;
 use App\Enum\ViewAuthorization;
 use App\Repository\AdventureRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -19,6 +20,7 @@ class Adventure
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
+    #[Assert\NotBlank(message: 'Le titre est obligatoire.')]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -31,12 +33,15 @@ class Adventure
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column]
+    #[Assert\LessThanOrEqual(propertyPath: 'endDate', message: 'La date de début doit précéder la date de fin.')]
     private ?\DateTime $startDate = null;
 
     #[ORM\Column]
+    #[Assert\GreaterThanOrEqual(propertyPath: 'startDate', message: 'La date de fin doit être après la date de début.')]
     private ?\DateTime $endDate = null;
 
     #[ORM\Column(enumType: Status::class)]
+    #[Assert\NotNull(message: 'Le statut est requis.')]
     private Status $status;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -396,5 +401,15 @@ class Adventure
         }
 
         return $this;
+    }
+
+    public function getTimerAlert(): ?TimerAlert
+    {
+        return $this->timerAlert;
+    }
+
+    public function hasActiveTimer(): bool
+    {
+        return $this->timerAlert !== null && $this->timerAlert->isActive();
     }
 }

@@ -22,8 +22,13 @@ const mobileDropdowns = mobileMenu.querySelectorAll(".dropdown > a");
 
 mobileDropdowns.forEach(link => {
     link.addEventListener("click", e => {
-        e.preventDefault(); // prevent default anchor behavior
         const parentLi = link.parentElement;
         parentLi.classList.toggle("open");
+        // On ne bloque le clic que si un sous-menu existe
+        if (submenu) {
+            e.preventDefault();
+            parentLi.classList.toggle("open");
+        }
+
     });
 });

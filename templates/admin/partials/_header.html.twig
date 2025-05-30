@@ -1,0 +1,112 @@
+    {% if currentRoute == 'home' %}
+        {# Special Header for home page #}
+        <header class="header-index" id="home">
+    {% else %}
+        <header class="header-login" id="home">
+    {% endif %}
+            <section class="flex-between">
+                <a href="{{ path('home') }}#features" class="logo">
+                    <div>
+                        <img src="../assets/img/LogoPathWhite.png" alt="Logo">
+                        <h1>Pathfinding<h1>
+                    </div>
+                </a>
+                <nav>
+                    <ul id="navID">
+                        <li class="dropdown">
+                                <a href="#">Features</a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="{{ path('home') }}#features">Adventure</a></li>
+                                    <li><a href="{{ path('home') }}#features">Live Track</a></li>
+                                    <li><a href="{{ path('home') }}#features">Safety Alert</a></li>
+                                </ul>
+                        </li>
+                        <li class="dropdown">
+                                <a href="{{ path('home') }}#community">Community</a>
+                                <ul class="dropdown-menu ">
+                                    <li><a href="{{ path('register') }}">Join us</a></li>
+                                    <li><a href="{{ path('contact-form') }}">Partnership</a></li>
+                                </ul>
+                        </li>
+                        <li class="dropdown">
+                                <a href="{{ path('about') }}">About us</a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="{{ path('about') }}#story">A short story</a></li>
+                                    <li><a href="{{ path('contact-form') }}">Contact</a></li>
+                                    <li><a href="{{ path('about') }}#roadmap">Roadmap</a></li>
+                                </ul>
+                        </li>
+                        <li>
+                            {% if app.user %}
+                                <a class="login" href="{{ path('logout') }}">Log Out</a>
+                            {% else %}
+                                <a class="login" href="{{ path('login') }}">Log In</a>
+                            {% endif %}
+                        </li>
+                    </ul>
+                </nav>
+    
+                 <!-- Mobile & Tablet menu (until lg breakpoint) -->
+                <button id="hamburger" class="hamburger">
+                    <i class="fas fa-bars"></i>
+                </button>
+    
+                <div id="mobile-menu" class="mobile-menu">
+                    <button id="close-mobile-menu" class="close-btn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <ul>
+                        <li class="dropdown">
+                            <a href="#">Features</a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{{ path('home') }}#features">Adventure</a></li>
+                                <li><a href="{{ path('home') }}#features">Live Track</a></li>
+                                <li><a href="{{ path('home') }}#features">Safety Alert</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="{{ path('home') }}#community">Community</a>
+                                <ul class="dropdown-menu ">
+                                    <li><a href="{{ path('register') }}">Join us</a></li>
+                                    <li><a href="{{ path('contact-form') }}">Partnership</a></li>
+                                </ul>
+                        </li>
+                        <li class="dropdown">
+                                <a href="{{ path('about') }}">About us</a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="{{ path('about') }}#story">A short story</a></li>
+                                    <li><a href="{{ path('contact-form') }}">Contact</a></li>
+                                    <li><a href="{{ path('about') }}#roadmap">Roadmap</a></li>
+                                </ul>
+                        </li>
+                        <li>
+                            {% if app.user %}
+                                <a class="login" href="{{ path('logout') }}">Log Out</a>
+                            {% else %}
+                                <a class="login" href="{{ path('login') }}">Log In</a>
+                            {% endif %}
+                        </li>
+                    </ul>
+                </div>
+                <div id="overlay" class="overlay"></div>
+            </section>
+
+    {% if currentRoute == 'home' %}
+            {# Special Header for home page - this section appears only on home page #}
+            <section>
+                    <div>
+                        <h1>PATHFINDING</h1>
+                        <h2>Safety & Adventure</h2>
+                    </div>
+                    
+                    <a href="{{ path('login') }}">
+                        <img src="../assets/img/icon_team.png" alt="hand">
+                        <div>
+                            <p>Step in</p>
+                            <p>New paths await you<p>
+                        </div>
+                    </a>
+            </section>
+    {% endif %}
+
+        </header>

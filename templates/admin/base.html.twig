@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <!-- Permet de configurer le site en responsive -->
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+        <!-- Import du fichier style.css -->
+        <link rel="stylesheet" href="{{ asset('css/main.css') ~ '?v=' ~ app.request.server.get('REQUEST_TIME') }}" />
+
+        <!-- Import de la bibliothèque externe Font Awesome pour les icons des social media -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+        <!-- Défini l'icône à gauche du titre de l'onglet du navigateur - de base une planète + message d'erreur dans l'inspecteur si rien de défini -->
+        <link rel="icon" href="{{ asset('assets/img/favicon.ico') }}" type="image/x-icon">
+        
+        <!-- Nomme l'onglet du navigateur -->
+        {% block metatitle %}
+        {% endblock metatitle %}
+</head>
+<body>
+
+{% include 'admin/partials/_header.html.twig' with { 'currentRoute': app.request.attributes.get('_route') } %}
+
+    {% block main %}
+    {% endblock main %} 
+      
+{% include 'admin/partials/_footer.html.twig' %}
+
+    <script src="../js/main.js" defer></script>
+    <script src="../js/menu.js" defer></script>
+
+    {% block script %}
+    {% endblock script %}
+
+</body>
+</html>

@@ -54,5 +54,28 @@
       
       }
     }
-  }
+
+    .dropdown-sub {
+    position: relative;
+
+    // Sous-menu latéral gauche
+    .dropdown-menu--left {
+      top: 0;
+      left: -100%;
+      transform: translateX(-10px);
+      transition: opacity 0.5s ease, transform 0.2s ease;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    &:hover {
+      .dropdown-menu--left {
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: auto;
+      }
+    }
+    } 
+
+}
 

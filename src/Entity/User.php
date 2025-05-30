@@ -9,6 +9,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
@@ -20,6 +21,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
+    #[Assert\NotBlank]
+    #[Assert\Email]
+    #[Assert\Length(min: 5)]
     private ?string $email = null;
 
     /**
@@ -32,15 +36,41 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 8)]
+    #[Assert\Regex(
+        pattern: '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/',
+        message: 'Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial.'
+    )]
     private ?string $password = null;
 
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $resetToken = null;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $resetTokenExpiresAt = null;
+
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 2)]
+    #[Assert\Regex(
+        pattern: '/^[\p{L} -]+$/u', 
+        message: "Le nom ne peut contenir que des lettres, espaces ou tirets.")]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 2)]
+    #[Assert\Regex(
+        pattern: '/^[\p{L} -]+$/u', 
+        message: "Le nom ne peut contenir que des lettres, espaces ou tirets.")]
     private ?string $surname = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Assert\NotBlank]
+    #[Assert\LessThanOrEqual(
+        value: 'today -18 years',
+        message: 'Vous devez avoir au moins 18 ans pour vous inscrire.')]
     private ?\DateTime $birthdate = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -52,23 +82,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 10, nullable: true)]
     private ?string $postcode = null;
 
-    #[ORM\Column(length: 100)]
+    #[ORM\Column(length: 100, nullable: true)]
     private ?string $city = null;
 
-    #[ORM\Column(length: 20)]
+    #[ORM\Column(length: 20, nullable: true)]
     private ?string $phoneNumber = null;
 
-    #[ORM\Column(length: 100)]
+    #[ORM\Column(length: 100, nullable: true)]
+    // #[Assert\NotBlank]
+    // #[Assert\Length(min: 2)]
     private ?string $country = null;
 
     #[ORM\Column]
-    private ?\DateTime $registrationAt = null;
+    private ?\DateTimeImmutable $registrationAt = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTime $updatedAt = null;
+    private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTime $lastLogin = null;
+    private ?\DateTimeImmutable $lastLogin = null;
 
     #[ORM\Column(nullable: true)]
     private ?array $lastKnownPosition = null;
@@ -85,10 +117,40 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: SafetyContact::class, mappedBy: 'user')]
     private Collection $safetyContacts;
 
+    /**
+     * @var Collection<int, ContactList>
+     */
+    #[ORM\OneToMany(targetEntity: ContactList::class, mappedBy: 'owner', orphanRemoval: true)]
+    private Collection $contactLists;
+
     public function __construct()
     {
-        $this->no = new ArrayCollection();
+        $this->authorizedAdventures = new ArrayCollection();
         $this->safetyContacts = new ArrayCollection();
+        $this->registrationAt = new \DateTimeImmutable();
+        $this->contactLists = new ArrayCollection(); 
+    }
+
+    public function createAdmin(string $email, string $passwordHashed) {
+        $this->email = $email;
+        $this->password = $passwordHashed;
+
+        $this->roles = ['ROLE_ADMIN'];
+    }
+
+    public function createUser(
+        string $email,
+        string $passwordHashed,
+        string $name,
+        string $surname,
+        \DateTime $birthdate
+    ): void {
+        $this->email = $email;
+        $this->password = $passwordHashed;
+        $this->roles = ['ROLE_USER'];
+        $this->name = $name;
+        $this->surname = $surname;
+        $this->birthdate = $birthdate;
     }
 
     public function getId(): ?int
@@ -152,6 +214,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->password = $password;
 
+        return $this;
+    }
+
+    public function getResetToken(): ?string
+    {
+        return $this->resetToken;
+    }
+
+    public function setResetToken(?string $resetToken): static
+    {
+        $this->resetToken = $resetToken;
+        return $this;
+    }
+
+    public function getResetTokenExpiresAt(): ?\DateTimeImmutable
+    {
+        return $this->resetTokenExpiresAt;
+    }
+
+    public function setResetTokenExpiresAt(?\DateTimeImmutable $expiresAt): static
+    {
+        $this->resetTokenExpiresAt = $expiresAt;
         return $this;
     }
 
@@ -272,36 +356,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getDateRegistration(): ?\DateTime
+    public function getDateRegistration(): ?\DateTimeImmutable
     {
         return $this->registrationAt;
     }
 
-    public function setDateRegistration(\DateTime $registrationAt): static
+    public function setDateRegistration(\DateTimeImmutable $registrationAt): static
     {
         $this->registrationAt = $registrationAt;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?\DateTimeImmutable
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): static
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
     {
         $this->updated_at = $updatedAt;
 
         return $this;
     }
 
-    public function getLastLogin(): ?\DateTime
+    public function getLastLogin(): ?\DateTimeImmutable
     {
         return $this->lastLogin;
     }
 
-    public function setLastLogin(?\DateTime $lastLogin): static
+    public function setLastLogin(?\DateTimeImmutable $lastLogin): static
     {
         $this->lastLogin = $lastLogin;
 
@@ -371,6 +455,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($safetyContact->getUser() === $this) {
                 $safetyContact->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ContactList>
+     */
+    public function getContactLists(): Collection
+    {
+        return $this->contactLists;
+    }
+
+    public function addContactList(ContactList $contactList): static
+    {
+        if (!$this->contactLists->contains($contactList)) {
+            $this->contactLists->add($contactList);
+            $contactList->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeContactList(ContactList $contactList): static
+    {
+        if ($this->contactLists->removeElement($contactList)) {
+            // set the owning side to null (unless already changed)
+            if ($contactList->getOwner() === $this) {
+                $contactList->setOwner(null);
             }
         }
 

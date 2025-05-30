@@ -16,13 +16,10 @@
 @use 'components/index-components';
 
 // Pages
-@use 'pages/index';  // Page d’accueil
-@use 'pages/about';  // Page à propos
-@use 'pages/contact-form';  // Formulaire de contact 
-@use 'pages/login';  // Formulaire de contact 
-@use 'pages/dashboard-user';  // Page d'accueil après connexion compte user
-@use 'pages/adventure';  // Page dédiée à chaque aventure par id dans l'url
-@use 'pages/contact-manager';  // Page dédiée à la gestion des contacts d'alertes
+@use 'pages/index-pages';  // Page d’accueil
+
+// Vendors
+@use 'vendors/sweetalert2';  // Page d’accueil
 
 
 

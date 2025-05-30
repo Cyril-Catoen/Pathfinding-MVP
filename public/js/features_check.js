@@ -1,25 +1,25 @@
 document.querySelectorAll('.toggle-btn input[type="checkbox"]').forEach(toggle => {
   const slider = toggle.nextElementSibling;
-  const btnText = slider.querySelector('.btn-text');
+  const btnText = slider?.querySelector('.btn-text');
 
-  // Fonction pour mettre à jour le texte
   function updateText() {
-      if (toggle.checked) {
-          btnText.textContent = "Yes";
-      } else {
-          btnText.textContent = "No";
-      }
+    if (btnText) {
+      btnText.textContent = toggle.checked ? "Yes" : "No";
+    }
   }
 
-  // On initialise au chargement
   updateText();
-
-  // On met à jour au changement
   toggle.addEventListener('change', updateText);
 });
 
-document.getElementById('myForm').addEventListener('submit', function(event) {
-  event.preventDefault();
-  console.log('Safety Alert:', document.getElementById('toggleButtonSafety').checked);
-  console.log('Live Track:', document.getElementById('toggleButtonLive').checked);
-});
+// // Formulaire : on vérifie qu'il existe avant de manipuler
+// const form = document.querySelector('form');
+// if (form) {
+//   form.addEventListener('submit', function (event) {
+//     const safetyToggle = document.getElementById('toggleButtonSafety');
+//     const liveToggle = document.getElementById('toggleButtonLive');
+
+//     console.log('Safety Alert:', safetyToggle?.checked);
+//     console.log('Live Track:', liveToggle?.checked);
+//   });
+// }

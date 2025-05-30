@@ -3,7 +3,7 @@
         <div class="flex-between">
             <a href="{{ path('home') }}" class="logo">
                 <div>
-                    <img src="../assets/img/LogoPathWhite.png" alt="Logo">
+                    <img src="{{ asset('assets/img/LogoPathWhite.png') }}" alt="Logo">
                     <h1>Pathfinding<h1>
                 </div>
             </a>
@@ -30,8 +30,8 @@
                 <h2>Community</h2>
                 <nav>
                     <ul>
-                        <li><a href="{{ path('register') }}">Become a Pathfinder</a></li>
-                        <li><a href="{{ path('contact-form') }}">Be our Partner</a></li>
+                        <li><a href="{{ path('register') }}">Join us</a></li>
+                        <li><a href="{{ path('contact-form') }}">Partnership</a></li>
                     </ul>
                 </nav>
             </div>
@@ -81,19 +81,9 @@
             </a>
             <a href="#home" class="logo">
                 <div>
-                    <img src="../assets/img/LogoPathWhite.png" alt="Logo">
+                    <img src="{{ asset('assets/img/LogoPathWhite.png') }}" alt="Logo">
                 </div>
             </a>
         </div>
-
     </section>
 </footer>
-
-    <script src="../js/main.js" defer></script>
-    <script src="../js/menu.js" defer></script>
-
-    {% block script %}
-    {% endblock script %}
-
-</body>
-</html>

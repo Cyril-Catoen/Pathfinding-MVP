@@ -6,10 +6,12 @@
 
 {% block main %}
 
-<main class="login">
+<main class="register">
         <section class="container">
-            <form action="submit.php" method="post">  
-                <h3 class ="pdt-8 pdb-2">JOIN THE PATHFINDERS</h3>
+            <form method="post" action="{{ path('register') }}">
+                <!-- Cross-Site Request Forgery token is used to prevent attack from external scripts. It checks that the request comes from our website -->
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}"> 
+                <h3 class ="pdb-2">BECOME A PATHFINDER</h3>
                 <div class="flex-center gap-4">
                     <div class="w45">
                         <label for="name">NAME</label>
@@ -19,30 +21,30 @@
                         <label for="surname">SURNAME</label>
                         <input type="text" id="surname" name="surname" placeholder="" required>
                     </div>
-                      
+                    
                     <div class="w45">
                         <label for="password">PASSWORD</label>
-                        <input type="text" id="password" name="password" placeholder="" required>
+                        <input type="password" id="password" name="password" placeholder="" required>
                     </div>
                     <div class="w45">
-                        <label for="confirmPass">CONFIRM PASSWORD</label>
-                        <input type="text" id="confirmPass" name="confirmPass" placeholder="" required>
+                        <label for="confirmPass">REPEAT PASSWORD</label>
+                        <input type="password" id="confirmPass" name="confirmPass" placeholder="" required>
                     </div>
             
                     <div class="w45">
-                        <label for="email">E-MAIL ADRESS</label>
+                        <label for="email">EMAIL ADRESS</label>
                         <input type="text" id="email" name="email" placeholder="" required>
                     </div>
                     <div class="w45">
-                        <label for="confirmEmail">CONFIRM E-MAIL</label>
+                        <label for="confirmEmail">REPEAT EMAIL</label>
                         <input type="text" id="confirmEmail" name="confirmEmail" placeholder="" required>
                     </div>
             
                     <div class="w45">
-                        <label for="birthdate">DATE OF BIRTH</label>
+                        <label for="birthdate">BORN THE</label>
                         <input type="date" id="birthdate" name="birthdate" required>
                     </div>
-                    <div class="w45 pdt-2">
+                    <div class="w45 pdt-2 flex-end">
                         <button class="button-type-1 button-green" id="join" type="submit">JOIN</button>
                     </div>
                 </div>
@@ -51,3 +53,7 @@
 </main>
 
 {% endblock main %}
+
+{% block script %}
+<script src="{{ asset('js/validatorRegisterForm.js') }}" defer></script>
+{% endblock script %}

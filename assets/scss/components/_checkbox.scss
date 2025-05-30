@@ -2,34 +2,32 @@
 
 // checkbox
 
-.checkbox-grid {
-    margin-top: 2rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(6vh, 1fr));
-    gap: 1rem;
-}
-
 .box-content {
     background: #f5f5f5;
     border: 2px solid transparent;
     border-radius: 50%;
-    padding: 1rem;
+    padding: clamp(0.5rem, 1vw, 1rem);
     text-align: center;
     transition: all 0.3s ease;
-    height: 6vh;
-    width: 6vh;
+    height: 7vw;
+    width: 7vw;
     @include flex-center($direction: column); 
     box-shadow: 0 0 0 transparent;
     cursor: pointer; 
 
     i {
-        font-size: 2rem;
+        font-size: clamp(0.75rem, 2.5vw, 2rem);
         color: #555;
     }
 
     img{
         width: 150%;
         height: auto;
+    }
+
+    @media (min-width: $breakpoint-lg) {
+        height: 8vh;
+        width: 8vh;
     }
 }
 
@@ -39,12 +37,9 @@ input[type="checkbox"] {
 
 label.adventure-box {
     padding: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    @include flex(column, center, center);
         
-    p {
+    p, span {
         width: 100%;
         font-size: 1rem;
         text-align: center;

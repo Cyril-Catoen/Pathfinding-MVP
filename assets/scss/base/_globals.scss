@@ -6,6 +6,7 @@ body{
 
 main{
     background-color: rgba(246, 237, 229, 1);
+    min-height: 50vh;
 }
 
 img{
@@ -35,12 +36,16 @@ html {
 .flex-between-top { @include flex(row, space-between, flex-start); }
 .flex-around { @include flex(row, space-around); }
 .flex-evenly { @include flex(row, space-evenly); }
+.flex-evenly-top { @include flex(row, space-evenly, flex-start); }
 .flex-start { @include flex(row, flex-start); }
+.flex-start-top { @include flex(row, flex-start, flex-start); }
 .flex-end { @include flex(row, flex-end); }
 .flex-cl-center { @include flex-center($direction: column); }
 .flex-cl-between { @include flex(column, space-between, center); }
+.flex-cl-between-start { @include flex(column, space-between, flex-start); }
 .flex-cl-around { @include flex(column, center, space-around); }
 .flex-cl-evenly { @include flex(column, center, space-evenly); }
+.flex-cl-evenly-end { @include flex(column, space-evenly, flex-end); }
 .flex-cl-start { @include flex(column, center, flex-start); }
 .flex-cl-end { @include flex(column, center, flex-end); }
 

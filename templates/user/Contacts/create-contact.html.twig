@@ -1,0 +1,146 @@
+{% extends 'user/base.html.twig' %}
+
+{% block metatitle %}
+    <title>Pathfinder - Contact creator</title>
+{% endblock metatitle %}
+
+{% block main %}
+<main class="create-contact">
+    <section class="container">
+        <div class="flex-start gap-2 pdt-8 pdb-2">
+            <a class="arrow-return-button" href="{{ path('contacts-manager')}}">
+                <i class="fas fa-arrow-left"></i>
+            </a> 
+            <h2>NEW CONTACT</h2>
+        </div>
+
+        <div class="container-type-3 shadow-black">
+            <form action="{{ path('create-contact') }}" method="post" enctype="multipart/form-data">
+                <div class="container-90 flex-cl-evenly gap-4">   
+                    <div class="flex-between-top wrap gap-2" id="createContact">
+                        <div class="w40 flex-cl-start gap-2">
+                            <div class="w90">
+                                <label for="name">NAME</label>
+                                <input type="text" id="name" name="name" required>
+                            </div>
+                            <div class="w90">
+                                <label for="surname">SURNAME</label>
+                                <input type="text" id="surname" name="surname" required>
+                            </div>
+                            <div class="w90">
+                                <label for="email">E-MAIL <span>ADDRESS</span></label>
+                                <input type="text" id="email" name="email" required>
+                            </div>
+                            <div class="w90">
+                                <label for="phone">PHONE <span>NUMBER</span></label>
+                                <input type="text" id="phone" name="phone" placeholder="starting with +" pattern="^\+\d{7,15}$" inputmode="tel" required>
+                            </div> 
+                            <!-- Contact list with default "none" -->
+                            <div class="w90">
+                                <label for="contactList">Contact list</label>
+                                <select class="mt-1" name="contactList"  id="contactList">
+                                    <option value="none" selected>None or Select a list</option>
+                                     {% for list in contactLists %}
+                                    <option value="{{ list.id }}">
+                                        {{ list.isDefault ? 'Default List' : list.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="w90">
+                                <label for="country">COUNTRY</label>
+                                <select class="mt-1" name="country" id="country">
+                                    <option value="">Select a country</option>
+                                    {% for code, name in countries %}
+                                        <option value="{{ code }}">{{ name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="flex-cl-start gap-2">
+                            <p>PICTURE</p>
+                            <div class="adventure-card">
+                                <label for="picture-contact" id="uploadLabel" class="upload-label">
+                                    Click here to add a profile picture
+                                </label>
+                                <input type="file" id="picture-contact" name="picture-contact" class="upload-input" accept="image/*" />
+                            </div>
+                        </div>
+                    </div>                
+                    <!-- Checkbox for declaration of majority -->
+                    <div class="w100 flex-end gap-2" id="Majority">
+                                <label for="declarationOfMajority">
+                                    I certify that my safety contact is legally an adult in their country of residence (at least 18 or 21 years old depending on jurisdiction).
+                                </label>
+                                <input class="w10" type="checkbox" name="declarationOfMajority" id="declarationOfMajority" required>
+                    </div>
+                    <div class="flex-end pdt-2">
+                        <button id="submitBtn" class="button-type-4" type="submit">Create</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    {% for label, messages in app.flashes %}
+        <div class="flash-popup flash-{{ label }}" data-messages="{{ messages|join('|') }}"></div>
+    {% endfor %}
+    </section>
+</main>
+{% endblock main %}
+
+{% block script %}
+
+<script src="{{ asset('js/validatorForm.js') }}" defer></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".flash-popup").forEach(popup => {
+        const messages = popup.dataset.messages.split('|');
+
+        messages.forEach(message => {
+            alert(message); 
+
+            const [field, msg] = message.split(':').map(s => s.trim());
+            const input = document.querySelector(`[name="${field}"]`);
+            if (input) {
+                if (input.type === "checkbox") {
+                    const label = document.querySelector(`label[for="${input.id}"]`);
+                    if (label) {
+                        label.classList.add('field-error');
+                    }
+                } else {
+                    input.classList.add('field-error');
+                }
+            }
+        });
+
+        popup.remove(); // nettoie après
+    });
+});
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const fileInput = document.getElementById('picture-contact');
+    const label = document.getElementById('uploadLabel');
+
+    fileInput.addEventListener('change', function () {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                label.style.backgroundImage = `url('${e.target.result}')`;
+                label.textContent = ""; // Enlève le texte une fois l'image chargée
+            };
+
+            reader.readAsDataURL(file);
+        } else {
+            label.style.backgroundImage = 'none';
+            label.textContent = "Click here to add a profile picture";
+        }
+    });
+});
+</script>
+{% endblock script %}
+

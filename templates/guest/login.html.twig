@@ -8,22 +8,43 @@
 
 <main class="login">
         <section class="container">
-            <form class ="pdt-8 pdb-2" action="submit.php" method="post">
-                <div class="flex-cl-start gap-2">
-                    <div class="w45">
-                        <label for="name">USER E-MAIL</label>
-                        <input type="text" id="username" name="username" placeholder="" required>
+                <form class ="container-dash-1" action="{{ path('login') }}" method="post">
+                    <!-- Cross-Site Request Forgery token is used to prevent attack from external scripts. It checks that the request comes from our website -->
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}"> 
+                    <div class="w50 flex-cl-start gap-2">
+                        <div class="w100">
+                            <label for="email">USER E-MAIL</label>
+                            <input type="email" id="username" name="_username" placeholder="" required>
+                        </div>
+                        <div class="w100">
+                            <label for="password">PASSWORD</label>
+                            <input type="password" id="password" name="_password" placeholder="" required>
+                        </div>  
+                        <div class="w100 pdt-2">
+                            <button class="button-type-1 button-green" id="login" type="submit">LOG IN</button>
+                        </div>
                     </div>
-                    <div class="w45">
-                        <label for="email">PASSWORD</label>
-                        <input type="text" id="password" name="password" placeholder="" required>
-                    </div>  
-                    <div class="w45 pdt-2">
-                        <button class="button-type-1 button-green" id="login" type="submit">LOG IN</button>
-                    </div>
+                </form>
+                <div id="register">
+                    <a href="{{ path('register')}}">New to Pathfinding ? Join now</a>
                 </div>
-            </form>
+        </div>
         </section>
 </main>
 
 {% endblock main %}
+
+{% block script %}
+{% if error %}
+    <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Échec de connexion',
+                html: "Mauvais identifiant ou mot de passe.<br>Veuillez réessayer ou réinitialiser votre mot de passe.",
+                confirmButtonText: 'Ok',
+                confirmButtonColor: '#d33'
+            });
+    </script>
+{% endif %}
+<script src="{{ asset('js/validatorLoginForm.js') }}" defer></script>
+{% endblock script %}

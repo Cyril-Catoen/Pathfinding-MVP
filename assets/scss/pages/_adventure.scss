@@ -16,27 +16,6 @@ main.adv-main {
 
     }
 
-    //component ???
-    .container-circle-2 {
-        background-color: $white-color;
-        box-shadow: 0 4px 8px $box-shadow-black;
-        @include flex-center;
-
-        i {
-          font-size: 5vh; // icône très visible
-          color: $secondary-color; // ou une autre couleur verte si tu veux
-        }
-      
-        &:hover {
-          i {
-            transform: scale(1.1);
-            transition: transform 0.2s ease;
-            color: $primary-color;
-          }
-          p{ color: $primary-color;}
-        }
-    }
-
     .button-type-3 {
       color: black;
       font-size: 1.325rem;

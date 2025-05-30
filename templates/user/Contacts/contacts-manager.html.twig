@@ -1,0 +1,228 @@
+{% extends 'user/base.html.twig' %}
+
+        {% block metatitle %}
+        <title>Pathfinder - Contacts Manager</title>
+        {% endblock metatitle %}
+
+{% block main %}
+
+<main class="contacts-manager">
+    <section class="container">
+        <div class="flex-start gap-2 pdt-8 pdb-2">
+            <a class="arrow-return-button" href="{{ path('dashboard')}}">
+                        <i class="fas fa-arrow-left" src="../../assets/img/LiveTrack.jpeg" alt=""></i>
+            </a> 
+            <h2>CONTACTS MANAGER</h2>
+        </div>
+    
+    <div class="container-type-5">
+        <div class="tab-header flex-between">
+            <div class="tab-button active-tab" data-tab="contacts">Contacts</div>
+            <div class="tab-button" data-tab="safety">Safety List</div>
+        </div>
+        <div class="tab-wrapper">
+            <div class="tab-content" id="tab-contacts">
+                <div class="flex-between mb-3 mt-2">
+                    <h3>All Contacts</h3>
+                    <div class="search-all-wrapper">
+                            <input type="text" id="search-all-contacts" placeholder="Search a contact..." />
+                            <span class="clear-search" id="clear-search-all" title="Clear">&times;</span>
+                    </div>
+                    <a href="{{ path('create-contact') }}" class="button-type-4">+ Add</a>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="contacts-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Surname</th>
+                                <th>Phone</th>
+                                <th>Email</th>
+                                <th>Edit</th>
+                                <th>Remove</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        
+                            {% if safetyContacts is empty %}
+                                <tr>
+                                    <td colspan="6">No contacts yet.</td>
+                                </tr>
+                            {% else %}
+                                {% for contact in safetyContacts %}
+                                    <tr>
+                                        <td>{{ contact.firstName }}</td>
+                                        <td>{{ contact.lastName }}</td>
+                                        <td>{{ contact.phoneNumber }}</td>
+                                        <td>{{ contact.email }}</td>
+                                        <td>
+                                            <a href="{{ path('update-contact', {'id': contact.id}) }}">
+                                                <i class="fas fa-pen"></i>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="{{ path('delete-contact', {'id': contact.id}) }}" 
+                                               class="delete-contact-btn" 
+                                               data-url="{{ path('delete-contact', {'id': contact.id}) }}">
+                                                <i class="fas fa-times"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+
+           <div class="tab-content d-none" id="tab-safety">
+                    <form class="flex-cl-between-start" method="post" action="{{ path('update-contact-list') }}">
+                        <div class="w100">
+                            <p class="mt-1">Select up to 5 contacts per list / required min. 2 contacts per list</p>
+
+                            <select class="mt-1" name="list" id="list-selector" required>
+                                {% for list in contactLists %}
+                                    <option value="{{ list.id }}" {% if list.id == selectedListId %}selected{% endif %}>
+                                        {{ list.isDefault ? 'Default List' : list.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+
+                            <div class="contact-toolbar">
+                                <div class="search-all-wrapper">
+                                    <input type="text" id="search-safety-contacts" placeholder="Search a contact..." />
+                                    <span class="clear-search" id="clear-search-safety" title="Clear">&times;</span>
+                                </div>
+                                <div class="sort-buttons">
+                                    <button type="button" class="sort-az">Z-A</button>
+                                    <button type="button" class="sort-recent">Recent</button>
+                                </div>
+                            </div>
+
+                            <div class="table-wrapper">
+                                <table class="contacts-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Surname</th>
+                                            <th>Phone</th>
+                                            <th>Email</th>
+                                            <th>In List</th>
+                                        </tr>
+                                    </thead>
+                                    {% include 'user/partials/_contact-table.html.twig' %}
+                                </table>
+                            </div>
+                        </div>
+                        <div class="w100 flex-end mt-2">
+                            <button type="submit" class="button-type-4">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </section>
+</main>
+{% endblock main %}
+{% block script %}
+
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <script>
+            Swal.fire({
+                title: "{{ message|e('js') }}",
+                icon: "{{ label == 'error' ? 'error' : 'success' }}",
+                timer: 2000,
+                timerProgressBar: true,
+                showConfirmButton: false
+            });
+        </script>
+    {% endfor %}
+{% endfor %}
+
+<script>
+const ajaxUrl = "{{ path('contacts-ajax') }}";
+const listSelector = document.getElementById('list-selector');
+const sortAzButton = document.querySelector('.sort-az');
+const sortRecentButton = document.querySelector('.sort-recent');
+let currentSort = 'az';
+
+function loadSafetyList(listId, sort = 'az') {
+    fetch(`${ajaxUrl}?list=${listId}&sort=${sort}`)
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById('safety-contact-table').outerHTML = html;
+            // Réappliquer le filtre après rechargement
+            setupSearchBar('search-safety-contacts', 'clear-search-safety', '#safety-contact-table tr.non-member');
+        });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // 🔁 Onglets dynamiques avec hash
+    const hash = window.location.hash;
+    if (hash === '#tab-safety' || hash === '#tab-contacts') {
+        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active-tab'));
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('d-none'));
+
+        const tabKey = hash.replace('#tab-', '');
+        const btn = document.querySelector(`.tab-button[data-tab="${tabKey}"]`);
+        const content = document.getElementById(`tab-${tabKey}`);
+        if (btn && content) {
+            btn.classList.add('active-tab');
+            content.classList.remove('d-none');
+        }
+    }
+
+    // 🖱️ Écouteur sur les onglets pour mettre à jour le hash
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', () => {
+            const tab = button.dataset.tab;
+            history.replaceState(null, null, `#tab-${tab}`);
+
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active-tab'));
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('d-none'));
+
+            button.classList.add('active-tab');
+            document.getElementById(`tab-${tab}`).classList.remove('d-none');
+        });
+    });
+
+    // 🎯 Listeners pour chargement dynamique de safety tab
+    listSelector?.addEventListener('change', () => {
+        currentSort = 'az';
+        sortAzButton.textContent = 'Z-A';
+        sortRecentButton.textContent = 'Recent';
+        loadSafetyList(listSelector.value, currentSort);
+    });
+
+    sortAzButton?.addEventListener('click', () => {
+        const listId = listSelector.value;
+        currentSort = currentSort === 'az' ? 'za' : 'az';
+        sortAzButton.textContent = currentSort === 'az' ? 'Z-A' : 'A-Z';
+        sortRecentButton.textContent = 'Recent';
+        loadSafetyList(listId, currentSort);
+    });
+
+    sortRecentButton?.addEventListener('click', () => {
+        const listId = listSelector.value;
+        currentSort = currentSort === 'recent' ? 'old' : 'recent';
+        sortRecentButton.textContent = currentSort === 'recent' ? 'Old' : 'Recent';
+        sortAzButton.textContent = 'Z-A';
+        loadSafetyList(listId, currentSort);
+    });
+});
+</script>
+
+<script src="{{ asset('js/components/searchBar.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    setupSearchBar('search-all-contacts', 'clear-search-all', '#tab-contacts tbody tr');
+    setupSearchBar('search-safety-contacts', 'clear-search-safety', '#safety-contact-table tr.non-member');
+});
+</script>
+
+
+{% endblock %}
