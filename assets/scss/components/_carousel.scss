@@ -1,0 +1,267 @@
+@use '../abstracts/index' as *;
+
+#photo-data {
+  display: none;
+}
+
+.photo-modal {
+    position: fixed;
+    top: 10%;
+    left: 5%;
+    width: 90%;
+    height: 70%;
+    background: white;
+    border-radius: 10px;
+    padding: 1em;
+    z-index: 999;
+    overflow-y: auto;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+}
+.photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1em;
+    margin-top: 1em;
+}
+
+.photo-thumbs-row {
+  display: flex;
+  gap: 10px;
+  margin-left: 20px;
+}
+
+.photo-thumb-wrapper {
+  position: relative;
+}
+
+.photo-thumb-wrapper img {
+  width: 10vw;
+  height: 10vw;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+}
+
+.photo-thumb-wrapper button {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: red;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+.btn-group button {
+    margin-left: 0.5em;
+}
+
+.photo-thumbs-row img {
+  width: 10vw;
+  height: 10vw;
+  object-fit: cover;
+  position: relative;
+}
+
+.photo-carousel-container {
+  display: flex;
+  align-items: center;
+  margin-left: 20px;
+}
+
+.carousel {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.carousel-wrapper {
+    @include flex-center;
+    height: 20vw;
+    margin: 0 auto;
+    perspective: 1000px; /* clé pour effet 3D */
+}
+
+.carousel-photo {
+  width: 40vw;
+  height: 22vw;
+  object-fit: cover;
+  position: absolute;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.4s ease-in-out;
+  transform-style: preserve-3d;
+  top: 0;
+}
+
+.carousel-photo.main {
+  position: relative;
+  border: 2px solid $secondary-color;
+  border-radius: 12px;
+  z-index: 3;
+  scale: 1;
+  transform: rotateY(0deg) translateZ(0);
+  opacity: 1;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.carousel-arrow {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+}
+
+.save-button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-left: 20px;
+  cursor: pointer;
+}
+
+.side-photo {
+  width: 32vw;
+  height: 16vw;
+  opacity: 0.6;
+  z-index: 2;
+  top: 2vw;
+}
+
+/* Effet 3D + décalage horizontal */
+.left {
+  transform: rotateY(30deg) translateX(-15vw) translateZ(-50px);
+}
+
+.right {
+  transform: rotateY(-30deg) translateX(15vw) translateZ(-50px);
+}
+
+#photo-edit{
+    position: absolute;
+    @include container-shape($size: 3vw, $margin: 0 auto, $shape: circle);
+    top : -2vw;
+    right : -1vw;
+    z-index: 4;
+    background-color: white;
+    border: 2px solid $secondary-color;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+// preview
+
+
+
+.photo-preview-limited {
+  width: 40vw;
+  height: 20vw;
+  display: flex;
+  gap: 0.5vw;
+  flex-wrap: wrap;
+  position: relative;
+}
+
+.thumb-img {
+  width: calc(50% - 0.25vw);
+  height: 9.5vw;
+  object-fit: cover;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-see-all {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: 0.3em 0.6em;
+  font-size: 0.8em;
+  background: #444;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.photo-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  backdrop-filter: blur(5px);
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2vw;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.photo-grid-full {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1vw;
+  justify-content: center;
+  max-width: 90vw;
+}
+
+.photo-full-wrapper {
+  position: relative;
+}
+
+.photo-full-wrapper img {
+  width: 15vw;
+  height: 10vw;
+  object-fit: cover;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.delete-photo-btn {
+  width: clamp(0.5rem, 2vw, 1rem);
+  height: clamp(0.5rem, 2vw, 1rem);
+  text-align: center;
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(255, 0, 0, 0.8);
+  border: none;
+  color: white;
+  font-size: 1em;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.close-popup {
+  align-self: flex-end;
+  margin-bottom: 1vw;
+  background: none;
+  border: none;
+  font-size: 1.5em;
+  color: white;
+  cursor: pointer;
+}
+
+.image-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(10, 10, 10, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+}
+
+.image-overlay img {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+}

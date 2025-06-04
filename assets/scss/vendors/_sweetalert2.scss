@@ -1,0 +1,14 @@
+.swal2-popup svg,
+.swal2-popup .swal2-success-ring,
+.swal2-popup .swal2-success-line-tip,
+.swal2-popup .swal2-success-line-long {
+  all: unset;
+  animation: initial;
+  transform: initial;
+}
+
+.swal2-popup{
+  span{
+    all: unset;
+  }
+}

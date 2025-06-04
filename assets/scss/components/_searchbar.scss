@@ -1,0 +1,32 @@
+.search-all-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    input {
+    padding-left: 1rem;
+    height: clamp(2rem, 5vw, 3rem);
+    width: 100%;
+    border: 1px solid grey;
+    border-radius: 25px;
+    }
+}
+
+#search-all-contacts, #search-safety-contacts {
+    padding-right: 24px; /* espace pour la croix */
+}
+
+
+
+.clear-search {
+    position: absolute;
+    right: 1rem;
+    font-size: 2rem;
+    color: #888;
+    cursor: pointer;
+    display: none;
+}
+
+.clear-search:hover {
+    color: #333;
+}

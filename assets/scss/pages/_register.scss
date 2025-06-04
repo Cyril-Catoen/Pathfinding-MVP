@@ -1,0 +1,101 @@
+@use '../abstracts/index' as *;
+
+main.register {
+    height: 100vh;
+    width: 100vw;
+    background-image: url(../assets/img/zhang.jpg);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    @include flex-center;
+
+    h3, h4{
+        font-size: clamp(2rem, 8vw, 6rem);
+        color:white;
+    }
+
+    h4{
+        font-size: clamp(1.5rem, 6vw, 4rem);
+    }
+    
+    section.container{
+        @include flex(column, flex-start, flex-start);
+        height: 90vh;
+        width: 90%;
+        border: 3px solid white;
+
+        .line-x-separator{
+            margin: 0;
+            background-color: white;
+        }
+
+        form{
+            width: 50%;
+            margin: 4rem 0 5vh 5vw;
+            padding: 1rem 0 1rem 0;
+            @include flex(column, center, center);
+            background-color: rgb(255, 255, 255, 0.3);
+            border-radius: 25px;
+
+            button {
+                width: 45%;
+            }
+
+            @media (max-width: $breakpoint-sm) {
+                width: 95%;
+                margin: 4rem 0 5vh 2vw;
+
+                    label {
+                    padding: 1rem 0 0.5rem 0.5rem;
+                    font-size: clamp(0.725rem, 3vw, 1.5rem);
+                    }
+
+                    input {
+                    padding-left: 0.5rem;
+                    font-size: clamp(0.725rem, 2.5vw, 1.5rem);
+                    height: clamp(1.5rem, 5vw, 3rem);
+                    }
+
+                .w50{
+                    width: 90%;
+                }
+            }
+
+            @media (min-width: calc($breakpoint-sm + 1px)) and (max-width: $breakpoint-md) {
+                width: 75%;
+
+                .w50{
+                    width: 70%;
+                }
+            }
+
+            @media (min-width: calc($breakpoint-md + 1px)) and (max-width: $breakpoint-xl) {
+                width: 65%;
+
+       
+            }
+
+            @media (min-width: calc($breakpoint-xl + 1px)) and (max-width: $breakpoint-xxl) {
+                width: 55%;
+            }
+        }
+
+        div.flex-center, div.flex-cl-start {
+            flex-wrap: wrap;
+
+            @media (max-width: $breakpoint-sm) {
+            gap: 1rem;
+
+            div.w100 {
+                width: 100%;
+            }
+        }
+        }
+
+    }
+
+    section div div.w100.pdt-2{
+         display: flex;
+         align-items: flex-end;
+    }
+}

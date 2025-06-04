@@ -1,0 +1,56 @@
+@use '../abstracts/index' as *;
+@use '../base/globals' as global;
+
+main.newAdv{
+    h2, h3{
+    color: black;
+    }
+    
+    h3{
+        font-size: 2rem;
+        line-height: 3vh;
+    }
+    
+    form{
+        display: flex;
+        align-items: top;
+        justify-content: space-evenly;
+
+        @media (max-width: $breakpoint-sm) {
+        flex-direction: column;
+
+        div.w40, div.w45, div.w70 {
+            width: 90%;
+        }
+        
+
+        div.w40{
+            margin:0 auto;
+        }
+
+        div.w100.d-flex.mt-2{
+            flex-direction: column;
+        }
+        }
+    }
+
+    .button-type-4{
+        border: 2px solid $button-border-green;
+        background-color: $button-green;
+        box-shadow: 0 0 24px $box-shadow-green;
+        transition: scale 0.1s ease-out;
+
+        &:hover{
+            border: 2px solid $button-border-blue;
+            background-color: $button-blue;
+            box-shadow: 0 0 24px $box-shadow-blue;
+            scale: 1.1;
+            transition: scale 0.2s ease-in;
+        }
+    }
+
+    div.w100.d-flex {
+        gap: 10%
+    }
+
+}

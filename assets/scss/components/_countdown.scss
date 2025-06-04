@@ -1,0 +1,6 @@
+@use '../abstracts/index' as *;
+
+.red-alert {
+    color: $red-danger; /* ← remplace par ta couleur rouge Pathfinding si différente */
+    font-weight: bold;
+}

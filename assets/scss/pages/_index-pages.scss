@@ -1,0 +1,14 @@
+@forward 'home';  // Page d’accueil
+@forward 'about';  // Page à propos
+@forward 'contact-form';  // Formulaire de contact 
+@forward 'login';  // Formulaire de connexion
+@forward 'register';  // Formulaire d'inscription
+@forward 'dashboard-user';  // Page d'accueil après connexion compte user
+@forward 'adventure';  // Page dédiée à chaque aventure par id dans l'url
+@forward 'adventures-manager';  // Page dédiée à l'affichage de la liste des aventures de l'utilisateur
+@forward 'create-adventure';  // Page dédiée au formulaire de création d'aventure
+@forward 'contacts-manager';  // Page dédiée à la gestion des contacts d'alertes
+@forward 'create-contact';  // Page dédiée à la création des contacts d'alertes
+@forward 'update-user';  // Page dédiée à la création des contacts d'alertes
+@forward 'update-contact';  // Page dédiée à l'édition des contacts d'alertes
+@forward 'users-manager';  // Page dédiée à la gestion des users
