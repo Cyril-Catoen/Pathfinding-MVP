@@ -1,0 +1,187 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block metatitle %}
+<title>
+    PathAdmin - 
+    {% if adventure.title %} 
+        {{ adventure.title }}  
+    {% else %}
+        Adventure not found
+    {% endif %}
+</title>
+{% endblock metatitle %}
+
+{% block main %}
+<main class="adv-main">
+    <section class="container">
+        <div class="w100 flex-between pdt-8">
+            <div class="flex-start gap-2">
+                <a class="arrow-return-button" href="{{ path('admin/adventure-manager')}}">
+                    <i class="fas fa-arrow-left"></i>
+                </a> 
+                <h2>{{ adventure.title ?: 'No title' }}</h2>
+            </div>
+            <div class="w25">
+                <p class="button-type-2 button-green">{{ adventure.status.value|capitalize }}</p>
+            </div>
+        </div>
+
+        <div class="w100 flex-between mt-8">
+            <div id="photo-data" 
+                data-adventure-id="{{ adventure.id }}"
+                data-uploaded-count="{{ pictures|length }}"
+                data-pictures2='{{ pictures|map(p => { id: p.id, path: asset(p.picturePath) })|json_encode|e("html_attr") }}'
+                data-pictures='{{ pictures|map(p => asset(p.picturePath))|json_encode(constant("JSON_UNESCAPED_SLASHES"))|e("html_attr") }}'
+                data-delete-url-template="{{ path('adventure_photo_delete', { adventureId: '__AID__', photoId: '__PID__' }) }}">
+            </div>
+            {% set isAchieved = adventure.status.value == 'achieved' %}
+            {% set hasPictures = pictures is not empty %}
+
+            {% if isAchieved %}
+                <div class="photo-section w100">
+                    {% include 'admin/adventures/partials/_photo-display-admin.html.twig' %}
+                </div>
+            {% else %}
+                <div class="adventure-card-empty">
+                    <i class="fas fa-hiking"></i>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="w100 mt-4">
+            <h3 class="d-flex gap-2">
+                <span>Description</span>
+            </h3>
+            <p class="{{ adventure.description is not empty ? '' : 'italic text-muted pdl-2' }}">
+                {{ adventure.description ?: 'No description.' }}
+            </p>
+        </div>
+
+        <div class="line-x-separator"></div>
+
+        <div class="flex-between">
+            <div class="w60 flex-cl-end mb-4">
+                <div class="w100 flex-between-top">
+                    <h3 class="mt-2">FILES</h3>
+                </div>
+                <div class="uploaded-files" id="uploaded-files-container">
+                    <!-- Uploaded files preview -->
+                </div>
+            </div>
+            <div class="w35 h100 flex-end">
+                <div class="vh30 flex-cl-between">
+                    <div class="w60">
+                        <label for="start_date">START DATE</label>
+                        <input type="datetime-local" name="start_date"
+                            value="{{ adventure.startDate ? adventure.startDate|date('Y-m-d\\TH:i') : '' }}" readonly>
+                    </div>
+                    <div class="w60">
+                        <label for="end_date">END DATE</label>
+                        <input type="datetime-local" name="end_date"
+                            value="{{ adventure.endDate ? adventure.endDate|date('Y-m-d\\TH:i') : '' }}" readonly>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="GPSTrack" class="container">
+        <div class="line-x-separator"></div>
+        <div class="w100 flex-between mt-4">
+            <div class="flex-start w45">
+                <h2>GPS TRACK</h2>
+            </div>
+        </div>
+        <div class="container-type-3 shadow-black">
+            <!-- Carte topographique avec tracé si existant -->
+        </div>
+
+        <div class="w100 flex-between mt-4 mb-8">
+            <div class="flex-start w30">
+                <h3 class="mt-2 mb-2 gap-2">SAFETY ALERT</h3>
+                <label class="toggle-btn">
+                    <input type="checkbox" name="safetyEnabled" {{ adventure.timerAlert and adventure.timerAlert.isActive ? 'checked' : '' }} disabled>
+                    <div class="slider"><div class="ball"></div></div>
+                </label>
+            </div>
+            <div class="w30">
+                <label>Contact list</label>
+                <select name="contact_list_id" disabled>
+                {% for list in contactLists %}
+                    <option value="{{ list.id }}"
+                        {% if selectedContactList and list.id == selectedContactList.id %}selected{% endif %}>
+                        {{ list.name }}
+                    </option>
+                {% endfor %}
+            </select>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock main %}
+
+{% block script %}
+
+<!-- Script carrousel display-->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const photoData = document.getElementById('photo-data');
+    if (!photoData || !photoData.dataset.pictures) return;
+
+    const displayPictures = JSON.parse(photoData.dataset.pictures);
+    let displayCarouselIndex = 0;
+
+    function updateDisplayCarousel() {
+        const left = document.getElementById('carousel-left');
+        const center = document.getElementById('carousel-center');
+        const right = document.getElementById('carousel-right');
+
+        const total = displayPictures.length;
+        if (total < 4 || !left || !center || !right) return;
+
+        const indexes = [
+            (displayCarouselIndex - 1 + total) % total,
+            displayCarouselIndex % total,
+            (displayCarouselIndex + 1) % total
+        ];
+
+        left.src = displayPictures[indexes[0]];
+        center.src = displayPictures[indexes[1]];
+        right.src = displayPictures[indexes[2]];
+    }
+
+    window.prevDisplayCarousel = function () {
+        displayCarouselIndex = (displayCarouselIndex - 1 + displayPictures.length) % displayPictures.length;
+        updateDisplayCarousel();
+    };
+
+    window.nextDisplayCarousel = function () {
+        displayCarouselIndex = (displayCarouselIndex + 1) % displayPictures.length;
+        updateDisplayCarousel();
+    };
+
+    updateDisplayCarousel(); // Appel initial pour afficher les images
+});
+
+function openImagePreview(src) {
+    const overlay = document.getElementById('image-overlay');
+    const img = document.getElementById('overlay-image');
+    img.src = src;
+    overlay?.classList.remove('d-none');
+}
+
+function closeImagePreview() {
+    const overlay = document.getElementById('image-overlay');
+    overlay?.classList.add('d-none');
+}
+
+function handleCarouselClick() {
+    const center = document.getElementById('carousel-center');
+    if (center?.src) {
+        openImagePreview(center.src);
+    }
+}
+
+</script>
+
+{% endblock script %}

@@ -1,0 +1,99 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block metatitle %}
+    <title>PathAdmin - Edit User</title>
+{% endblock metatitle %}
+
+{% block main %}
+<main class="update-user">
+    <section class="container">
+        <div class="flex-start gap-2 pdt-8 pdb-2">
+            <a class="arrow-return-button" href="{{ path('admin/user-manager')}}"><i class="fas fa-arrow-left"></i></a>
+            <h2>EDIT USER</h2>
+        </div>
+        <form method="post" action="{{ path('update-user', {'id': user.id}) }}" enctype="multipart/form-data">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+            <div class="flex-center gap-4">
+                <div class="w45">
+                    <label for="name">NAME</label>
+                    <input type="text" id="name" name="name" value="{{ user.name }}" required>
+                </div>
+                <div class="w45">
+                    <label for="surname">SURNAME</label>
+                    <input type="text" id="surname" name="surname" value="{{ user.surname }}" required>
+                </div>
+                <div class="w45">
+                    <label for="email">EMAIL ADDRESS</label>
+                    <input type="text" id="email" name="email" value="{{ user.email }}" readonly required>
+                </div>
+                <div class="w45">
+                    <label for="birthdate">BORN THE</label>
+                    <input type="date" id="birthdate" name="birthdate" value="{{ user.birthdate ? user.birthdate|date('Y-m-d') : '' }}" required>
+                </div>
+                <div class="w45">
+                    <label for="country">COUNTRY</label>
+                    <select name="country" id="country">
+                        <option value="">Select a country</option>
+                        {% for code, name in countries %}
+                            <option value="{{ code }}" {% if code == user.country %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="w45">
+                    <label for="role">ROLE</label>
+                    <select id="role" name="role" required>
+                        <option value="" disabled>Role</option>
+                        <option value="user" {% if 'ROLE_USER' in user.roles and not 'ROLE_ADMIN' in user.roles %}selected{% endif %}>User</option>
+                        <option value="admin" {% if 'ROLE_ADMIN' in user.roles %}selected{% endif %}>Admin</option>
+                    </select>
+                </div>
+                <div class="w45">
+                    <label for="picture-user">PICTURE</label>
+                    <div class="adventure-card">
+                        {% set pictureUrl = user.picturePath ? asset('uploads/user-picture/' ~ user.picturePath)|e('css') : null %}
+                        <label for="picture-user" id="uploadLabel" class="upload-label"
+                            {% if pictureUrl %}
+                                style="background-image: url('{{ pictureUrl }}');"
+                            {% endif %}>
+                            {% if not pictureUrl %}
+                                Click here to add a profile picture
+                            {% endif %}
+                        </label>
+                        <input type="file" id="picture-user" name="picture-user" class="upload-input" accept="image/*" />
+                    </div>
+                </div>
+                <div class="w100 flex-end pdt-2">
+                    <button class="button-type-1 button-green" id="update" type="submit">UPDATE</button>
+                </div>
+            </div>
+        </form>
+    </section>
+</main>
+{% endblock main %}
+
+{% block script %}
+<script src="{{ asset('js/validatorRegisterForm.js') }}" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const fileInput = document.getElementById('picture-user');
+    const label = document.getElementById('uploadLabel');
+
+    if (fileInput && label) {
+        fileInput.addEventListener('change', function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    label.style.backgroundImage = `url('${e.target.result}')`;
+                    label.textContent = ""; // Enlève le texte une fois l'image chargée
+                };
+                reader.readAsDataURL(file);
+            } else {
+                label.style.backgroundImage = 'none';
+                label.textContent = "Click here to add a profile picture";
+            }
+        });
+    }
+});
+</script>
+{% endblock script %}

@@ -40,6 +40,7 @@ html {
 .flex-start { @include flex(row, flex-start); }
 .flex-start-top { @include flex(row, flex-start, flex-start); }
 .flex-end { @include flex(row, flex-end); }
+.flex-end-top { @include flex(row, flex-end, flex-start); }
 .flex-cl-center { @include flex-center($direction: column); }
 .flex-cl-between { @include flex(column, space-between, center); }
 .flex-cl-between-start { @include flex(column, space-between, flex-start); }

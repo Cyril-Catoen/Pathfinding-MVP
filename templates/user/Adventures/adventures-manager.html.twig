@@ -25,12 +25,13 @@
 
                 <div class="contact-toolbar">
                     <div class="search-all-wrapper">
-                        <input type="text" id="search-safety-contacts" placeholder="Search an adventure..." />
-                        <span class="clear-search" id="clear-search-safety" title="Clear">&times;</span>
+                        <input type="text" id="search-adventures" placeholder="Search an adventure..." />
+                        <span class="clear-search" id="clear-search-adventures" title="Clear">&times;</span>
                     </div>
                     <div class="sort-buttons">
-                        <button type="button" class="sort-az">Z-A</button>
-                        <button type="button" class="sort-recent">Recent</button>
+                        <button type="button" class="sort-button" data-sort="alpha">Z-A</button>
+                        <button type="button" class="sort-button" data-sort="date">Recent</button>
+                        <button type="button" class="sort-button" data-sort="status">Status</button>
                     </div>
                 </div>
 
@@ -85,16 +86,18 @@
                                 </tr>
                             {% else %}
                                 <tr>
-                                    <td colspan="7" class="text-center">Il n'y a pas d'aventure en cours.</td>
+                                    <td colspan="7" class="text-center separator">Il n'y a pas d'aventure en cours.</td>
                                 </tr>
                             {% endif %}
 
                             {% if otherAdventures is not empty %}
-                                <tr><td colspan="7"><hr></td></tr>
+                                <tr>
+                                    <td colspan="7" class="separator"><hr></td>
+                                </tr>
                             {% endif %}
 
                             {% for adventure in otherAdventures %}
-                                <tr>
+                                <tr class="adventure-row" data-title="{{ adventure.title|lower }}" data-start="{{ adventure.startDate.getTimestamp }}" data-status="{{ adventure.status.value }}">
                                     <td>{{ adventure.title }}</td>
                                     <td>{{ adventure.status.value }}</td>
                                     <td>{{ adventure.startDate|date('Y-m-d') }}</td>
@@ -147,83 +150,99 @@
 {% endfor %}
 
 <script>
-const ajaxUrl = "{{ path('contacts-ajax') }}";
-const listSelector = document.getElementById('list-selector');
-const sortAzButton = document.querySelector('.sort-az');
-const sortRecentButton = document.querySelector('.sort-recent');
-let currentSort = 'az';
-
-function loadSafetyList(listId, sort = 'az') {
-    fetch(`${ajaxUrl}?list=${listId}&sort=${sort}`)
-        .then(res => res.text())
-        .then(html => {
-            document.getElementById('safety-contact-table').outerHTML = html;
-            // Réappliquer le filtre après rechargement
-            setupSearchBar('search-safety-contacts', 'clear-search-safety', '#safety-contact-table tr.non-member');
-        });
-}
-
 document.addEventListener('DOMContentLoaded', () => {
-    // 🔁 Onglets dynamiques avec hash
-    const hash = window.location.hash;
-    if (hash === '#tab-safety' || hash === '#tab-contacts') {
-        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active-tab'));
-        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('d-none'));
+    const searchInput = document.getElementById('search-adventures');
+    const clearBtn = document.getElementById('clear-search-adventures');
+    const sortButtons = document.querySelectorAll('.sort-button');
+    let currentSort = 'alpha-asc'; // tri initial A-Z
 
-        const tabKey = hash.replace('#tab-', '');
-        const btn = document.querySelector(`.tab-button[data-tab="${tabKey}"]`);
-        const content = document.getElementById(`tab-${tabKey}`);
-        if (btn && content) {
-            btn.classList.add('active-tab');
-            content.classList.remove('d-none');
+    const tbody = document.getElementById('adventure-list');
+    const ongoingRow = document.querySelector('.ongoing-highlight');
+    let adventureRows = Array.from(document.querySelectorAll('.adventure-row'));
+
+    // Crée ou récupère un séparateur <tr>
+    let separator = document.querySelector('.separator');
+    if (!separator) {
+        separator = document.createElement('tr');
+        separator.classList.add('separator');
+        separator.innerHTML = '<td colspan="7"><hr></td>';
+    }
+
+    function updateView() {
+        const query = searchInput.value.trim().toLowerCase();
+        clearBtn.style.display = query ? 'inline' : 'none';
+
+        // Filtrage logique + copie locale des lignes filtrées
+        const filtered = adventureRows.filter(row => {
+            const title = row.dataset.title;
+            const match = title.includes(query);
+            row.style.display = match ? '' : 'none';
+            return match;
+        });
+
+        // Tri logique sur les lignes visibles
+        filtered.sort((a, b) => {
+            if (currentSort === 'alpha-asc') {
+                return a.dataset.title.localeCompare(b.dataset.title);
+            } else if (currentSort === 'alpha-desc') {
+                return b.dataset.title.localeCompare(a.dataset.title);
+            } else if (currentSort === 'date-recent') {
+                return b.dataset.start - a.dataset.start;
+            } else if (currentSort === 'date-old') {
+                return a.dataset.start - b.dataset.start;
+            } else if (currentSort === 'status-asc') {
+                return a.dataset.status.localeCompare(b.dataset.status);
+            } else if (currentSort === 'status-desc') {
+                return b.dataset.status.localeCompare(a.dataset.status);
+            }
+        });
+
+        // Réinjection DOM ordonnée, sans perte
+        // On enlève les anciennes positions (mais sans supprimer du DOM)
+        // Supprime tous les anciens séparateurs existants
+        document.querySelectorAll('#adventure-list tr.separator').forEach(s => s.remove());
+
+
+        // On réordonne
+        filtered.forEach(row => tbody.appendChild(row));
+
+        if (ongoingRow) {
+            tbody.insertBefore(separator, ongoingRow.nextSibling);
+        } else if (filtered.length > 0) {
+            tbody.insertBefore(separator, filtered[0]);
         }
     }
 
-    // 🖱️ Écouteur sur les onglets pour mettre à jour le hash
-    document.querySelectorAll('.tab-button').forEach(button => {
-        button.addEventListener('click', () => {
-            const tab = button.dataset.tab;
-            history.replaceState(null, null, `#tab-${tab}`);
+    // Gestion boutons de tri
+    sortButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const type = btn.dataset.sort;
 
-            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active-tab'));
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('d-none'));
+            if (type === 'alpha') {
+                currentSort = currentSort === 'alpha-asc' ? 'alpha-desc' : 'alpha-asc';
+                btn.textContent = currentSort === 'alpha-asc' ? 'Z-A' : 'A-Z';
+            } else if (type === 'date') {
+                currentSort = currentSort === 'date-recent' ? 'date-old' : 'date-recent';
+                btn.textContent = currentSort === 'date-recent' ? 'Old' : 'Recent';
+            } else if (type === 'status') {
+                currentSort = currentSort === 'status-asc' ? 'status-desc' : 'status-asc';
+                btn.textContent = currentSort === 'status-asc' ? 'Status ↓' : 'Status ↑';
+            }
 
-            button.classList.add('active-tab');
-            document.getElementById(`tab-${tab}`).classList.remove('d-none');
+            updateView();
         });
     });
 
-    // 🎯 Listeners pour chargement dynamique de safety tab
-    listSelector?.addEventListener('change', () => {
-        currentSort = 'az';
-        sortAzButton.textContent = 'Z-A';
-        sortRecentButton.textContent = 'Recent';
-        loadSafetyList(listSelector.value, currentSort);
+    // Barre de recherche
+    searchInput.addEventListener('input', updateView);
+
+    clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        clearBtn.style.display = 'none';
+        updateView();
     });
 
-    sortAzButton?.addEventListener('click', () => {
-        const listId = listSelector.value;
-        currentSort = currentSort === 'az' ? 'za' : 'az';
-        sortAzButton.textContent = currentSort === 'az' ? 'Z-A' : 'A-Z';
-        sortRecentButton.textContent = 'Recent';
-        loadSafetyList(listId, currentSort);
-    });
-
-    sortRecentButton?.addEventListener('click', () => {
-        const listId = listSelector.value;
-        currentSort = currentSort === 'recent' ? 'old' : 'recent';
-        sortRecentButton.textContent = currentSort === 'recent' ? 'Old' : 'Recent';
-        sortAzButton.textContent = 'Z-A';
-        loadSafetyList(listId, currentSort);
-    });
-});
-</script>
-
-<script src="{{ asset('js/components/searchBar.js') }}"></script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    setupSearchBar('search-all-contacts', 'clear-search-all', '#tab-contacts tbody tr');
-    setupSearchBar('search-safety-contacts', 'clear-search-safety', '#safety-contact-table tr.non-member');
+    updateView(); // Initialisation
 });
 </script>
 

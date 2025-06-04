@@ -27,8 +27,13 @@
       
 {% include 'admin/partials/_footer.html.twig' %}
 
-    <script src="../js/main.js" defer></script>
-    <script src="../js/menu.js" defer></script>
+    <!-- ! Import de la bibliothèque externe JS - SweetAlert2 pour les messages pop-ups -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
+    <script src="{{ asset('js/antibackForward.js') }}" defer></script>
+    <script src="{{ asset('js/main.js') }}" defer></script>
+    <script src="{{ asset('js/menu.js') }}" defer></script>
+    <script src="{{ asset('js/components/confirmDeleteButton.js') }}" defer></script>
+
 
     {% block script %}
     {% endblock script %}

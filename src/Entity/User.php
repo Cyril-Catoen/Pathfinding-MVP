@@ -93,6 +93,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     // #[Assert\Length(min: 2)]
     private ?string $country = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $picturePath = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $description = null;
+
     #[ORM\Column]
     private ?\DateTimeImmutable $registrationAt = null;
 
@@ -131,11 +137,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->contactLists = new ArrayCollection(); 
     }
 
-    public function createAdmin(string $email, string $passwordHashed) {
+    public function createAdmin(
+        string $email,
+        string $passwordHashed,
+        string $name,
+        string $surname,
+        \DateTime $birthdate
+    ): void {
         $this->email = $email;
         $this->password = $passwordHashed;
-
         $this->roles = ['ROLE_ADMIN'];
+        $this->name = $name;
+        $this->surname = $surname;
+        $this->birthdate = $birthdate;
     }
 
     public function createUser(
@@ -356,12 +370,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getDateRegistration(): ?\DateTimeImmutable
+    public function getRegistrationAt(): ?\DateTimeImmutable
     {
         return $this->registrationAt;
     }
 
-    public function setDateRegistration(\DateTimeImmutable $registrationAt): static
+    public function setRegistrationAt(\DateTimeImmutable $registrationAt): static
     {
         $this->registrationAt = $registrationAt;
 
@@ -490,4 +504,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    // PicturePath (photo de profil)
+    public function getPicturePath(): ?string
+    {
+        return $this->picturePath;
+    }
+
+    public function setPicturePath(?string $picturePath): static
+    {
+        $this->picturePath = $picturePath;
+        return $this;
+    }
+
+    // Description (bio, présentation)
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
+        return $this;
+    }
+
 }

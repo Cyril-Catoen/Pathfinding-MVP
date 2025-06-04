@@ -1,0 +1,198 @@
+{% extends 'admin/base.html.twig' %}
+
+        {% block metatitle %}
+        <title>PathAdmin - User Manager</title>
+        {% endblock metatitle %}
+
+{% block main %}
+
+<main class="users-manager">
+    <section class="container">
+        <div class="flex-start gap-2 pdt-8 pdb-2">
+            <a class="arrow-return-button" href="{{ path('admin_dashboard')}}">
+                        <i class="fas fa-arrow-left" src="../../assets/img/LiveTrack.jpeg" alt=""></i>
+            </a> 
+            <h2>USER MANAGER</h2>
+        </div>
+    
+    <div class="container-type-5">
+        <div class="tab-wrapper">
+            <div class="tab-content" id="tab-contacts">
+                <div class="flex-between mb-3 mt-2">
+                    <h3>All Users</h3>
+                    <a href="{{ path('create-user') }}" class="button-type-4">+ Add</a>
+                </div>
+
+                <div class="contact-toolbar">
+                    <div class="search-all-wrapper">
+                        <input type="text" id="search-users" placeholder="Search a User by Id, email or name" />
+                        <span class="clear-search" id="clear-search-users" title="Clear">&times;</span>
+                    </div>
+                    <div class="sort-buttons">
+                        <button type="button" class="sort-button" data-sort="alpha">Z-A</button>
+                        <button type="button" class="sort-button" data-sort="id">Id</button>
+                        <button type="button" class="sort-button" data-sort="registration">Registration</button>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Email</th>
+                                <th>Roles</th>
+                                <th>Name</th>
+                                <th>Surname</th>
+                                <th>Country</th>
+                                <th>Member since</th>
+                                <th>Last login</th>
+                                <th>Edit</th>
+                                <th>Remove</th>
+                            </tr>
+                        </thead>
+                        <tbody id="user-list">
+                        
+                            {% if users is empty %}
+                                <tr>
+                                    <td colspan="10">No users yet.</td>
+                                </tr>
+                            {% else %}
+                                {% for user in users %}
+                                    <tr class="user-row"
+                                        data-name="{{ user.name ~ ' ' ~ user.surname }}"
+                                        data-id="{{ user.id }}"
+                                        data-registration="{{ user.registrationAt ? user.registrationAt|date('Y-m-d H:i:s') : '' }}"
+                                        data-title="{{ user.id ~ ' ' ~ user.email ~ ' ' ~ user.name ~ ' ' ~ user.surname }}">
+                                        <td>{{ user.id }}</td>
+                                        <td>{{ user.email }}</td>
+                                        <td>{{ user.roles|join(', ') }}</td> 
+                                        <td>{{ user.name }}</td>
+                                        <td>{{ user.surname }}</td>
+                                        <td>{{ user.country}}</td>
+                                        <td>{{ user.registrationAt ? user.registrationAt|date('d/m/Y H:i') : '' }}</td>
+                                        <td>{{ user.lastLogin ? user.lastLogin|date('d/m/Y H:i') : '' }}</td>
+                                        <td>
+                                            <a href="{{ path('update-user', {'id': user.id}) }}">
+                                                <i class="fas fa-pen"></i>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="{{ path('delete-user', {'id': user.id}) }}" 
+                                               class="delete-contact-btn" 
+                                               data-url="{{ path('delete-user', {'id': user.id}) }}">
+                                                <i class="fas fa-times"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+    </section>
+</main>
+{% endblock main %}
+{% block script %}
+
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <script>
+            Swal.fire({
+                title: "{{ message|e('js') }}",
+                icon: "{{ label == 'error' ? 'error' : 'success' }}",
+                timer: 2000,
+                timerProgressBar: true,
+                showConfirmButton: false
+            });
+        </script>
+    {% endfor %}
+{% endfor %}
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('search-users');
+    const clearBtn = document.getElementById('clear-search-users');
+    const sortButtons = document.querySelectorAll('.sort-button');
+    let currentSort = 'id-asc'; // tri initial id croissant
+
+    const tbody = document.getElementById('user-list');
+    let userRows = Array.from(document.querySelectorAll('.user-row'));
+
+    function normalize(str) {
+    return (str || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    }
+
+    function updateView() {
+        const query = normalize(searchInput.value.trim());
+        clearBtn.style.display = query ? 'inline' : 'none';
+
+        // Filtrage logique + copie locale des lignes filtrées
+        const filtered = userRows.filter(row => {
+            const title = normalize(row.dataset.title);
+            const match = title.includes(query);
+            row.style.display = match ? '' : 'none';
+            return match;
+        });
+
+        // Tri logique sur les lignes visibles
+        filtered.sort((a, b) => {
+            if (currentSort === 'alpha-asc') {
+                return a.dataset.name.localeCompare(b.dataset.name);
+            } else if (currentSort === 'alpha-desc') {
+                return b.dataset.name.localeCompare(a.dataset.name);
+            } else if (currentSort === 'id-desc') {
+                return b.dataset.id - a.dataset.id;
+            } else if (currentSort === 'id-asc') {
+                return a.dataset.id - b.dataset.id;
+            } else if (currentSort === 'registration-asc') {
+                return a.dataset.registration.localeCompare(b.dataset.registration);
+            } else if (currentSort === 'registration-desc') {
+                return b.dataset.registration.localeCompare(a.dataset.registration);
+            }
+        });
+
+        // Réinjection DOM ordonnée, sans perte
+        // On enlève les anciennes positions (mais sans supprimer du DOM)
+
+        // On réordonne
+        filtered.forEach(row => tbody.appendChild(row));
+    }
+
+    // Gestion boutons de tri
+    sortButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const type = btn.dataset.sort;
+
+            if (type === 'alpha') {
+                currentSort = currentSort === 'alpha-asc' ? 'alpha-desc' : 'alpha-asc';
+                btn.textContent = currentSort === 'alpha-asc' ? 'Z-A' : 'A-Z';
+            } else if (type === 'id') {
+                currentSort = currentSort === 'id-asc' ? 'id-desc' : 'id-asc';
+                btn.textContent = currentSort === 'id-asc' ? 'Id ↓' : 'Id ↑';
+            } else if (type === 'registration') {
+                currentSort = currentSort === 'registration-asc' ? 'registration-desc' : 'registration-asc';
+                btn.textContent = currentSort === 'registration-asc' ? 'Registration ↓' : 'Registration ↑';
+            }
+
+            updateView();
+        });
+    });
+
+    // Barre de recherche
+    searchInput.addEventListener('input', updateView);
+
+    clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        clearBtn.style.display = 'none';
+        updateView();
+    });
+
+    updateView(); // Initialisation
+});
+</script>
+
+
+
+{% endblock %}

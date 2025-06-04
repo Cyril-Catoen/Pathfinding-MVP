@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Enum\Status;
 use App\Enum\ViewAuthorization;
 use App\Repository\AdventureRepository;
+use App\Entity\ContactList;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -90,6 +91,17 @@ class Adventure
     #[ORM\OneToMany(mappedBy: 'adventure', targetEntity: SafetyAlert::class, orphanRemoval: true)]
     private Collection $safetyAlerts;
 
+    /**
+     * @var Collection<int, AdventurePicture>
+     */
+
+    #[ORM\OneToMany(mappedBy: 'adventure', targetEntity: AdventurePicture::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
+    private Collection $pictures;
+
+    #[ORM\ManyToOne(targetEntity: ContactList::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?ContactList $contactList = null;
+
     #[ORM\PrePersist]
     public function generateShareLink(): void
     {
@@ -104,7 +116,8 @@ class Adventure
         $this->authorizedUsers = new ArrayCollection();
         $this->safetyAlerts = new ArrayCollection();
 
-        $this->createdAt = new \DateTimeImmutable(); 
+        $this->createdAt = new \DateTimeImmutable();
+        $this->pictures = new ArrayCollection(); 
     }
 
     public function isVisibleTo(?User $user): bool {
@@ -411,5 +424,46 @@ class Adventure
     public function hasActiveTimer(): bool
     {
         return $this->timerAlert !== null && $this->timerAlert->isActive();
+    }
+
+    /**
+     * @return Collection<int, AdventurePicture>
+     */
+    public function getPictures(): Collection
+    {
+        return $this->pictures;
+    }
+
+    public function addPicture(AdventurePicture $picture): static
+    {
+        if (!$this->pictures->contains($picture)) {
+            $this->pictures->add($picture);
+            $picture->setAdventure($this);
+        }
+
+        return $this;
+    }
+
+    public function removePicture(AdventurePicture $picture): static
+    {
+        if ($this->pictures->removeElement($picture)) {
+            // set the owning side to null (unless already changed)
+            if ($picture->getAdventure() === $this) {
+                $picture->setAdventure(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getContactList(): ?ContactList
+    {
+        return $this->contactList;
+    }
+
+    public function setContactList(?ContactList $contactList): static
+    {
+        $this->contactList = $contactList;
+        return $this;
     }
 }

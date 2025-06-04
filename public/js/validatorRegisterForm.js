@@ -2,6 +2,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const joinBtn = document.getElementById('join');
     const form = document.querySelector('form');
 
+    if (!joinBtn || !form) return; // Sécurité : pas de bouton ou pas de form, on sort
+
     joinBtn.addEventListener('click', function(event) {
         event.preventDefault();
         if (validateForm()) {
@@ -17,11 +19,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const passwordField = document.getElementById('password');
         const confirmPasswordField = document.getElementById('confirmPass');
         const birthdateField = document.getElementById('birthdate');
+        const roleSelect = document.getElementById('role'); // peut ne pas exister !
 
+        // Tableau de tous les champs à nettoyer (erreurs)
         const fields = [nameField, surnameField, emailField, confirmEmailField, passwordField, confirmPasswordField, birthdateField];
+        if (roleSelect) fields.push(roleSelect);
 
-        // Clean previous errors
+        // Nettoyage des erreurs précédentes
         fields.forEach(field => {
+            if (!field) return;
             field.classList.remove('field-error');
             const error = field.parentElement.querySelector('.error-message');
             if (error) error.remove();
@@ -29,31 +35,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let isValid = true;
 
+        // Validation du champ rôle uniquement s'il existe (form admin)
+        if (roleSelect && roleSelect.value === "") {
+            fail("Please select a role (User or Admin).", roleSelect);
+            isValid = false;
+        }
+
         const nameRegex = /^\p{L}+$/u;
         const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/;
 
-        if (!nameRegex.test(nameField.value)) {
+        if (!nameField || !nameRegex.test(nameField.value)) {
             fail("Name must only contain alphabetical letters.", nameField);
             isValid = false;
         }
 
-        if (!nameRegex.test(surnameField.value)) {
+        if (!surnameField || !nameRegex.test(surnameField.value)) {
             fail("Surname must only contain alphabetical letters.", surnameField);
             isValid = false;
         }
 
-        if (!emailRegex.test(emailField.value)) {
+        if (!emailField || !emailRegex.test(emailField.value)) {
             fail("Invalid email format.", emailField);
             isValid = false;
         }
 
-        if (emailField.value !== confirmEmailField.value) {
+        if (!confirmEmailField || emailField.value !== confirmEmailField.value) {
             fail("Email confirmation does not match.", confirmEmailField);
             isValid = false;
         }
 
-        if (passwordField.value.length < 8) {
+        if (!passwordField || passwordField.value.length < 8) {
             fail("Password must be at least 8 characters long.", passwordField);
             isValid = false;
         } else if (!passwordRegex.test(passwordField.value)) {
@@ -61,12 +73,12 @@ document.addEventListener('DOMContentLoaded', () => {
             isValid = false;
         }
 
-        if (passwordField.value !== confirmPasswordField.value) {
+        if (!confirmPasswordField || passwordField.value !== confirmPasswordField.value) {
             fail("Password confirmation does not match.", confirmPasswordField);
             isValid = false;
         }
 
-        if (!birthdateField.value) {
+        if (!birthdateField || !birthdateField.value) {
             fail("Please enter your birthdate.", birthdateField);
             isValid = false;
         } else {
@@ -87,6 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function fail(message, field) {
+        if (!field) return;
         field.classList.add('field-error');
         const error = document.createElement('div');
         error.classList.add('error-message');
@@ -95,4 +108,3 @@ document.addEventListener('DOMContentLoaded', () => {
         field.parentElement.appendChild(error);
     }
 });
-

@@ -47,6 +47,20 @@
     white-space: nowrap;
   }
 
+// cursors
+.c-pointer {
+  cursor: pointer;
+}
+
+// position
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+}
+
 // Predifined width
 // Using a @for loop allows us to create a lot of utilities class with few line
 @for $i from 10 through 100 {

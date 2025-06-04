@@ -1,0 +1,195 @@
+{% extends 'admin/base.html.twig' %}
+
+        {% block metatitle %}
+        <title>PathAdmin - Adventure Manager</title>
+        {% endblock metatitle %}
+
+{% block main %}
+
+<main class="adventures-manager">
+    <section class="container">
+        <div class="flex-start gap-2 pdt-8 pdb-2">
+            <a class="arrow-return-button" href="{{ path('admin_dashboard')}}">
+                        <i class="fas fa-arrow-left" src="../../assets/img/LiveTrack.jpeg" alt=""></i>
+            </a> 
+            <h2>ADVENTURE MANAGER</h2>
+        </div>
+    
+    <div class="container-type-5">
+        <div class="tab-wrapper">
+            <div class="tab-content" id="tab-contacts">
+                <div class="flex-between mb-3 mt-2">
+                    <h3>All Adventures</h3>
+                </div>
+
+                <div class="contact-toolbar">
+                    <div class="search-all-wrapper">
+                        <input type="text" id="search-adventures" placeholder="Search an Adventure by Id or Owner" />
+                        <span class="clear-search" id="clear-search-adventures" title="Clear">&times;</span>
+                    </div>
+                    <div class="sort-buttons">
+                        <button type="button" class="sort-button" data-sort="start">Start</button>
+                        <button type="button" class="sort-button" data-sort="id">Id</button>
+                        <button type="button" class="sort-button" data-sort="created">Created</button>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="adventures-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Owner</th>
+                                <th>Title</th>
+                                <th>Start</th>
+                                <th>End</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Display</th>
+                                <th>Remove</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adventure-list">
+                        
+                            {% if adventures is empty %}
+                                <tr>
+                                    <td colspan="9">No adventures yet.</td>
+                                </tr>
+                            {% else %}
+                                {% for adventure in adventures %}
+                                    <tr class="adventure-row"
+                                        data-start="{{ adventure.startDate ? adventure.startDate|date('Y-m-d H:i:s') : '' }}"
+                                        data-id="{{ adventure.id }}"
+                                        data-created="{{ adventure.createdAt ? adventure.createdAt|date('Y-m-d H:i:s') : '' }}"
+                                        data-search="{{ adventure.id ~ ' ' ~ (adventure.owner ? adventure.owner.email : '') ~ ' ' ~ adventure.title }}">
+                                        <td>{{ adventure.id }}</td>
+                                        <td>{{ adventure.owner ? adventure.owner.email : '' }}</td>
+                                        <td>{{ adventure.title }}</td>
+                                        <td>{{ adventure.startDate ? adventure.startDate|date('d/m/Y H:i') : '' }}</td>
+                                        <td>{{ adventure.endDate ? adventure.endDate|date('d/m/Y H:i') : '' }}</td>
+                                        <td>{{ adventure.status.value|capitalize }}</td>
+                                        <td>{{ adventure.createdAt ? adventure.createdAt|date('d/m/Y H:i') : '' }}</td>
+                                        <td>
+                                            <a href="{{ path('display-adventure', {'id': adventure.id}) }}">
+                                                <i class="fas fa-magnifying-glass"></i>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="{{ path('admin/delete-adventure', {'id': adventure.id}) }}" 
+                                            class="delete-contact-btn" 
+                                            data-url="{{ path('admin/delete-adventure', {'id': adventure.id}) }}">
+                                                <i class="fas fa-times"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+    </section>
+</main>
+{% endblock main %}
+{% block script %}
+
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <script>
+            Swal.fire({
+                title: "{{ message|e('js') }}",
+                icon: "{{ label == 'error' ? 'error' : 'success' }}",
+                timer: 2000,
+                timerProgressBar: true,
+                showConfirmButton: false
+            });
+        </script>
+    {% endfor %}
+{% endfor %}
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('search-adventures');
+    const clearBtn = document.getElementById('clear-search-adventures');
+    const sortButtons = document.querySelectorAll('.sort-button');
+    let currentSort = 'id-asc'; // tri initial id croissant
+
+    const tbody = document.getElementById('adventure-list');
+    let userRows = Array.from(document.querySelectorAll('.adventure-row'));
+
+    function normalize(str) {
+    return (str || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    }
+
+    function updateView() {
+        const query = normalize(searchInput.value.trim());
+        clearBtn.style.display = query ? 'inline' : 'none';
+
+        // Filtrage logique + copie locale des lignes filtrées
+        const filtered = userRows.filter(row => {
+            const search = normalize(row.dataset.search);
+            const match = search.includes(query);
+            row.style.display = match ? '' : 'none';
+            return match;
+        });
+
+        // Tri logique sur les lignes visibles
+        filtered.sort((a, b) => {
+            if (currentSort === 'start-asc') {
+                return a.dataset.start.localeCompare(b.dataset.start);
+            } else if (currentSort === 'start-desc') {
+                return b.dataset.start.localeCompare(a.dataset.start);
+            } else if (currentSort === 'id-desc') {
+                return b.dataset.id - a.dataset.id;
+            } else if (currentSort === 'id-asc') {
+                return a.dataset.id - b.dataset.id;
+            } else if (currentSort === 'created-asc') {
+                return a.dataset.created.localeCompare(b.dataset.created);
+            } else if (currentSort === 'created-desc') {
+                return b.dataset.created.localeCompare(a.dataset.created);
+            }
+        });
+
+        // Réinjection DOM ordonnée, sans perte
+        // On enlève les anciennes positions (mais sans supprimer du DOM)
+
+        // On réordonne
+        filtered.forEach(row => tbody.appendChild(row));
+    }
+
+    // Gestion boutons de tri
+    sortButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const type = btn.dataset.sort;
+
+            if (type === 'start') {
+                currentSort = currentSort === 'start-asc' ? 'start-desc' : 'start-asc';
+                btn.textContent = currentSort === 'start-asc' ? 'Start ↓' : 'Start ↑';
+            } else if (type === 'id') {
+                currentSort = currentSort === 'id-asc' ? 'id-desc' : 'id-asc';
+                btn.textContent = currentSort === 'id-asc' ? 'Id ↓' : 'Id ↑';
+            } else if (type === 'created') {
+                currentSort = currentSort === 'created-asc' ? 'created-desc' : 'created-asc';
+                btn.textContent = currentSort === 'created-asc' ? 'Created ↓' : 'Created ↑';
+            }
+
+            updateView();
+        });
+    });
+
+    // Barre de recherche
+    searchInput.addEventListener('input', updateView);
+
+    clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        clearBtn.style.display = 'none';
+        updateView();
+    });
+
+    updateView(); // Initialisation
+});
+</script>
+
+
+
+{% endblock %}

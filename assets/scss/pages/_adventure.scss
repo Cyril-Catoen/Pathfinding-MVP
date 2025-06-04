@@ -16,6 +16,21 @@ main.adv-main {
 
     }
 
+    #photo-upload-form{
+        height: clamp(120px ,30vw, 420px);
+    }
+
+    #description-view{
+      padding-left: 1rem;
+    }
+
+    #visibility, #status{
+    padding-left: 1rem;
+    width: 9rem;
+    height: clamp(2rem, 5vw, 3rem);
+    border-radius: 25px;
+    }
+
     .button-type-3 {
       color: black;
       font-size: 1.325rem;

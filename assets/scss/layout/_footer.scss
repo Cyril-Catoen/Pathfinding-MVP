@@ -1,12 +1,35 @@
 @use '../abstracts/index' as *;
 
 //Footer for index page
-footer{
-    width: 100%;
+.footer-special {
+  height: 7.5vh;
+
+  #register{
+    margin: 1rem 0 1rem 0;
+  }
+
+  a.login {
+      padding: 0.5rem 1rem;
+      border: 2px solid white;
+      border-radius: 50px;
+      text-decoration: none;
+
+      &:hover {
+        border: 2px solid black;
+        color: black;
+      }
+    }
+}
+
+.footer-all{
     min-height: 50vh;
     max-height: 100vh;
-    background-color: rgba(46, 125, 50, 1) ;
+}
 
+footer{
+    width: 100%;
+    background-color: rgba(46, 125, 50, 1) ;
+    
     .container { 
       @media (max-width: $breakpoint-md) {
           width: 90%; // Ajuste progressivement

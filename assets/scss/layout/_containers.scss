@@ -121,6 +121,64 @@
     max-width: 80vh;
 }
 
+.adventure-card-empty {
+    @extend %container-commun;
+    @include flex-center;
+    height: 20vw;
+    width: 20vw;
+    border: 2px dashed $primary-color; // bleu style "border-blue"
+    border-radius: 25px;
+    background-color: #f0f8ff; // fond légèrement bleu clair
+    color: $primary-color;
+    font-size: 8rem;
+    transition: background-color 0.2s, border-color 0.2s;
+    box-shadow: 0 2px 8px rgba(30, 136, 229, 0.1);
+
+    &:hover {
+        background-color: #e6f2ff;
+        border-color: #0056b3;
+    }
+
+    i {
+        pointer-events: none;
+    }
+
+    input[type='file'] {
+        display: none;
+    }
+}
+
+.admin-card {
+    @extend %container-commun;
+    @include flex(column);
+    height: 25vw;
+    width: 25vw;
+    border: 2px solid $primary-color; // bleu style "border-blue"
+    border-radius: 25px;
+    background-color: #f0f8ff; // fond légèrement bleu clair
+    color: $primary-color;
+    font-size: 8rem;
+    transition: background-color 0.2s, border-color 0.2s;
+    box-shadow: 0 2px 8px rgba(30, 136, 229, 0.1);
+
+    &:hover {
+        background-color: #e6f2ff;
+        border-color: #0056b3;
+    }
+
+    h4{
+        color: black;
+    }
+
+    img{
+        width: 75%;
+    }
+
+    i {
+        pointer-events: none;
+    }
+}
+
 .roadmap-card {
     overflow: hidden;
     height: 40vh;

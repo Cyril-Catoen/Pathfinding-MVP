@@ -1,0 +1,30 @@
+{% if adventure.status.value != 'achieved' %}
+    <div class="adventure-card-empty">
+        <i class="fas fa-hiking"></i>
+    </div>
+{% elseif pictures|length == 0 %}
+    <div class="adventure-card-empty">
+        <i class="fas fa-hiking"></i>
+    </div>
+{% elseif pictures|length <= 3 %}
+    <div class="photo-block-limited d-flex gap-4">
+        {% for picture in pictures %}
+            <div class="{{ loop.first ? 'adventure-card-xl' : 'adventure-card' }}">
+                <img src="{{ asset(picture.picturePath) }}" alt="Adventure Photo" onclick="openImagePreview('{{ asset(picture.picturePath) }}')">
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div id="image-overlay" class="d-none">
+        <div class="image-overlay" onclick="closeImagePreview()">
+            <img id="overlay-image" src="" alt="Agrandissement">
+        </div>
+    </div>
+    <div class="photo-carousel-container">
+        <div class="carousel-wrapper">  
+            <img onclick="prevDisplayCarousel()" id="carousel-left" class="carousel-photo side-photo left" alt="Previous">
+            <img onclick="handleCarouselClick()" id="carousel-center" class="carousel-photo main" alt="Main">
+            <img onclick="nextDisplayCarousel()"  id="carousel-right" class="carousel-photo side-photo right" alt="Next">
+        </div>
+    </div>
+{% endif %}

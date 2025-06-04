@@ -8,10 +8,17 @@
 
 <main class="register">
         <section class="container">
+            <div class="w100 flex-center">
+                <div class="flex-cl-between gap-2 w50">
+                    <h3 class="pdt-4">BECOME</h3>
+                    <div class="line-x-separator w100"></div>
+                    <h4>PATHFINDER</h4>
+                </div>
+            </div>
             <form method="post" action="{{ path('register') }}">
                 <!-- Cross-Site Request Forgery token is used to prevent attack from external scripts. It checks that the request comes from our website -->
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}"> 
-                <h3 class ="pdb-2">BECOME A PATHFINDER</h3>
+                 
                 <div class="flex-center gap-4">
                     <div class="w45">
                         <label for="name">NAME</label>

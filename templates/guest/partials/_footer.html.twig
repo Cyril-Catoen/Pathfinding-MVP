@@ -1,4 +1,19 @@
-<footer>
+{% if currentRoute in ['login', 'register'] %}
+<footer class="footer-special">
+    <section class="container flex-end">
+            <div id="register">
+                {% if currentRoute == 'login' %}
+                <a class="login" href="{{ path('register')}}">New to Pathfinding ? Join now</a>
+                {% else %}
+                <a class="login" href="{{ path('login')}}">Already Pathfinder ? Step in</a>
+                {% endif %}
+            </div>
+    </section>
+</footer>
+
+{% else %}
+
+<footer class="footer-all">
     <section class="container">
         <div class="flex-between">
             <a href="{{ path('home') }}" class="logo">
@@ -88,3 +103,5 @@
 
     </section>
 </footer>
+
+{% endif %}

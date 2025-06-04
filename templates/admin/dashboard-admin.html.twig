@@ -1,15 +1,26 @@
-{% extends 'user/base.html.twig' %}
+{% extends 'admin/base.html.twig' %}
 
         {% block metatitle %}
-        <title>Admin Dashboard</title>
+        <title>PathAdmin - Dashboard</title>
         {% endblock metatitle %}
 
 {% block main %}
 
-<main class="dashboard">
-        <p>Admin</p>
+    <main class="index">
+        <section id="features" class="container flex-cl-between">
+            <h2 class="mt-4 mb-4">MANAGE</h2>
+            <div class="flex-evenly mb-8">
+                <a href="{{ path('admin/user-manager')}}" class="admin-card">
+                        <img src="{{ asset('assets/img/icon_team.png') }}" alt="Hiking">
+                        <h4>USERS</h4>
+                </a>
 
+                <a href="{{ path('admin/adventure-manager')}}" class="admin-card">
+                        <img src="{{ asset('assets/img/icon_ice_axe.png') }}" alt="Live Track">
+                        <h4>ADVENTURES</h4>
+                </a>
+            </div>
         </section>
-</main>
+    </main>
 
 {% endblock main %}

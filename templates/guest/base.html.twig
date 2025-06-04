@@ -25,7 +25,7 @@
     {% block main %}
     {% endblock main %} 
       
-{% include 'guest/partials/_footer.html.twig' %}
+{% include 'guest/partials/_footer.html.twig' with { 'currentRoute': app.request.attributes.get('_route') } %}
 
     <!-- ! Import de la bibliothèque externe JS - SweetAlert2 pour les messages pop-ups -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 

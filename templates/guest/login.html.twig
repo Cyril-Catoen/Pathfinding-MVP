@@ -8,26 +8,31 @@
 
 <main class="login">
         <section class="container">
-                <form class ="container-dash-1" action="{{ path('login') }}" method="post">
+                <div class="w100 flex-center">
+                    <div class="flex-cl-between gap-2 w50">
+                        <h3 class="pdt-4">FIND</h3>
+                        <div class="line-x-separator w100"></div>
+                        <h4>YOUR PATH</h4>
+                    </div>
+                </div>
+                <form action="{{ path('login') }}" method="post">
                     <!-- Cross-Site Request Forgery token is used to prevent attack from external scripts. It checks that the request comes from our website -->
                     <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}"> 
-                    <div class="w50 flex-cl-start gap-2">
-                        <div class="w100">
+                    <div class="w80 flex-cl-start gap-2">
+                        <div class="w100 flex-cl-start">
                             <label for="email">USER E-MAIL</label>
                             <input type="email" id="username" name="_username" placeholder="" required>
                         </div>
-                        <div class="w100">
+                        <div class="w100 flex-cl-start">
                             <label for="password">PASSWORD</label>
                             <input type="password" id="password" name="_password" placeholder="" required>
                         </div>  
-                        <div class="w100 pdt-2">
-                            <button class="button-type-1 button-green" id="login" type="submit">LOG IN</button>
+                        <div class="w100 pdt-2 flex-end">
+                            <button class="button-type-1 button-green" id="login" type="submit">STEP IN</button>
                         </div>
                     </div>
                 </form>
-                <div id="register">
-                    <a href="{{ path('register')}}">New to Pathfinding ? Join now</a>
-                </div>
+                
         </div>
         </section>
 </main>

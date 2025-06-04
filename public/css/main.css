@@ -362,6 +362,18 @@
   white-space: nowrap;
 }
 
+.c-pointer {
+  cursor: pointer;
+}
+
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+}
+
 .w10 {
   width: 10%;
 }
@@ -784,6 +796,13 @@ html {
   align-items: center;
 }
 
+.flex-end-top {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: flex-start;
+}
+
 .flex-cl-center {
   display: flex;
   justify-content: center;
@@ -1070,10 +1089,30 @@ header.header-index section:last-of-type a:hover {
   }
 }
 
-footer {
-  width: 100%;
+.footer-special {
+  height: 7.5vh;
+}
+.footer-special #register {
+  margin: 1rem 0 1rem 0;
+}
+.footer-special a.login {
+  padding: 0.5rem 1rem;
+  border: 2px solid white;
+  border-radius: 50px;
+  text-decoration: none;
+}
+.footer-special a.login:hover {
+  border: 2px solid black;
+  color: black;
+}
+
+.footer-all {
   min-height: 50vh;
   max-height: 100vh;
+}
+
+footer {
+  width: 100%;
   background-color: rgb(46, 125, 50);
 }
 @media (max-width: 768px) {
@@ -1256,7 +1295,7 @@ footer section nav ul li {
   }
 }
 
-.contact-list, .uploaded-files, .adventure-card, .adventure-card-xl {
+.contact-list, .uploaded-files, .admin-card, .adventure-card-empty, .adventure-card, .adventure-card-xl {
   border-radius: 25px;
   background-color: rgb(255, 255, 255);
 }
@@ -1420,6 +1459,61 @@ footer section nav ul li {
 .adventure-card-xl {
   height: 35vh;
   max-width: 80vh;
+}
+
+.adventure-card-empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  height: 20vw;
+  width: 20vw;
+  border: 2px dashed rgb(30, 136, 229);
+  border-radius: 25px;
+  background-color: #f0f8ff;
+  color: rgb(30, 136, 229);
+  font-size: 8rem;
+  transition: background-color 0.2s, border-color 0.2s;
+  box-shadow: 0 2px 8px rgba(30, 136, 229, 0.1);
+}
+.adventure-card-empty:hover {
+  background-color: #e6f2ff;
+  border-color: #0056b3;
+}
+.adventure-card-empty i {
+  pointer-events: none;
+}
+.adventure-card-empty input[type=file] {
+  display: none;
+}
+
+.admin-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 25vw;
+  width: 25vw;
+  border: 2px solid rgb(30, 136, 229);
+  border-radius: 25px;
+  background-color: #f0f8ff;
+  color: rgb(30, 136, 229);
+  font-size: 8rem;
+  transition: background-color 0.2s, border-color 0.2s;
+  box-shadow: 0 2px 8px rgba(30, 136, 229, 0.1);
+}
+.admin-card:hover {
+  background-color: #e6f2ff;
+  border-color: #0056b3;
+}
+.admin-card h4 {
+  color: black;
+}
+.admin-card img {
+  width: 75%;
+}
+.admin-card i {
+  pointer-events: none;
 }
 
 .roadmap-card {
@@ -1774,6 +1868,283 @@ footer section nav ul li {
   transform: translateX(-2vh) translateY(-50%); /* pour aller à gauche */
 }
 
+#photo-data {
+  display: none;
+}
+
+.photo-modal {
+  position: fixed;
+  top: 10%;
+  left: 5%;
+  width: 90%;
+  height: 70%;
+  background: white;
+  border-radius: 10px;
+  padding: 1em;
+  z-index: 999;
+  overflow-y: auto;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1em;
+  margin-top: 1em;
+}
+
+.photo-thumbs-row {
+  display: flex;
+  gap: 10px;
+  margin-left: 20px;
+}
+
+.photo-thumb-wrapper {
+  position: relative;
+}
+
+.photo-thumb-wrapper img {
+  width: 10vw;
+  height: 10vw;
+  -o-object-fit: cover;
+     object-fit: cover;
+  border-radius: 6px;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+}
+
+.photo-thumb-wrapper button {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: red;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.btn-group button {
+  margin-left: 0.5em;
+}
+
+.photo-thumbs-row img {
+  width: 10vw;
+  height: 10vw;
+  -o-object-fit: cover;
+     object-fit: cover;
+  position: relative;
+}
+
+.photo-carousel-container {
+  display: flex;
+  align-items: center;
+  margin-left: 20px;
+}
+
+.carousel {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.carousel-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  height: 20vw;
+  margin: 0 auto;
+  perspective: 1000px; /* clé pour effet 3D */
+}
+
+.carousel-photo {
+  width: 40vw;
+  height: 22vw;
+  -o-object-fit: cover;
+     object-fit: cover;
+  position: absolute;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.4s ease-in-out;
+  transform-style: preserve-3d;
+  top: 0;
+}
+
+.carousel-photo.main {
+  position: relative;
+  border: 2px solid rgb(46, 125, 50);
+  border-radius: 12px;
+  z-index: 3;
+  scale: 1;
+  transform: rotateY(0deg) translateZ(0);
+  opacity: 1;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.carousel-arrow {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+}
+
+.save-button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-left: 20px;
+  cursor: pointer;
+}
+
+.side-photo {
+  width: 32vw;
+  height: 16vw;
+  opacity: 0.6;
+  z-index: 2;
+  top: 2vw;
+}
+
+/* Effet 3D + décalage horizontal */
+.left {
+  transform: rotateY(30deg) translateX(-15vw) translateZ(-50px);
+}
+
+.right {
+  transform: rotateY(-30deg) translateX(15vw) translateZ(-50px);
+}
+
+#photo-edit {
+  position: absolute;
+  width: 3vw;
+  height: 3vw;
+  margin: 0 auto;
+  border-radius: 50%;
+  overflow: hidden;
+  top: -2vw;
+  right: -1vw;
+  z-index: 4;
+  background-color: white;
+  border: 2px solid rgb(46, 125, 50);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.photo-preview-limited {
+  width: 40vw;
+  height: 20vw;
+  display: flex;
+  gap: 0.5vw;
+  flex-wrap: wrap;
+  position: relative;
+}
+
+.thumb-img {
+  width: calc(50% - 0.25vw);
+  height: 9.5vw;
+  -o-object-fit: cover;
+     object-fit: cover;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-see-all {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: 0.3em 0.6em;
+  font-size: 0.8em;
+  background: #444;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.photo-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  -webkit-backdrop-filter: blur(5px);
+          backdrop-filter: blur(5px);
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2vw;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.photo-grid-full {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1vw;
+  justify-content: center;
+  max-width: 90vw;
+}
+
+.photo-full-wrapper {
+  position: relative;
+}
+
+.photo-full-wrapper img {
+  width: 15vw;
+  height: 10vw;
+  -o-object-fit: cover;
+     object-fit: cover;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.delete-photo-btn {
+  width: clamp(0.5rem, 2vw, 1rem);
+  height: clamp(0.5rem, 2vw, 1rem);
+  text-align: center;
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(255, 0, 0, 0.8);
+  border: none;
+  color: white;
+  font-size: 1em;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.close-popup {
+  align-self: flex-end;
+  margin-bottom: 1vw;
+  background: none;
+  border: none;
+  font-size: 1.5em;
+  color: white;
+  cursor: pointer;
+}
+
+.image-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(10, 10, 10, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+}
+
+.image-overlay img {
+  max-width: 90vw;
+  max-height: 90vh;
+  -o-object-fit: contain;
+     object-fit: contain;
+}
+
 .box-content {
   background: #f5f5f5;
   border: 2px solid transparent;
@@ -1876,29 +2247,29 @@ label:hover .box-content {
   min-height: 60vh;
 }
 
-.contacts-table, .adventures-table {
+.contacts-table, .adventures-table, .users-table {
   width: 100%;
   border-collapse: collapse;
 }
-.contacts-table th, .contacts-table td, .adventures-table th, .adventures-table td {
+.contacts-table th, .contacts-table td, .adventures-table th, .adventures-table td, .users-table th, .users-table td {
   border: 1px solid #ccc;
   padding: 0.75rem;
   text-align: center;
 }
-.contacts-table th i, .contacts-table td i, .adventures-table th i, .adventures-table td i {
+.contacts-table th i, .contacts-table td i, .adventures-table th i, .adventures-table td i, .users-table th i, .users-table td i {
   color: rgb(46, 125, 50);
 }
 @media (max-width: 576px) {
-  .contacts-table th:nth-of-type(4), .contacts-table td:nth-of-type(4), .adventures-table th:nth-of-type(4), .adventures-table td:nth-of-type(4) {
+  .contacts-table th:nth-of-type(4), .contacts-table td:nth-of-type(4), .adventures-table th:nth-of-type(4), .adventures-table td:nth-of-type(4), .users-table th:nth-of-type(4), .users-table td:nth-of-type(4) {
     display: none;
   }
 }
 @media (max-width: 768px) {
-  .contacts-table th:nth-of-type(3), .contacts-table td:nth-of-type(3), .adventures-table th:nth-of-type(3), .adventures-table td:nth-of-type(3) {
+  .contacts-table th:nth-of-type(3), .contacts-table td:nth-of-type(3), .adventures-table th:nth-of-type(3), .adventures-table td:nth-of-type(3), .users-table th:nth-of-type(3), .users-table td:nth-of-type(3) {
     display: none;
   }
 }
-.contacts-table .checkbox-item, .adventures-table .checkbox-item {
+.contacts-table .checkbox-item, .adventures-table .checkbox-item, .users-table .checkbox-item {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -2583,48 +2954,66 @@ main.contact-form div.pdt-2 {
   justify-content: flex-end;
 }
 
-main.login h3 {
-  line-height: 4vh;
-  color: black;
+main.login {
+  height: 100vh;
+  width: 100vw;
+  background-image: url(../assets/img/login1.jpg);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+}
+main.login h3, main.login h4 {
+  font-size: clamp(3rem, 8vw, 8rem);
+  color: white;
+}
+main.login h4 {
+  font-size: clamp(1.5rem, 6vw, 6rem);
 }
 main.login section.container {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  justify-content: flex-start;
+  align-items: flex-start;
+  height: 90vh;
+  width: 90%;
+  border: 3px solid white;
 }
-main.login section.container #register {
-  margin: 1rem 0 10vh 0;
+main.login section.container .line-x-separator {
+  margin: 0;
+  background-color: white;
 }
-main.login section.container a {
-  color: rgb(30, 136, 229);
-}
-main.login section.container div.w100 {
+main.login section.container form {
+  width: 30%;
+  margin: 4rem 0 5vh 5vw;
+  padding: 1rem 0 1rem 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: flex-start;
-}
-main.login section.container form {
-  width: 80%;
-  margin-top: 10vh;
-  justify-content: center;
   align-items: center;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 25px;
 }
 main.login section.container form button {
-  width: 45%;
+  width: clamp(6rem, 12vw, 8rem);
 }
 @media (max-width: 576px) {
   main.login section.container form {
-    width: 95%;
+    width: 65%;
   }
   main.login section.container form .w50 {
     width: 90%;
   }
+  main.login section.container form button {
+    font-size: 1rem;
+  }
 }
 @media (min-width: 577px) and (max-width: 768px) {
   main.login section.container form {
-    width: 95%;
+    width: 60%;
   }
   main.login section.container form .w50 {
     width: 70%;
@@ -2632,12 +3021,12 @@ main.login section.container form button {
 }
 @media (min-width: 769px) and (max-width: 1200px) {
   main.login section.container form {
-    width: 80%;
+    width: 50%;
   }
 }
 @media (min-width: 1201px) and (max-width: 1400px) {
   main.login section.container form {
-    width: 75%;
+    width: 30%;
   }
 }
 main.login section.container div.flex-center, main.login section.container div.flex-cl-start {
@@ -2651,43 +3040,53 @@ main.login section.container div.flex-center, main.login section.container div.f
     width: 100%;
   }
 }
-main.login section.container label {
-  padding: 1rem 0 0.5rem 1rem;
-}
-main.login section.container input {
-  font-size: 1.325rem;
-  padding-left: 1rem;
-  height: 2.65rem;
-  width: 100%;
-  border: 1px solid grey;
-  border-radius: 25px;
-}
 main.login section div div.w100.pdt-2 {
   display: flex;
   align-items: flex-end;
 }
 
-main.register h3 {
-  line-height: 4vh;
-  color: black;
+main.register {
+  height: 100vh;
+  width: 100vw;
+  background-image: url(../assets/img/zhang.jpg);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+}
+main.register h3, main.register h4 {
+  font-size: clamp(2rem, 8vw, 6rem);
+  color: white;
+}
+main.register h4 {
+  font-size: clamp(1.5rem, 6vw, 4rem);
 }
 main.register section.container {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  justify-content: flex-start;
+  align-items: flex-start;
+  height: 90vh;
+  width: 90%;
+  border: 3px solid white;
 }
-main.register section.container div.w100 {
+main.register section.container .line-x-separator {
+  margin: 0;
+  background-color: white;
+}
+main.register section.container form {
+  width: 50%;
+  margin: 4rem 0 5vh 5vw;
+  padding: 1rem 0 1rem 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: flex-start;
-}
-main.register section.container form {
-  width: 80%;
-  margin: 10vh 0 10vh 0;
-  justify-content: center;
   align-items: center;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 25px;
 }
 main.register section.container form button {
   width: 45%;
@@ -2695,6 +3094,7 @@ main.register section.container form button {
 @media (max-width: 576px) {
   main.register section.container form {
     width: 95%;
+    margin: 4rem 0 5vh 2vw;
   }
   main.register section.container form label {
     padding: 1rem 0 0.5rem 0.5rem;
@@ -2711,7 +3111,7 @@ main.register section.container form button {
 }
 @media (min-width: 577px) and (max-width: 768px) {
   main.register section.container form {
-    width: 95%;
+    width: 75%;
   }
   main.register section.container form .w50 {
     width: 70%;
@@ -2719,12 +3119,12 @@ main.register section.container form button {
 }
 @media (min-width: 769px) and (max-width: 1200px) {
   main.register section.container form {
-    width: 80%;
+    width: 65%;
   }
 }
 @media (min-width: 1201px) and (max-width: 1400px) {
   main.register section.container form {
-    width: 75%;
+    width: 55%;
   }
 }
 main.register section.container div.flex-center, main.register section.container div.flex-cl-start {
@@ -2811,6 +3211,18 @@ main.adv-main h4 {
   font-size: 1.325rem;
   padding: 1rem 0 0.5rem 1rem;
 }
+main.adv-main #photo-upload-form {
+  height: clamp(120px, 30vw, 420px);
+}
+main.adv-main #description-view {
+  padding-left: 1rem;
+}
+main.adv-main #visibility, main.adv-main #status {
+  padding-left: 1rem;
+  width: 9rem;
+  height: clamp(2rem, 5vw, 3rem);
+  border-radius: 25px;
+}
 main.adv-main .button-type-3 {
   color: black;
   font-size: 1.325rem;
@@ -2862,6 +3274,9 @@ main.adventures-manager h2, main.adventures-manager h3, main.adventures-manager 
 }
 main.adventures-manager .container-type-5 {
   margin-bottom: 10vh;
+}
+main.adventures-manager .tab-content {
+  border-radius: 25px;
 }
 main.adventures-manager .button-type-4 {
   border: 2px solid rgb(46, 125, 50);
@@ -3096,6 +3511,147 @@ main.create-contact #Majority input[type=checkbox] {
   }
 }
 
+main.update-user {
+  height: 100vh;
+  width: 100vw;
+  background-image: url(../assets/img/zhang.jpg);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+}
+main.update-user h3, main.update-user h4 {
+  font-size: clamp(2rem, 8vw, 6rem);
+  color: white;
+}
+main.update-user h4 {
+  font-size: clamp(1.5rem, 6vw, 4rem);
+}
+main.update-user section.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  height: 90vh;
+  width: 90%;
+  border: 3px solid white;
+}
+main.update-user section.container .line-x-separator {
+  margin: 0;
+  background-color: white;
+}
+main.update-user section.container form {
+  width: 50%;
+  margin: 4rem 0 5vh 5vw;
+  padding: 1rem 0 1rem 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 25px;
+}
+main.update-user section.container form button {
+  width: 45%;
+}
+@media (max-width: 576px) {
+  main.update-user section.container form {
+    width: 95%;
+    margin: 4rem 0 5vh 2vw;
+  }
+  main.update-user section.container form label {
+    padding: 1rem 0 0.5rem 0.5rem;
+    font-size: clamp(0.725rem, 3vw, 1.5rem);
+  }
+  main.update-user section.container form input {
+    padding-left: 0.5rem;
+    font-size: clamp(0.725rem, 2.5vw, 1.5rem);
+    height: clamp(1.5rem, 5vw, 3rem);
+  }
+  main.update-user section.container form .w50 {
+    width: 90%;
+  }
+}
+@media (min-width: 577px) and (max-width: 768px) {
+  main.update-user section.container form {
+    width: 75%;
+  }
+  main.update-user section.container form .w50 {
+    width: 70%;
+  }
+}
+@media (min-width: 769px) and (max-width: 1200px) {
+  main.update-user section.container form {
+    width: 65%;
+  }
+}
+@media (min-width: 1201px) and (max-width: 1400px) {
+  main.update-user section.container form {
+    width: 55%;
+  }
+}
+main.update-user section.container div.flex-center, main.update-user section.container div.flex-cl-start {
+  flex-wrap: wrap;
+}
+@media (max-width: 576px) {
+  main.update-user section.container div.flex-center, main.update-user section.container div.flex-cl-start {
+    gap: 1rem;
+  }
+  main.update-user section.container div.flex-center div.w100, main.update-user section.container div.flex-cl-start div.w100 {
+    width: 100%;
+  }
+}
+main.update-user section div div.w100.pdt-2 {
+  display: flex;
+  align-items: flex-end;
+}
+main.update-user .upload-label {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  background-color: #f0f0f0;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #555;
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+main.update-user .upload-label:hover {
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+}
+main.update-user .upload-label::after {
+  content: "Click to change picture";
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.4);
+  padding: 4px 8px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+main.update-user .upload-label:hover::after {
+  opacity: 1;
+}
+main.update-user .upload-input {
+  display: none;
+}
+
 main.update-contact h2, main.update-contact h3 {
   color: black;
 }
@@ -3221,6 +3777,48 @@ main.update-contact .upload-input {
   #updateContact div.w40 {
     width: 35%;
   }
+}
+
+main.users-manager h2, main.users-manager h3 {
+  color: black;
+}
+main.users-manager h2, main.users-manager h3, main.users-manager p {
+  padding-left: 1rem;
+}
+main.users-manager .container-type-5 {
+  margin-bottom: 10vh;
+}
+@media screen and (min-width: 992px) {
+  main.users-manager .search-all-wrapper {
+    min-width: 26rem;
+  }
+}
+main.users-manager .tab-content {
+  border-radius: 25px;
+}
+main.users-manager .button-type-4 {
+  border: 2px solid rgb(46, 125, 50);
+  background-color: rgba(46, 125, 50, 0.8);
+  box-shadow: 0 0 24px rgba(46, 125, 50, 0.5);
+  transition: scale 0.1s ease-out;
+}
+main.users-manager .button-type-4:hover {
+  border: 2px solid rgb(30, 136, 229);
+  background-color: rgba(30, 136, 229, 0.8);
+  box-shadow: 0 0 24px rgba(30, 136, 229, 0.5);
+  scale: 1.1;
+  transition: scale 0.2s ease-in;
+}
+main.users-manager .upload-label {
+  width: 100%;
+  height: 100%;
+}
+main.users-manager input[type=checkbox] {
+  display: flex;
+}
+main.users-manager .users-table td:last-of-type i {
+  color: rgb(216, 67, 21);
+  font-size: 2rem;
 }
 
 .swal2-popup svg,

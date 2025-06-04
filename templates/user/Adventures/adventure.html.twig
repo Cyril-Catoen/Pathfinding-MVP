@@ -1,198 +1,344 @@
 {% extends 'user/base.html.twig' %}
 
-        {% block metatitle %}
-        <title>
-            Pathfinder - 
-            {% if adventure.title %} 
-                {{ adventure.title }}  
-            {% else %}
-                Adventure not found
-            {% endif %}
-        </title>
-        {% endblock metatitle %}
+{% block metatitle %}
+<title>
+    Pathfinder - 
+    {% if adventure.title %} 
+        {{ adventure.title }}  
+    {% else %}
+        Adventure not found
+    {% endif %}
+</title>
+{% endblock metatitle %}
 
 {% block main %}
 <main class="adv-main">
-        <section class="container">
-            <div class="w100 flex-between pdt-8">
-                <div class="flex-start gap-2">
-                    <a class="arrow-return-button" href="{{ path('dashboard')}}">
-                        <i class="fas fa-arrow-left" src="../../assets/img/LiveTrack.jpeg" alt=""></i>
-                    </a> 
-                    <h2>ADVENTURE TITLE</h2>
+    <section class="container">
+        <div class="w100 flex-between pdt-8">
+            <div class="flex-start gap-2">
+                <a class="arrow-return-button" href="{{ path('dashboard')}}">
+                    <i class="fas fa-arrow-left"></i>
+                </a> 
+                 {% if isOwner %}
+                    <form method="post" action="{{ path('update_adventure_title', { id: adventure.id }) }}" id="title-form">
+                        
+                        {# Affichage normal (titre + bouton) #}
+                        <div id="title-view">
+                            <div class="flex-between gap-2">
+                                <h2>{{ adventure.title ?: 'No title' }}</h2>
+                                <button type="button" class="btn-icon" onclick="toggleTitleEdit(true)">
+                                    <i class="fas fa-pen"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        {# Bloc d’édition (masqué par défaut) #}
+                        <div id="title-edit-container" class="d-none">
+                            <div class="flex-between gap-2">
+                                <input 
+                                    type="text"
+                                    name="title"
+                                    id="title-edit"
+                                    maxlength="100"
+                                    value="{{ adventure.title }}"
+                                    class="w100"
+                                />
+                                <button type="submit" class="btn-icon">💾</button>
+                                <button type="button" class="btn-icon text-red" onclick="toggleTitleEdit(false)">❌</button>
+                            </div>
+                        </div>
+                    </form>
+                {% else %}
+                    <h2>{{ adventure.title ?: 'No title' }}</h2>
+                {% endif %}
+
+            </div>
+            {% if isOwner %}
+            <div class="flex-end gap-4">
+                <div>
+                    <label for="visibility"></label>
+                    <select name="visibility" id="visibility">
+                        <option value="private" {{ adventure.viewAuthorization == 'private' ? 'selected' }}>Private</option>
+                        <option value="public" {{ adventure.viewAuthorization == 'public' ? 'selected' }}>Public</option>
+                        <option value="selection" {{ adventure.viewAuthorization == 'selection' ? 'selected' }}>Selection</option>
+                    </select>
                 </div>
-                <div class="w25">
-                    <p class="button-type-2 button-green" href="">ACHIEVED</p>
+                <div>
+                    <form method="post" action="{{ path('update_adventure_status', {'id': adventure.id}) }}">
+                        <select name="status" id="status" onchange="this.form.submit()">
+                            <option value="preparation" {{ adventure.status.value == 'preparation' ? 'selected' }}>Preparation</option>
+                            
+                            {% if not anotherOngoing %}
+                                <option value="ongoing" {{ adventure.status.value == 'ongoing' ? 'selected' }}>Ongoing</option>
+                            {% else %}
+                                <option value="ongoing" disabled {{ adventure.status.value == 'ongoing' ? 'selected' }}>Ongoing (déjà en cours)</option>
+                            {% endif %}
+                            
+                            <option value="achieved" {{ adventure.status.value == 'achieved' ? 'selected' }}>Achieved</option>
+                        </select>
+                    </form>
                 </div>
             </div>
+            {% else %}
+            <div class="w25">
+                <p class="button-type-2 button-green">{{ adventure.status.value|capitalize }}</p>
+            </div>
+            {% endif %}
+        </div>
 
-            <div class="w100 flex-between mt-8">
-                    <div class="d-flex just-space-btw w100">
-                        <div class="w45 pdr-4">
-                            <div class="adventure-card-xl">
-                            <img src="../../assets/img/shiretoko3.jpg" alt="">
-                            </div>
-                        </div>
-                        <div class="w55">
-                            <div class="flex-between">
-                                <div>
-                                    <div class="adventure-card">
-                                    <img src="../../assets/img/shiretoko3.jpg" alt="">
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="adventure-card">
-                                    <img src="../../assets/img/akanMashu4.jpg" alt="">
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="adventure-card">
-                                    <img src="../../assets/img/rishiri_island2.jpg" alt="">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex-start gap-8">
-                                <div class="pdt-1 pdb-1 flex-end">
-                                    <label for="picture-upload" class="button-type-3 button-white">
-                                        Add pictures
-                                    </label>
-                                    <input type="file" id="picture-upload" name="pictures" multiple class="upload-input" />
-                                </div>
-                                <div class="pdt-1 pdb-1 flex-end">
-                                    <button class="button-type-3 button-white" id="submit" type="submit">Remove pictures</button>
-                                </div>
-                            </div>
-                        </div>
+        <div class="w100 flex-between mt-8">
+            <div id="photo-data" 
+                data-adventure-id="{{ adventure.id }}"
+                data-uploaded-count="{{ pictures|length }}"
+                data-pictures2='{{ pictures|map(p => { id: p.id, path: asset(p.picturePath) })|json_encode|e("html_attr") }}'
+                data-pictures='{{ pictures|map(p => asset(p.picturePath))|json_encode(constant("JSON_UNESCAPED_SLASHES"))|e("html_attr") }}'
+                data-delete-url-template="{{ path('adventure_photo_delete', { adventureId: '__AID__', photoId: '__PID__' }) }}">
+            </div>
+            {% set isAchieved = adventure.status.value == 'achieved' %}
+            {% set hasPictures = pictures is not empty %}
+
+            {% if isAchieved %}
+                <div class="photo-section w100">
+                    {% if isOwner %}
+                        {% include 'user/adventures/partials/_photo-display-owner.html.twig' %}
+                    {% else %}
+                        {% include 'user/adventures/partials/_photo-display-viewer.html.twig' %}
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="adventure-card-empty">
+                    <i class="fas fa-hiking"></i>
+                </div>
+            {% endif %}
+        </div>
+
+
+        <div class="w100 mt-4">
+            <h3 class="d-flex gap-2">
+                <span>Description</span>
+                {% if isOwner %}
+                    <button type="button" class="btn-icon" onclick="toggleDescriptionEdit(true)">
+                        <i class="fas fa-pen"></i>
+                    </button>
+                {% endif %}
+            </h3>
+
+            {% if isOwner %}
+                <form method="post" action="{{ path('update_adventure_description', { id: adventure.id }) }}" id="description-form">
+                    <div id="description-view" class="{{ adventure.description is not empty ? '' : 'italic text-muted pdl-2' }}">
+                        {{ adventure.description ?: 'No description.' }}
                     </div>
-            </div>
 
-            <div class="w100">
-                <h4>DESCRIPTION</h4>
-                <p class="pdl-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut et massa mi. Aliquam in hendrerit urna. Pellentesque sit amet sapien fringilla, mattis ligula consectetur, ultrices mauris. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut et massa mi. Aliquam in hendrerit urna. Pellentesque sit amet sapien fringilla, mattis ligula consectetur, ultrices mauris. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut et massa mi. Aliquam in hendrerit urna. Pellentesque sit amet sapien fringilla, mattis ligula consectetur, ultrices mauris.
+                    <div id="description-edit-container" class="d-none">
+                        <div class="mt-2 flex-end gap-2">
+                            <button type="submit" class="btn-icon"><i class="far fa-save"></i></button>
+                            <button type="button" class="btn-icon" onclick="toggleDescriptionEdit(false)"><i class="fas fa-times"></i></button>
+                        </div>
+
+                        <textarea 
+                            name="description"
+                            id="description-edit"
+                            class="w100"
+                            rows="5"
+                        >{{ adventure.description ?: 'No description.' }}
+                        </textarea>
+                    </div>
+                </form>
+            {% else %}
+                <p class="{{ adventure.description is not empty ? '' : 'italic text-muted pdl-2' }}">
+                    {{ adventure.description ?: 'No description.' }}
                 </p>
+            {% endif %}
+        </div>
+
+
+
+
+        <div class="line-x-separator"></div>
+
+        {% if isOwner %}
+        <form class="w100 flex-between mt-4" action="{{ path('update_adventure', {'id': adventure.id}) }}" method="post" enctype="multipart/form-data">
+            <div class="w60 flex-cl-end mb-4">
+                <div class="w100 flex-between-top">
+                    <h3 class="mt-2">FILES</h3>
+                    <div class="upload-container">
+                        <label for="file-upload" class="upload-label">Add files</label>
+                        <input type="file" id="file-upload" name="files[]" multiple class="upload-input" />
+                    </div>
+                </div>
+                <div class="uploaded-files" id="uploaded-files-container">
+                    <!-- Uploaded files preview -->
+                </div>
             </div>
-
-            <div class="line-x-separator"></div>
-
-            <form class="w100 flex-between mt-4" action="submit.php" method="post">
-                <div class="w60 flex-cl-end mb-4">
-                    <!-- Champ de glisser-déposer -->
-                    <div class="w100 flex-between-top">
-                        <h3 class="mt-2">FILES & GENERAL SETTINGS</h3>
-                        <div>
-                            <div class="upload-container">
-                                <label for="file-upload" class="upload-label">
-                                    Add files
-                                </label>
-                                <input type="file" id="file-upload" name="files" multiple class="upload-input" />
-                            </div>
-                        </div>
+            <div class="w35 h100 flex-end">
+                <div class="vh30 flex-cl-between">
+                    <div class="w60">
+                        <label for="start_date">START DATE</label>
+                        <input type="datetime-local" name="start_date"
+                            value="{{ adventure.startDate ? adventure.startDate|date('Y-m-d\\TH:i') : '' }}">
                     </div>
-                    <!-- Affichage des fichiers uploadés -->
-                    <div class="uploaded-files" id="uploaded-files-container">
-                    <!-- Les fichiers téléchargés seront affichés ici -->
+                    <div class="w60">
+                        <label for="end_date">END DATE</label>
+                        <input type="datetime-local" name="end_date"
+                            value="{{ adventure.endDate ? adventure.endDate|date('Y-m-d\\TH:i') : '' }}">
                     </div>
                 </div>
+            </div>
+        </form>
+        {% endif %}
+    </section>
 
-                <div class="w35 h100 flex-between">   
-                        <div class="w45 vh30 flex-cl-between">
-                            <div class="w100">
-                                <label class="d-block" for="status">STATUS</label>
-                                    <select name="status" id="status" required>
-                                        <option value="status1" selected>Preparation</option>
-                                        <option value="status3">Achieved</option>
-                                    </select>
-                            </div>
-                            <div class="w100">
-                                <label class="d-block" for="visibility">VISIBILITY</label>
-                                <select name="visibility" id="visibility" required>
-                                    <option value="privacy1" selected>Private</option>
-                                    <option value="privacy2">Public</option>
-                                    <option value="privacy_list1">Private list 1</option>
-                                    <option value="privacy_list2">Private list 2</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="w45 vh30 flex-cl-between">
-                            <div class="w100">
-                                <label class="d-block" for="start_date">START DATE</label>
-                                <input type="datetime-local" id="start_date" name="start_date" placeholder="" required>
-                            </div>
-                            <div class="w100">
-                                <label class="d-block" for="end_date">EXPECTED END DATE</label>
-                                <input type="datetime-local" id="ex_end_date" name="ex_end_date" placeholder="" required>
-                            </div>
-                            <div class="w100">
-                                <label class="d-block" for="end_date">REAL END DATE</label>
-                                <input type="datetime-local" id="r_end_date" name="r_end_date" placeholder="" required>
-                            </div>
-                        </div>
-                    </div>
-            </form>
-        </section>
+    <section id="GPSTrack" class="container">
+        <div class="line-x-separator"></div>
+        <div class="w100 flex-between mt-4">
+            <div class="flex-start w45">
+                <h2>GPS TRACK</h2>
+            </div>
+        </div>
+        <div class="container-type-3 shadow-black">
+            <!-- Carte topographique avec tracé si existant -->
+        </div>
 
-        <section id="GPSTrack" class="container">
-            <div class="line-x-separator"></div>
+        {% if isOwner %}
+        <form class="w100" action="{{ path('update_alert_settings', {'id': adventure.id}) }}" method="post">
             <div class="w100 flex-between mt-4">
-                <div class="flex-start w45">
-                    <h2>GPS TRACK</h2>
-                </div>
-                <div class="flex-end w45  pdb-2 pdr-2">
-                    <span>Live Track</span>
+                <div class="flex-start w30">
+                    <h3 class="mt-2 mb-2 gap-2">SAFETY ALERT</h3>
                     <label class="toggle-btn">
-                        <input type="checkbox" id="toggleButtonLive" name="statusLive">
-                        <div class="slider">
-                        <div class="ball"></div>
-                        <span class="btn-text"></span>
-                        </div>
+                        <input type="checkbox" name="safetyEnabled" {{ adventure.timerAlert and adventure.timerAlert.isActive ? 'checked' : '' }}>
+                        <div class="slider"><div class="ball"></div></div>
                     </label>
                 </div>
-            </div>
-            
-            <div class="container-type-3 shadow-black">
-            </div>
-            <form class="w100" action="submit.php" method="post"> 
-                <div class="w100 flex-between mt-4">
-                    <div class="flex-start w30">
-                        <h3 class="mt-2 mb-2 gap-2">SAFETY ALERT</h3>
-                        <label class="toggle-btn">
-                            <input type="checkbox" id="toggleButtonSafety" name="statusSafety">
-                            <div class="slider">
-                            <div class="ball"></div>
-                            <span class="btn-text"></span>
-                            </div>
-                        </label>
-                    </div>
-                    <div class="w30">
-                                <label for="timerAlert">Set alert timer</label>
-                                <!-- Formulaire pour définir la durée -->
-                                <div class="timer-container">
-                                    <input type="number" id="hours" name="hours" placeholder="hrs." min="0">
-                                    <input type="number" id="minutes" name="minutes" placeholder="min." min="0" max="59">
-                                    <input type="number" id="seconds" name="seconds" placeholder="sec." min="0" max="59">
-                                </div>
-                            </div>
-                    <div class="w30">
-                        <label for="objet">Contact list</label>
-                        <select class="mt-1" name="objet" id="objet" required>
-                            <option value="" selected>Default list</option>
-                            <option value="object1">List 1</option>
-                            <option value="object1">List 2</option>
-                            <option value="object2">List 3</option>
-                        </select>
+                <div class="w30">
+                    <label>Set alert timer</label>
+                    <div class="timer-container">
+                        <input type="number" name="hours" placeholder="hrs." min="0">
+                        <input type="number" name="minutes" placeholder="min." min="0" max="59">
+                        <input type="number" name="seconds" placeholder="sec." min="0" max="59">
                     </div>
                 </div>
-                
-                <div class="w100 pdt-4 pdb-4 flex-end">
-                    <button id="submit" class="button-type-4" type="submit">SAVE</button>
+                <div class="w30">
+                    <label>Contact list</label>
+                    <select name="contact_list_id">
+                        {% for list in contactLists %}
+                            <option value="{{ list.id }}">{{ list.name }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
-            </form>
             </div>
-        </section>
+            <div class="w100 pdt-4 pdb-4 flex-end">
+                <button class="button-type-4" type="submit">SAVE</button>
+            </div>
+        </form>
+        {% endif %}
+    </section>
 </main>
-
 {% endblock main %}
 
 {% block script %}
-<script src="../js/features_check.js" defer></script>
+
+<!-- Script Title -->
+<script>
+    let isEditingTitle = false;
+
+    function toggleTitleEdit(submitIfEditing = false) {
+        const form = document.getElementById('title-form');
+        const view = document.getElementById('title-view');
+        const edit = document.getElementById('title-edit-container');
+        const input = document.getElementById('title-edit');
+
+        if (!form || !view || !edit || !input) return;
+
+        if (isEditingTitle && submitIfEditing) {
+            form.submit();
+            return;
+        }
+
+        isEditingTitle = !isEditingTitle;
+
+        if (isEditingTitle) {
+            view.classList.add('d-none');
+            edit.classList.remove('d-none');
+            input.focus();
+        } else {
+            edit.classList.add('d-none');
+            view.classList.remove('d-none');
+        }
+    }
+</script>
+
+<!-- Script carrousel display-->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const photoData = document.getElementById('photo-data');
+    if (!photoData || !photoData.dataset.pictures) return;
+
+    const displayPictures = JSON.parse(photoData.dataset.pictures);
+    let displayCarouselIndex = 0;
+
+    function updateDisplayCarousel() {
+        const left = document.getElementById('carousel-left');
+        const center = document.getElementById('carousel-center');
+        const right = document.getElementById('carousel-right');
+
+        const total = displayPictures.length;
+        if (total < 4 || !left || !center || !right) return;
+
+        const indexes = [
+            (displayCarouselIndex - 1 + total) % total,
+            displayCarouselIndex % total,
+            (displayCarouselIndex + 1) % total
+        ];
+
+        left.src = displayPictures[indexes[0]];
+        center.src = displayPictures[indexes[1]];
+        right.src = displayPictures[indexes[2]];
+    }
+
+    window.prevDisplayCarousel = function () {
+        displayCarouselIndex = (displayCarouselIndex - 1 + displayPictures.length) % displayPictures.length;
+        updateDisplayCarousel();
+    };
+
+    window.nextDisplayCarousel = function () {
+        displayCarouselIndex = (displayCarouselIndex + 1) % displayPictures.length;
+        updateDisplayCarousel();
+    };
+
+    updateDisplayCarousel(); // Appel initial pour afficher les images
+});
+</script>
+
+<!-- Script photo gallery management -->
+<script src="{{ asset('js/adventurePictureManager.js')}}"></script>
+
+
+<!-- Script Description -->
+<script>
+    let isEditingDescription = false;
+
+    function toggleDescriptionEdit(submitIfEditing = false) {
+        const form = document.getElementById('description-form');
+        const view = document.getElementById('description-view');
+        const editContainer = document.getElementById('description-edit-container');
+
+        if (isEditingDescription && submitIfEditing) {
+            form.submit();
+            return;
+        }
+
+        isEditingDescription = !isEditingDescription;
+
+        if (isEditingDescription) {
+            view.classList.add('d-none');
+            editContainer.classList.remove('d-none');
+        } else {
+            editContainer.classList.add('d-none');
+            view.classList.remove('d-none');
+        }
+    }
+</script>
+
+
+
 {% endblock script %}

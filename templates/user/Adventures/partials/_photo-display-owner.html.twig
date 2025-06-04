@@ -1,0 +1,119 @@
+<div id="image-overlay" class="d-none">
+    <div class="image-overlay" onclick="closeImagePreview()">
+        <img id="overlay-image" src="" alt="Agrandissement">
+    </div>
+</div>
+
+<form id="photo-upload-form" 
+      class="d-none"
+      method="post" 
+      action="{{ path('upload_adventure_photos', { id: adventure.id }) }}" 
+      enctype="multipart/form-data" 
+      onsubmit="submitPhotos(event)">
+
+    <div class="flex-between-top" id="photo-edit-mode">
+        <!-- Zone upload -->
+        <div class="adventure-card-empty cursor-pointer" onclick="openPhotoModal()">
+            <i class="fas fa-camera"></i>
+        </div>
+        <!-- Photos existantes -->
+        {% if pictures|length > 0 %}
+            <div id="photo-popup" class="d-none">
+                <div class="photo-popup">
+                    <button type="button" class="close-popup" onclick="togglePhotoPopup(false)">❌</button>
+                    <div class="photo-grid-full">
+                        {% for picture in pictures %}
+                            <div class="photo-full-wrapper">
+                                <img src="{{ asset(picture.picturePath) }}" alt="Photo" onclick="openImagePreview('{{ asset(picture.picturePath) }}')">
+                                <button type="button" class="delete-photo-btn" 
+                                        data-id="{{ picture.id }}" 
+                                        data-adventure-id="{{ adventure.id }}"
+                                        onclick="deletePhotoFromElement(this)">
+                                        <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div id="photo-upload-preview">
+                <div>
+                    <p class="bold mb-2">Uploaded pictures</p>
+                </div>
+                <div id="photo-preview-limited" class="photo-preview-limited">
+            {% for picture in pictures|slice(0, 6) %}
+                    <div class="photo-thumb-wrapper">
+                        <img src="{{ asset(picture.picturePath) }}" alt="Photo" class="thumb-img" onclick="openImagePreview('{{ asset(picture.picturePath) }}')">
+                        <button type="button" class="delete-photo-btn" 
+                                                data-id="{{ picture.id }}" 
+                                                data-adventure-id="{{ adventure.id }}"
+                                                onclick="deletePhotoFromElement(this)">
+                                                <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+            {% endfor %}
+                    {% if pictures|length > 6 %}
+                    <button type="button" class="btn-see-all" onclick="togglePhotoPopup(true)">See all</button>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+        <div class="h100 flex-end-top gap-2">
+            <button type="submit"><i class="far fa-save"></i></button>
+            <button type="submit" onclick="exitPhotoEditMode()"><i class="fas fa-times"></i></button>
+        </div>
+    </div>
+
+
+    <!-- Fenêtre modale pour ajout/preview photos -->
+    <div id="photo-edit-modal" class="d-none photo-modal">
+        <div class="modal-header flex-between">
+            <div class="w100 flex-cl-center">
+                <p class="bold">Upload Pictures (max 12 per adventure)</p>
+                <p id="photo-counter" class="photo-counter-text">Photos restantes : {{ 12 - pictures|length }}</p>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="button" onclick="submitPhotoUpload()"><i class="far fa-save"></i></button>
+                <button type="button" onclick="closePhotoModal()"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+
+        <div>
+            <div class="adventure-card-empty c-pointer" onclick="document.getElementById('modal-photo-input').click()">
+                <i class="fas fa-camera"></i>
+            </div>
+            <input type="file" id="modal-photo-input" accept="image/*" multiple class="d-none" onchange="handlePhotoSelection(event)">
+            <div id="photo-preview-grid" class="photo-grid"></div>
+        </div>
+    </div>
+</form>
+
+{# DIsplay owner #}
+<div id="photo-display-mode">
+{% if pictures|length == 0 %}
+    <div class="adventure-card-empty relative">
+        <i class="fas fa-hiking"></i>
+        <button onclick="enterPhotoEditMode()" id="photo-edit" title="Edit pictures"><i class="fas fa-pen"></i></button>
+    </div>
+    
+{% elseif pictures|length <= 3 %}
+    <div class="photo-block-limited d-flex gap-4 relative">
+        {% for picture in pictures %}
+            <div class="{{ loop.first ? 'adventure-card-xl' : 'adventure-card' }}">
+                <img src="{{ asset(picture.picturePath) }}" alt="Adventure Photo" onclick="openImagePreview('{{ asset(picture.picturePath) }}')">
+            </div>
+        {% endfor %}
+        <button onclick="enterPhotoEditMode()" id="photo-edit" title="Edit pictures"><i class="fas fa-pen"></i></button>
+    </div>
+{% else %}
+    <div class="photo-carousel-container">
+        <div class="carousel-wrapper">  
+            <img onclick="prevDisplayCarousel()" id="carousel-left" class="carousel-photo side-photo left" alt="Previous">
+            <img onclick="handleCarouselClick()" id="carousel-center" class="carousel-photo main" alt="Main">
+            <button onclick="enterPhotoEditMode()" id="photo-edit" title="Edit pictures"><i class="fas fa-pen"></i></button>
+            <img onclick="nextDisplayCarousel()"  id="carousel-right" class="carousel-photo side-photo right" alt="Next">
+        </div>
+    </div>
+{% endif %}
+</div>
+
