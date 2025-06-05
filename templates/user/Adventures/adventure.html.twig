@@ -1,5 +1,9 @@
 {% extends 'user/base.html.twig' %}
 
+{% block link %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+{% endblock link %}
+
 {% block metatitle %}
 <title>
     Pathfinder - 
@@ -157,34 +161,58 @@
         <div class="line-x-separator"></div>
 
         {% if isOwner %}
-        <form class="w100 flex-between mt-4" action="{{ path('update_adventure', {'id': adventure.id}) }}" method="post" enctype="multipart/form-data">
-            <div class="w60 flex-cl-end mb-4">
-                <div class="w100 flex-between-top">
+        <div class="w100 flex-between wrap mt-4">
+            
+            <div class="w100 flex-between">
+                <div>
+                    <label for="start_date">START DATE</label>
+                    <input type="datetime-local" name="start_date"
+                        value="{{ adventure.startDate ? adventure.startDate|date('Y-m-d\\TH:i') : '' }}">
+                </div>
+                <div>
+                    <label for="end_date">END DATE</label>
+                    <input type="datetime-local" name="end_date"
+                        value="{{ adventure.endDate ? adventure.endDate|date('Y-m-d\\TH:i') : '' }}">
+                </div>
+            </div>
+
+            <div class="w100 flex-cl-end mb-4">
+                <div class="w100 flex-cl-start">
                     <h3 class="mt-2">FILES</h3>
-                    <div class="upload-container">
-                        <label for="file-upload" class="upload-label">Add files</label>
-                        <input type="file" id="file-upload" name="files[]" multiple class="upload-input" />
-                    </div>
                 </div>
-                <div class="uploaded-files" id="uploaded-files-container">
-                    <!-- Uploaded files preview -->
+                <div class="uploaded-files" id="uploaded-files-container" data-uploaded-files='{{ adventure.adventureFiles|map(f => {
+                    id: f.id,
+                    name: f.fileName,
+                    type: f.type.value,
+                    typeLabel: f.type.label(),
+                    typeIcon: f.type.icon(),
+                    size: f.size,
+                    url: path('download_adventure_file', { id: f.id })
+                })|json_encode|e("html_attr") }}'>
+                    <!-- Liste générée par JS -->
                 </div>
+                <form id="adventure-file-upload-form" class="w100 flex-cl-between-start gap-2 mt-2" method="post" action="{{ path('upload_adventure_file', { id: adventure.id }) }}" enctype="multipart/form-data">
+                        <div class="w100 flex-between">
+                            <select name="type" id="adventure-file-type" class="w50" required>
+                                <option value="">Type</option>
+                                <option value="itinerary">Itinerary</option>
+                                <option value="equipment">Gear / Supplies</option>
+                                <option value="readme">Readme / Note</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <div for="adventure-file-input" class="w40 like-input">
+                                Choose a file
+                                <input type="file" name="file" id="adventure-file-input" class="d-none" accept=".pdf,.txt,.doc,.docx,.odt,.csv,.json" required>
+                            </div>
+                            
+                        </div>
+                        <div class="w100 flex-end">
+                            <button type="submit" class="button-type-1 button-green">Add</button>
+                        </div>
+                </form>
+                <div id="adventure-files-feedback" class="mt-2"></div>
             </div>
-            <div class="w35 h100 flex-end">
-                <div class="vh30 flex-cl-between">
-                    <div class="w60">
-                        <label for="start_date">START DATE</label>
-                        <input type="datetime-local" name="start_date"
-                            value="{{ adventure.startDate ? adventure.startDate|date('Y-m-d\\TH:i') : '' }}">
-                    </div>
-                    <div class="w60">
-                        <label for="end_date">END DATE</label>
-                        <input type="datetime-local" name="end_date"
-                            value="{{ adventure.endDate ? adventure.endDate|date('Y-m-d\\TH:i') : '' }}">
-                    </div>
-                </div>
-            </div>
-        </form>
+        </div>
         {% endif %}
     </section>
 
@@ -194,9 +222,25 @@
             <div class="flex-start w45">
                 <h2>GPS TRACK</h2>
             </div>
+            {% if isOwner %}
+            <form id="adventure-track-upload-form" class="flex-between gap-2 mb-2" method="post" action="{{ path('upload_adventure_track', { id: adventure.id }) }}" enctype="multipart/form-data" class="mb-2">
+                <div for="track-file-input" class="like-input">
+                    Select a GPS track
+                    <input type="file" class="d-none" name="track" id="track-file-input" accept=".gpx,.csv,.json" required>
+                </div>       
+                <button type="submit" class="button-type-1 button-green">Upload</button>
+                <span id="track-upload-feedback"></span>
+            </form>
+            {% endif %}
         </div>
-        <div class="container-type-3 shadow-black">
-            <!-- Carte topographique avec tracé si existant -->
+        <div id="mapid"
+            class="container-type-3 shadow-black"
+            data-points='{{ points|map(p => {
+                "latitude": p.latitude,
+                "longitude": p.longitude,
+                "elevation": p.elevation,
+                "recordedAt": p.recordedAt|date("c")
+            })|json_encode|e("html_attr") }}'>
         </div>
 
         {% if isOwner %}
@@ -210,11 +254,30 @@
                     </label>
                 </div>
                 <div class="w30">
-                    <label>Set alert timer</label>
-                    <div class="timer-container">
-                        <input type="number" name="hours" placeholder="hrs." min="0">
-                        <input type="number" name="minutes" placeholder="min." min="0" max="59">
-                        <input type="number" name="seconds" placeholder="sec." min="0" max="59">
+                    <label for="timerAlert">Timer Alert</label>
+                    <!-- Formulaire pour définir la durée -->
+                    <div class="duration-wrapper">
+                        <input type="text" id="duration-input" name="duration-input" readonly placeholder="HH:MM:SS" class="duration-display" />
+
+                        <div class="duration-picker" id="duration-picker">
+                            <div class="picker-column">
+                            {% for h in 0..72 %}
+                                <div class="picker-option" data-type="h">{{ "%02d"|format(h) }}</div>
+                            {% endfor %}
+                            </div>
+                            <div class="divider"></div>
+                            <div class="picker-column">
+                            {% for m in 0..59 %}
+                                <div class="picker-option" data-type="m">{{ "%02d"|format(m) }}</div>
+                            {% endfor %}
+                            </div>
+                            <div class="divider"></div>
+                            <div class="picker-column">
+                            {% for s in 0..59 %}
+                                <div class="picker-option" data-type="s">{{ "%02d"|format(s) }}</div>
+                            {% endfor %}
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="w30">
@@ -339,6 +402,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 </script>
 
-
+<script src="{{ asset('js/fileManager.js') }}" defer></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+<script src="{{ asset('js/gps-track.js') }}" defer></script>
+<script src="{{ asset('js/timer-picker.js') }}" defer></script>
 
 {% endblock script %}

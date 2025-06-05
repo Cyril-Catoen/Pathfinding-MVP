@@ -16,6 +16,33 @@ main.adv-main {
 
     }
 
+    #adventure-file-upload-form{
+      .button-type-1{
+        width: 25%;
+      }
+    }
+
+    #uploaded-files-container{
+      min-height: 240px;
+
+      a{
+        color: $primary-color;
+      }
+
+      .file-list-header{
+        @include flex(row, flex-end, center);
+        font-size: clamp(1rem, 2.5vw, 1.5rem);
+        height: clamp(2rem, 5vw, 3rem);
+        width: 100%;
+        padding-right: 2.5%;
+      }
+
+      .file-list{
+        width: 95%;
+        margin: 0 auto;
+      }
+    }
+
     #photo-upload-form{
         height: clamp(120px ,30vw, 420px);
     }

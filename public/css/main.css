@@ -2384,23 +2384,33 @@ label:hover .box-content {
 form label {
   padding: 1rem 0 0.5rem 1rem;
 }
-form input {
+form div.like-input {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  background-color: white;
+  padding: 0;
+  padding-left: 0;
+  cursor: pointer;
+  min-width: 15rem;
+}
+form input, form select, form textarea, form .like-input {
   padding-left: 1rem;
   height: clamp(2rem, 5vw, 3rem);
-  width: 100%;
-  border: 1px solid grey;
   border-radius: 25px;
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+}
+form input, form select, form textarea {
+  width: 100%;
+}
+form input, form .like-input {
+  border: 1px solid grey;
 }
 form input[type=number] {
   height: clamp(2rem, 5vw, 3rem);
   width: 60%;
   min-width: 5rem;
-}
-form select, form textarea {
-  padding-left: 1rem;
-  height: clamp(2rem, 5vw, 3rem);
-  width: 100%;
-  border-radius: 25px;
 }
 form textarea {
   min-height: 6rem;
@@ -3225,6 +3235,29 @@ main.adv-main h2, main.adv-main h3, main.adv-main h4 {
 main.adv-main h4 {
   font-size: 1.325rem;
   padding: 1rem 0 0.5rem 1rem;
+}
+main.adv-main #adventure-file-upload-form .button-type-1 {
+  width: 25%;
+}
+main.adv-main #uploaded-files-container {
+  min-height: 240px;
+}
+main.adv-main #uploaded-files-container a {
+  color: rgb(30, 136, 229);
+}
+main.adv-main #uploaded-files-container .file-list-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  height: clamp(2rem, 5vw, 3rem);
+  width: 100%;
+  padding-right: 2.5%;
+}
+main.adv-main #uploaded-files-container .file-list {
+  width: 95%;
+  margin: 0 auto;
 }
 main.adv-main #photo-upload-form {
   height: clamp(120px, 30vw, 420px);

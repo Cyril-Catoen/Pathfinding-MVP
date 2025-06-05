@@ -6,25 +6,34 @@ form{
     padding: 1rem 0 0.5rem 1rem;
     }
 
-    input {
+    div.like-input{
+      @include flex-center;
+      background-color: white;
+      padding: 0;  
+      padding-left: 0;
+      cursor: pointer;
+      min-width: 15rem;
+    }
+
+    input, select, textarea, .like-input {
     padding-left: 1rem;
     height: clamp(2rem, 5vw, 3rem);
-    width: 100%;
-    border: 1px solid grey;
     border-radius: 25px;
+    font-size: clamp(1rem, 2.5vw, 1.5rem); 
+    }
+
+    input, select, textarea {
+    width: 100%;
+    }
+
+    input, .like-input {
+    border: 1px solid grey;
     }
 
     input[type="number"] {
         height: clamp(2rem, 5vw, 3rem);
         width: 60%;
         min-width: 5rem;
-    }
-
-    select, textarea {
-    padding-left: 1rem;
-    height: clamp(2rem, 5vw, 3rem);
-    width: 100%;
-    border-radius: 25px;
     }
 
     textarea{

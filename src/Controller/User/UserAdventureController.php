@@ -4,29 +4,21 @@ namespace App\Controller\User;
 
 use App\Entity\Adventure;
 use App\Repository\AdventureRepository;
-use App\Entity\AdventureFile;
-use App\Repository\AdventureFileRepository;
 use App\Entity\AdventurePicture;
 use App\Repository\AdventurePictureRepository;
+use App\Repository\AdventurePointRepository;
 use App\Entity\AdventureType;
 use App\Repository\AdventureTypeRepository;
 use App\Entity\ContactList;
 use App\Repository\ContactListRepository;
-use App\Entity\SafetyAlert;
-use App\Repository\SafetyAlertRepository;
-use App\Entity\SafetyContact;
-use App\Repository\SafetyContactRepository;
 use App\Entity\TimerAlert;
 use App\Repository\TimerAlertRepository;
 use App\Enum\Status;
-use Exception;
-use Doctrine\ORM\EntityManager;
+use App\Enum\ViewAuthorization;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -72,6 +64,7 @@ class UserAdventureController extends AbstractController {
 		Adventure $adventure,
 		AdventureRepository $adventureRepository,
 		AdventurePictureRepository $pictureRepository,
+		AdventurePointRepository $adventurePointRepository,
 		ContactListRepository $contactListRepository,
 		Security $security
 	): Response {
@@ -103,6 +96,8 @@ class UserAdventureController extends AbstractController {
 			['position' => 'ASC', 'uploadedAt' => 'ASC']
 		);
 
+		$points = $adventurePointRepository->findBy(['adventure' => $adventure], ['recordedAt' => 'ASC']);
+
 		return $this->render('user/adventures/adventure.html.twig', [
 			'adventure' => $adventure,
 			'isOwner' => $isOwner,
@@ -111,208 +106,10 @@ class UserAdventureController extends AbstractController {
 			'anotherOngoing' => $anotherOngoing,
 			'contactLists' => $isOwner ? $contactListRepository->findBy(['owner' => $user]) : [],
 			'pictures' => $pictures,
+			'points' => $points,
 		]);
 
 	}
-
-	#[Route('/user/adventure/{id}/update-status', name: 'update_adventure_status', methods: ['POST'])]
-	public function updateStatus(
-		Request $request,
-		Adventure $adventure,
-		EntityManagerInterface $em,
-		AdventureRepository $adventureRepository,
-		Security $security
-	): Response {
-		$this->denyAccessUnlessGranted('EDIT', $adventure);
-
-		$user = $security->getUser();
-		$status = $request->request->get('status');
-		$statusEnum = Status::from($status);
-
-		// Si l'utilisateur veut passer en 'ongoing', vérifier qu'aucune autre aventure en cours n'existe
-		if ($statusEnum === Status::Ongoing) {
-			$otherOngoing = $adventureRepository->findOneBy([
-				'owner' => $user,
-				'status' => Status::Ongoing,
-			]);
-
-			if ($otherOngoing && $otherOngoing->getId() !== $adventure->getId()) {
-				$this->addFlash('error', 'Vous avez déjà une aventure en cours.');
-				return $this->redirectToRoute('adventure', ['id' => $adventure->getId()]);
-			}
-
-			// Mise à jour de la date de départ
-			$adventure->setStartDate(new \DateTime());
-		}
-
-		$adventure->setStatus($statusEnum);
-		$em->flush();
-
-		return $this->redirectToRoute('adventure', ['id' => $adventure->getId()]);
-	}
-
-	#[Route('/user/adventure/{id}/update-title', name: 'update_adventure_title', methods: ['POST'])]
-	public function updateTitle(Request $request, Adventure $adventure, EntityManagerInterface $em): Response {
-		$this->denyAccessUnlessGranted('EDIT', $adventure);
-
-		$title = trim($request->request->get('title', ''));
-		if ($title !== '' && mb_strlen($title) <= 100) {
-			$adventure->setTitle($title);
-			$adventure->setUpdatedAt(new \DateTimeImmutable());
-			$em->flush();
-		}
-
-		return $this->redirectToRoute('adventure', ['id' => $adventure->getId()]);
-	}
-
-	#[Route('/user/adventure/{id}/upload-photos', name: 'upload_adventure_photos', methods: ['POST'])]
-	public function uploadAdventurePhotos(
-		int $id,
-		Request $request,
-		EntityManagerInterface $em,
-		AdventureRepository $adventureRepository,
-		Security $security
-	): Response {
-		$adventure = $adventureRepository->find($id);
-		if (!$adventure) {
-			throw $this->createNotFoundException('Adventure not found.');
-		}
-
-		$this->denyAccessUnlessGranted('EDIT', $adventure);
-
-		$files = $request->files->get('photos');
-
-		if (is_array($files)) {
-			foreach ($files as $file) {
-				if ($file && $file->isValid()) {
-					$filename = uniqid().'.'.$file->guessExtension();
-					$file->move($this->getParameter('pictures_directory'), $filename);
-
-					$picture = new \App\Entity\AdventurePicture();
-					$picture->setAdventure($adventure);
-					$picture->setPicturePath('uploads/pictures/'.$filename);
-					$picture->setUploadedAt(new \DateTimeImmutable());
-
-					$em->persist($picture);
-				}
-			}
-			$em->flush();
-		}
-
-		return $this->redirectToRoute('adventure', ['id' => $id]);
-	}
-
-	#[Route('/user/adventure/{adventureId}/delete-photo/{photoId}', name: 'adventure_photo_delete', methods: ['DELETE'])]
-	public function deletePicture(
-		int $adventureId,
-		int $photoId,
-		AdventureRepository $adventureRepo,
-		AdventurePictureRepository $pictureRepo,
-		EntityManagerInterface $em
-	): JsonResponse {
-		try {
-			$adventure = $adventureRepo->find($adventureId);
-			$picture = $pictureRepo->find($photoId);
-
-			if (!$adventure || !$picture || $picture->getAdventure()->getId() !== $adventureId) {
-				return new JsonResponse(['error' => 'Aventure ou photo invalide.'], 404);
-			}
-
-			// Vérifie que l'utilisateur connecté est bien le propriétaire
-			if ($adventure->getOwner()->getId() !== $this->getUser()->getId()) {
-				return new JsonResponse(['error' => 'Non autorisé.'], 403);
-			}
-
-			// Supprime physiquement le fichier image
-			$photoPath = $this->getParameter('kernel.project_dir') . '/public/' . $picture->getPicturePath();
-			if (file_exists($photoPath)) {
-				unlink($photoPath);
-			}
-
-			// Supprime l'entité
-			$em->remove($picture);
-			$em->flush();
-
-			// Log temporaire (peut être retiré après debug)
-			file_put_contents(
-				$this->getParameter('kernel.project_dir') . '/var/log/photo_delete.log',
-				"[" . date('Y-m-d H:i:s') . "] Photo $photoId supprimée de l'aventure $adventureId\n",
-				FILE_APPEND
-			);
-
-			return new JsonResponse(['success' => true], 200, ['Content-Type' => 'application/json']);
-		} catch (\Throwable $e) {
-			// Log l'erreur
-			file_put_contents(
-				$this->getParameter('kernel.project_dir') . '/var/log/photo_delete.log',
-				"[" . date('Y-m-d H:i:s') . "] Erreur suppression photo $photoId : " . $e->getMessage() . "\n",
-				FILE_APPEND
-			);
-
-			return new JsonResponse([
-				'error' => 'Erreur serveur : ' . $e->getMessage()
-			], 500);
-		}
-	}
-
-	#[Route('/user/adventure/{id}/update-description', name: 'update_adventure_description', methods: ['POST'])]
-	public function updateDescription(Request $request, Adventure $adventure, EntityManagerInterface $em): Response {
-		$this->denyAccessUnlessGranted('EDIT', $adventure);
-
-		$description = trim($request->request->get('description'));
-		if ($description === 'No description') {
-			$description = null;
-		}
-
-		$adventure->setDescription($description);
-		$em->flush();
-
-		return $this->redirectToRoute('adventure', ['id' => $adventure->getId()]);
-	}
-
-
-
-	#[Route('/user/adventure/{id}/update', name: 'update_adventure', methods: ['POST'])]
-	public function updateAdventure(Request $request, Adventure $adventure, EntityManagerInterface $em): Response {
-		$this->denyAccessUnlessGranted('EDIT', $adventure);
-
-		// Exemples de champs
-		$adventure->setStartDate(new \DateTime($request->request->get('start_date')));
-		$adventure->setEndDate(new \DateTime($request->request->get('end_date')));
-		$adventure->setViewAuthorization($request->request->get('visibility'));
-
-		$em->flush();
-
-		return $this->redirectToRoute('adventure', ['id' => $adventure->getId()]);
-	}
-
-	#[Route('/user/adventure/{id}/update-alert-settings', name: 'update_alert_settings', methods: ['POST'])]
-	public function updateAlertSettings(Request $request, Adventure $adventure, EntityManagerInterface $em, TimerAlertRepository $timerRepo): Response {
-		$this->denyAccessUnlessGranted('EDIT', $adventure);
-
-		$enabled = $request->request->getBoolean('safetyEnabled');
-		$hours = (int)$request->request->get('hours', 0);
-		$minutes = (int)$request->request->get('minutes', 0);
-		$seconds = (int)$request->request->get('seconds', 0);
-
-		if ($enabled) {
-			$alertTime = (new \DateTime())->add(new \DateInterval("PT{$hours}H{$minutes}M{$seconds}S"));
-			$timer = $adventure->getTimerAlert() ?? new TimerAlert();
-			$timer->setAdventure($adventure);
-			$timer->setAlertTime($alertTime);
-			$timer->setIsActive(true);
-			$em->persist($timer);
-		} else {
-			if ($adventure->getTimerAlert()) {
-				$em->remove($adventure->getTimerAlert());
-			}
-		}
-
-		$em->flush();
-
-		return $this->redirectToRoute('adventure', ['id' => $adventure->getId()]);
-	}
-
 
 	#[Route('/user/create-adventure', name: 'create-adventure', methods: ['GET', 'POST'])]
 	public function displayCreateAdventure(
@@ -331,7 +128,7 @@ class UserAdventureController extends AbstractController {
 			$adventure->setTitle($data->get('title'));
 			$adventure->setStartDate(new \DateTime($data->get('start_date')));
 			$adventure->setEndDate(new \DateTime($data->get('end_date')));
-			$adventure->setStatus(\App\Enum\Status::Preparation);
+			$adventure->setStatus(Status::Preparation);
 
 			// ✅ Générer le lien partageable ici
 			$adventure->setShareLink(bin2hex(random_bytes(16)));
@@ -339,10 +136,10 @@ class UserAdventureController extends AbstractController {
 			// Visibilité
 			$visibility = $data->get('visibility');
 			$viewAuth = match($visibility) {
-				'privacy1' => \App\Enum\ViewAuthorization::Private,
-				'privacy2' => \App\Enum\ViewAuthorization::Public,
-				'privacy3' => \App\Enum\ViewAuthorization::Selection,
-				default    => \App\Enum\ViewAuthorization::Private,
+				'privacy1' => ViewAuthorization::Private,
+				'privacy2' => ViewAuthorization::Public,
+				'privacy3' => ViewAuthorization::Selection,
+				default    => ViewAuthorization::Private,
 			};
 			$adventure->setViewAuthorization($viewAuth);
 
