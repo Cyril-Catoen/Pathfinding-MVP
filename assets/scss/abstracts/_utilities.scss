@@ -36,6 +36,11 @@
 .wrap   { flex-wrap: wrap; }
 .nowrap { flex-wrap: nowrap; }
 
+//background
+.bg-position-center { background-position: center; }
+.bg-size-cover { background-size: cover; }
+.bg-size-contain { background-size: contain; }
+
 // Accessibility
 .visually-hidden {
     position: absolute;

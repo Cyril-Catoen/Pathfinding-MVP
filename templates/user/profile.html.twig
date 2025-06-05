@@ -1,0 +1,114 @@
+{% extends 'user/base.html.twig' %}
+
+        {% block metatitle %}
+        <title>Pathfinder - Profile</title>
+        {% endblock metatitle %}
+
+{% block main %}
+<main class="profile">
+    <section class="container">
+        <form method="post" action="{{ path('user_profile') }}" class="mt-8 mb-8" enctype="multipart/form-data">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('edit-profile') }}">
+
+            <div class="flex-cl-between gap-3">
+                <div class="w100 flex-center gap-1">
+                    <div class="w45">
+                        {% set pictureUrl = asset('uploads/user-picture/' ~ app.user.picturePath)|e('css') %}
+                            <label for="picture-profile" id="uploadLabel" class="flex-center container-circle-1 bg-size-cover bg-position-center"
+                                {% if app.user.picturePath %}
+                                    style="background-image: url('{{ pictureUrl }}');"
+                                {% endif %}>
+                                {% if not app.user.picturePath %}
+                                    Click here to add a profile picture
+                                {% endif %}
+                            </label>
+                            <input type="file" id="picture-profile" name="picture-profile" class="upload-input" accept="image/*">
+                    </div>
+                    <div class="d-flex gap-2 w45">
+                        <div class="w45">
+                            <label for="name">First name</label>
+                            <input type="text" id="name" name="name" value="{{ app.user.name }}" required>
+                        </div>
+                        <div class="w45">
+                            <label for="surname">Surname</label>
+                            <input type="text" id="surname" name="surname" value="{{ app.user.surname }}" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w100">
+                    <label for="description">Bio / Presentation</label>
+                    <textarea id="description" name="description" rows="5" maxlength="1000">{{ app.user.description }}</textarea>
+                </div>
+
+                <div class="w100 flex-between wrap">
+                    <div class="w25">
+                        <label for="email">Email address</label>
+                        <input type="email" id="email" name="email" value="{{ app.user.email }}" required readonly>
+                    </div>
+                    <div class="w25">
+                        <label for="phoneNumber">Phone number</label>
+                        <input type="text" id="phoneNumber" name="phoneNumber" value="{{ app.user.phoneNumber }}">
+                    </div>
+                    <div class="w20">
+                        <label for="birthdate">Birthdate</label>
+                        <input type="date" id="birthdate" name="birthdate"
+                            value="{{ app.user.birthdate ? app.user.birthdate|date('Y-m-d') : '' }}" readonly>
+                    </div>
+                    <div class="w20">
+                        <label for="registrationAt">Registration date</label>
+                        <input type="text" id="registrationAt" value="{{ app.user.registrationAt|date('d/m/Y H:i') }}" readonly>
+                    </div>
+                </div>
+
+                <div class="w100 flex-between wrap">
+                    <div class="w30">
+                        <label for="city">City</label>
+                        <input type="text" id="city" name="city" value="{{ app.user.city }}">
+                    </div>
+                    <div class="w30">
+                        <label for="country">Country</label>
+                        <select id="country" name="country">
+                            <option value="">Select your country</option>
+                            {% for code, name in countries %}
+                                <option value="{{ code }}" {% if code == app.user.country %}selected{% endif %}>{{ name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="w100 flex-end mt-2 mb-8">
+                    <button type="submit" class="button-type-1 button-green">Save</button>
+                </div>
+            </div>
+        </form>
+    </section>
+</main>
+{% endblock %}
+
+{% block script %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const fileInput = document.getElementById('picture-profile');
+    const label = document.getElementById('uploadLabel');
+
+    fileInput.addEventListener('change', function () {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                label.style.backgroundImage = `url('${e.target.result}')`;
+                label.textContent = ""; // Enlève le texte une fois l'image chargée
+            };
+
+            reader.readAsDataURL(file);
+        } else {
+            label.style.backgroundImage = 'none';
+            label.textContent = "Click here to add a profile picture";
+        }
+    });
+});
+</script>
+{% endblock %}

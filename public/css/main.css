@@ -351,6 +351,18 @@
   flex-wrap: nowrap;
 }
 
+.bg-position-center {
+  background-position: center;
+}
+
+.bg-size-cover {
+  background-size: cover;
+}
+
+.bg-size-contain {
+  background-size: contain;
+}
+
 .visually-hidden {
   position: absolute;
   clip: rect(0 0 0 0);
@@ -1334,8 +1346,8 @@ footer section nav ul li {
 }
 
 .container-circle-1 {
-  width: 25%;
-  height: 25%;
+  width: 20vw;
+  height: 20vw;
   margin: 0;
   border-radius: 50%;
   overflow: hidden;
@@ -2389,6 +2401,9 @@ form select, form textarea {
   height: clamp(2rem, 5vw, 3rem);
   width: 100%;
   border-radius: 25px;
+}
+form textarea {
+  min-height: 6rem;
 }
 form label.field-error {
   color: #D84315;

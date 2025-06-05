@@ -26,7 +26,7 @@
     }
 }
 .container-90 { @include container-main(90%)}
-.container-circle-1 { @include container-shape($size:25%, $margin:0, $shape: circle); object-fit: cover;}
+.container-circle-1 { @include container-shape($size:20vw, $margin:0, $shape: circle); object-fit: cover;}
 .container-circle-2 { @include container-shape($size:8vh, $margin:0, $shape: circle); object-fit: cover; object-position: top;}
 
 .container-type-1 {
