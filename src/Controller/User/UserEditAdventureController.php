@@ -64,7 +64,7 @@ class UserEditAdventureController extends AbstractController {
 			}
 
 			// Mise à jour de la date de départ
-			$adventure->setStartDate(new \DateTime());
+			$adventure->setStartDate(new \DateTimeImmutable());
 		}
 
 		$adventure->setStatus($statusEnum);
@@ -234,6 +234,54 @@ class UserEditAdventureController extends AbstractController {
 
 		return $this->redirectToRoute('adventure', ['id' => $adventure->getId()]);
 	}
+
+
+	//Gestion des dates en AJAX
+	#[Route('/user/adventure/{id}/update-dates', name: 'update_adventure_dates', methods: ['POST'])]
+	public function updateDates(
+		int $id,
+		Request $request,
+		AdventureRepository $adventureRepository,
+		EntityManagerInterface $em,
+		Security $security
+	): JsonResponse {
+		$adventure = $adventureRepository->find($id);
+		if (!$adventure) {
+			return new JsonResponse(['success' => false, 'error' => 'Adventure not found'], 404);
+		}
+		$user = $security->getUser();
+		if (!$user || $adventure->getOwner() !== $user) {
+			return new JsonResponse(['success' => false, 'error' => 'Not allowed'], 403);
+		}
+
+		$start = $request->request->get('start_date');
+		$end = $request->request->get('end_date');
+
+		try {
+			$startDate = $start ? new \DateTimeImmutable($start) : null;
+			$endDate = $end ? new \DateTimeImmutable($end) : null;
+		} catch (\Exception $e) {
+			return new JsonResponse(['success' => false, 'error' => 'Invalid date format']);
+		}
+
+		if ($startDate && $endDate && $startDate > $endDate) {
+			return new JsonResponse([
+				'success' => false,
+				'error' => "La date de début doit précéder la date de fin."
+			]);
+		}
+
+		if ($startDate) $adventure->setStartDate($startDate);
+		if ($endDate) $adventure->setEndDate($endDate);
+		$em->flush();
+
+		return new JsonResponse([
+			'success' => true,
+			'start_date' => $adventure->getStartDate()?->format('Y-m-d H:i'),
+			'end_date' => $adventure->getEndDate()?->format('Y-m-d H:i'),
+		]);
+	}
+
 
     // Ajout de fichiers pour une aventure
 	#[Route('/user/adventure/{id}/upload-file', name: 'upload_adventure_file', methods: ['POST'])]
@@ -407,89 +455,108 @@ class UserEditAdventureController extends AbstractController {
     }
 
 	#[Route('/user/adventure/{id}/upload-track', name: 'upload_adventure_track', methods: ['POST'])]
-public function uploadTrack(
-    int $id,
-    Request $request,
-    AdventureRepository $adventureRepository,
-    AdventurePointRepository $adventurePointRepository,
-    EntityManagerInterface $em
-): JsonResponse {
-    $adventure = $adventureRepository->find($id);
-    if (!$adventure) {
-        return new JsonResponse(['error' => 'Adventure not found.'], 404);
-    }
-    $this->denyAccessUnlessGranted('EDIT', $adventure);
+	public function uploadTrack(
+		int $id,
+		Request $request,
+		AdventureRepository $adventureRepository,
+		AdventurePointRepository $adventurePointRepository,
+		EntityManagerInterface $em
+	): JsonResponse {
+		$adventure = $adventureRepository->find($id);
+		if (!$adventure) {
+			return new JsonResponse(['error' => 'Adventure not found.'], 404);
+		}
+		$this->denyAccessUnlessGranted('EDIT', $adventure);
 
-    /** @var UploadedFile|null $file */
-    $file = $request->files->get('track');
-    if (!$file || !$file->isValid()) {
-        return new JsonResponse(['error' => 'No valid file.'], 400);
-    }
+		/** @var UploadedFile|null $file */
+		$file = $request->files->get('track');
+		if (!$file || !$file->isValid()) {
+			return new JsonResponse(['error' => 'No valid file.'], 400);
+		}
 
-    $ext = strtolower($file->getClientOriginalExtension());
-    if (!in_array($ext, ['gpx', 'csv', 'json'])) {
-        return new JsonResponse(['error' => 'Format non supporté (gpx, csv, json seulement)'], 400);
-    }
+		$ext = strtolower($file->getClientOriginalExtension());
+		if (!in_array($ext, ['gpx', 'csv', 'json'])) {
+			return new JsonResponse(['error' => 'Format non supporté (gpx, csv, json seulement)'], 400);
+		}
 
-    $points = [];
-    // GPX
-    if ($ext === 'gpx') {
-        $xml = simplexml_load_file($file->getPathname());
-        foreach ($xml->trk->trkseg->trkpt as $pt) {
-            $points[] = [
-                'lat' => (float)$pt['lat'],
-                'lng' => (float)$pt['lon'],
-                'ele' => isset($pt->ele) ? (float)$pt->ele : null,
-                'time' => isset($pt->time) ? new \DateTimeImmutable((string)$pt->time) : new \DateTimeImmutable(),
-            ];
-        }
-    }
-    // CSV (lat,lon,ele)
-    elseif ($ext === 'csv') {
-        $rows = array_map('str_getcsv', file($file->getPathname()));
-        foreach ($rows as $row) {
-            if (count($row) >= 2) {
-                $points[] = [
-                    'lat' => (float)$row[0],
-                    'lng' => (float)$row[1],
-                    'ele' => isset($row[2]) ? (float)$row[2] : null,
-                    'time' => new \DateTimeImmutable(),
-                ];
-            }
-        }
-    }
-    // JSON (array de {lat, lon, ele})
-    elseif ($ext === 'json') {
-        $data = json_decode(file_get_contents($file->getPathname()), true);
-        foreach ($data as $row) {
-            $points[] = [
-                'lat' => (float)($row['lat'] ?? $row['latitude']),
-                'lng' => (float)($row['lon'] ?? $row['lng'] ?? $row['longitude']),
-                'ele' => $row['ele'] ?? $row['elevation'] ?? null,
-                'time' => new \DateTimeImmutable(),
-            ];
-        }
-    }
+		$points = [];
+		// GPX
+		if ($ext === 'gpx') {
+			$xml = simplexml_load_file($file->getPathname());
+			foreach ($xml->trk->trkseg->trkpt as $pt) {
+				$points[] = [
+					'lat' => (float)$pt['lat'],
+					'lng' => (float)$pt['lon'],
+					'ele' => isset($pt->ele) ? (float)$pt->ele : null,
+					'time' => isset($pt->time) ? new \DateTimeImmutable((string)$pt->time) : new \DateTimeImmutable(),
+				];
+			}
+		}
+		// CSV (lat,lon,ele)
+		elseif ($ext === 'csv') {
+			$rows = array_map('str_getcsv', file($file->getPathname()));
+			foreach ($rows as $row) {
+				if (count($row) >= 2) {
+					$points[] = [
+						'lat' => (float)$row[0],
+						'lng' => (float)$row[1],
+						'ele' => isset($row[2]) ? (float)$row[2] : null,
+						'time' => new \DateTimeImmutable(),
+					];
+				}
+			}
+		}
+		// JSON (array de {lat, lon, ele})
+		elseif ($ext === 'json') {
+			$data = json_decode(file_get_contents($file->getPathname()), true);
+			foreach ($data as $row) {
+				$points[] = [
+					'lat' => (float)($row['lat'] ?? $row['latitude']),
+					'lng' => (float)($row['lon'] ?? $row['lng'] ?? $row['longitude']),
+					'ele' => $row['ele'] ?? $row['elevation'] ?? null,
+					'time' => new \DateTimeImmutable(),
+				];
+			}
+		}
 
-    // Nettoyage des anciens points
-    foreach ($adventure->getAdventurePoints() as $pt) {
-        $em->remove($pt);
-    }
-    // Ajout des nouveaux points
-    foreach ($points as $pt) {
-        $adventurePoint = new AdventurePoint();
-        $adventurePoint->setAdventure($adventure)
-            ->setLatitude($pt['lat'])
-            ->setLongitude($pt['lng'])
-            ->setElevation($pt['ele'])
-            ->setRecordedAt($pt['time']);
-        $em->persist($adventurePoint);
-    }
-    $em->flush();
+		// Nettoyage des anciens points
+		foreach ($adventure->getAdventurePoints() as $pt) {
+			$em->remove($pt);
+		}
+		// Ajout des nouveaux points
+		foreach ($points as $pt) {
+			$adventurePoint = new AdventurePoint();
+			$adventurePoint->setAdventure($adventure)
+				->setLatitude($pt['lat'])
+				->setLongitude($pt['lng'])
+				->setElevation($pt['ele'])
+				->setRecordedAt($pt['time']);
+			$em->persist($adventurePoint);
+		}
+		$em->flush();
 
-    return new JsonResponse(['success' => true, 'count' => count($points)]);
-}
+		return new JsonResponse(['success' => true, 'count' => count($points)]);
+	}
 
+	#[Route('/user/adventure/{id}/points', name: 'adventure_points', methods: ['GET'])]
+	public function getPoints(
+		int $id,
+		AdventureRepository $adventureRepository,
+		AdventurePointRepository $adventurePointRepository
+	): JsonResponse {
+		$adventure = $adventureRepository->find($id);
+		if (!$adventure) {
+			return new JsonResponse(['error' => 'Adventure not found.'], 404);
+		}
+		$points = $adventurePointRepository->findBy(['adventure' => $adventure], ['recordedAt' => 'ASC']);
+		$result = array_map(fn($pt) => [
+			'lat' => $pt->getLatitude(),
+			'lng' => $pt->getLongitude(),
+			'elev' => $pt->getElevation(),
+			'time' => $pt->getRecordedAt()->format('c')
+		], $points);
 
+		return new JsonResponse(['points' => $result]);
+	}
 
 }

@@ -126,8 +126,8 @@ class UserAdventureController extends AbstractController {
 			$adventure = new Adventure();
 			$adventure->setOwner($user);
 			$adventure->setTitle($data->get('title'));
-			$adventure->setStartDate(new \DateTime($data->get('start_date')));
-			$adventure->setEndDate(new \DateTime($data->get('end_date')));
+			$adventure->setStartDate(new \DateTimeImmutable($data->get('start_date')));
+			$adventure->setEndDate(new \DateTimeImmutable($data->get('end_date')));
 			$adventure->setStatus(Status::Preparation);
 
 			// ✅ Générer le lien partageable ici

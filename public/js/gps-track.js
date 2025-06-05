@@ -16,8 +16,18 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(r => r.json())
             .then(res => {
                 if (res.success) {
-                    feedback.textContent = "Trace GPS importée !";
-                    window.location.reload();
+                    feedback.textContent = "Fichier GPS ajouté avec succès !";
+
+                    // Recharge les points depuis le serveur (route twig renvoyant du JSON)
+                    fetch(`/Pathfinding-MVP/public/user/adventure/${adventureId}/points`)
+                        .then(r => r.json())
+                        .then(data => {
+                            // Mets à jour la carte et/ou la liste en front JS
+                            updateMapWithPoints(data.points);
+                        });
+
+                    // Reset le formulaire d’upload
+                    form.reset();
                 } else {
                     feedback.textContent = res.error || "Erreur.";
                 }
@@ -48,3 +58,19 @@ document.addEventListener('DOMContentLoaded', function() {
         attribution: 'Map data © OpenTopoMap'
     }).addTo(map);
 });
+
+function updateMapWithPoints(points) {
+    // Supprime l’ancien tracé
+    if (window.gpsTrackLayer) {
+        map.removeLayer(window.gpsTrackLayer);
+    }
+    if (!points.length) return;
+
+    // Construit un array de LatLng
+    const latlngs = points.map(pt => [pt.lat, pt.lng]);
+    window.gpsTrackLayer = L.polyline(latlngs, {color: 'blue'}).addTo(map);
+
+    // Fit bounds (zoom auto)
+    map.fitBounds(window.gpsTrackLayer.getBounds());
+}
+

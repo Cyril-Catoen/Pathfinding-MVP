@@ -35,11 +35,11 @@ class Adventure
 
     #[ORM\Column]
     #[Assert\LessThanOrEqual(propertyPath: 'endDate', message: 'La date de début doit précéder la date de fin.')]
-    private ?\DateTime $startDate = null;
+    private ?\DateTimeImmutable $startDate = null;
 
     #[ORM\Column]
     #[Assert\GreaterThanOrEqual(propertyPath: 'startDate', message: 'La date de fin doit être après la date de début.')]
-    private ?\DateTime $endDate = null;
+    private ?\DateTimeImmutable $endDate = null;
 
     #[ORM\Column(enumType: Status::class)]
     #[Assert\NotNull(message: 'Le statut est requis.')]
@@ -75,8 +75,9 @@ class Adventure
     /**
      * @var Collection<int, User>
      */
-    #[ORM\ManyToMany(targetEntity: User::class)]
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: "authorizedAdventures")]
     private Collection $authorizedUsers;
+
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -195,27 +196,25 @@ class Adventure
         return $this;
     }
 
-    public function getStartDate(): ?\DateTime
+    public function getStartDate(): ?\DateTimeImmutable
     {
         return $this->startDate;
     }
 
-    public function setStartDate(\DateTime $startDate): static
+    public function setStartDate(\DateTimeImmutable $startDate): static
     {
         $this->startDate = $startDate;
-
         return $this;
     }
 
-    public function getEndDate(): ?\DateTime
+    public function getEndDate(): ?\DateTimeImmutable
     {
         return $this->endDate;
     }
 
-    public function setEndDate(\DateTime $endDate): static
+    public function setEndDate(\DateTimeImmutable $endDate): static
     {
         $this->endDate = $endDate;
-
         return $this;
     }
 

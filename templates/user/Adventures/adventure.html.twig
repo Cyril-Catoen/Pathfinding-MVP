@@ -164,16 +164,29 @@
         <div class="w100 flex-between wrap mt-4">
             
             <div class="w100 flex-between">
-                <div>
-                    <label for="start_date">START DATE</label>
-                    <input type="datetime-local" name="start_date"
-                        value="{{ adventure.startDate ? adventure.startDate|date('Y-m-d\\TH:i') : '' }}">
+                {% if isOwner %}
+                <div class="w45">
+                    <label for="start-date-input">START DATE</label>
+                    <input type="datetime-local" name="start_date" id="start-date-input"
+                            value="{{ adventure.startDate ? adventure.startDate|date('Y-m-d\\TH:i') : '' }}" />
                 </div>
-                <div>
-                    <label for="end_date">END DATE</label>
-                    <input type="datetime-local" name="end_date"
-                        value="{{ adventure.endDate ? adventure.endDate|date('Y-m-d\\TH:i') : '' }}">
+                <div class="w45">
+                    <label for="end-date-input">END DATE</label>
+                    <input type="datetime-local" name="end_date" id="end-date-input"
+                            value="{{ adventure.endDate ? adventure.endDate|date('Y-m-d\\TH:i') : '' }}" />
                 </div>
+                <span id="dates-update-feedback" class="ml-2"></span>
+                <span id="dates-update-spinner" style="display:none;">⏳</span>
+                {% else %}
+                <div class="w45">
+                    <label>START DATE</label>
+                    <input type="datetime-local" value="{{ adventure.startDate ? adventure.startDate|date('Y-m-d\\TH:i') : '' }}" readonly disabled />
+                </div>
+                <div class="w45">
+                    <label>END DATE</label>
+                    <input type="datetime-local" value="{{ adventure.endDate ? adventure.endDate|date('Y-m-d\\TH:i') : '' }}" readonly disabled />
+                </div>
+                {% endif %}
             </div>
 
             <div class="w100 flex-cl-end mb-4">
@@ -401,6 +414,76 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 </script>
+
+<!-- Script Dates -->
+ <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const startInput = document.getElementById('start-date-input');
+    const endInput = document.getElementById('end-date-input');
+    const feedback = document.getElementById('dates-update-feedback');
+    const spinner = document.getElementById('dates-update-spinner');
+    let updateTimeout = null;
+
+    // Récupère adventureId (à définir quelque part dans ton template JS)
+    const adventureId = document.querySelector('[data-adventure-id]')?.dataset.adventureId;
+
+    function updateDatesAJAX() {
+        // Efface feedback
+        feedback.textContent = "";
+
+        // Si l'un des champs est vide, on ne fait rien
+        if (!startInput.value || !endInput.value) return;
+
+        // Validation front
+        if (startInput.value > endInput.value) {
+            feedback.textContent = "La date de début doit précéder la date de fin.";
+            feedback.style.color = "red";
+            return;
+        }
+
+        // Affiche spinner
+        spinner.style.display = "inline";
+
+        // Anti-spam : attend 700ms après la dernière frappe pour lancer la requête
+        clearTimeout(updateTimeout);
+        updateTimeout = setTimeout(() => {
+            fetch(`/Pathfinding-MVP/public/user/adventure/${adventureId}/update-dates`, {
+                method: 'POST',
+                body: new URLSearchParams({
+                        start_date: startInput.value,
+                        end_date: endInput.value
+                }),
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(r => r.json())
+            .then(res => {
+                spinner.style.display = "none";
+                if (res.success) {
+                    feedback.textContent = "Dates mises à jour !";
+                    feedback.style.color = "green";
+                } else {
+                    feedback.textContent = res.error || "Erreur.";
+                    feedback.style.color = "red";
+                }
+            })
+            .catch(() => {
+                spinner.style.display = "none";
+                feedback.textContent = "Erreur réseau.";
+                feedback.style.color = "red";
+            });
+        }, 700); // délai pour ne pas spammer à chaque frappe
+    }
+
+    if (startInput && endInput) {
+        startInput.addEventListener('change', updateDatesAJAX);
+        endInput.addEventListener('change', updateDatesAJAX);
+    }
+});
+</script>
+
+
 
 <script src="{{ asset('js/fileManager.js') }}" defer></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>

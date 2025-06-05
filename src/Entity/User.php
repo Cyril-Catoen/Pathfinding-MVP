@@ -114,7 +114,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Adventure>
      */
-    #[ORM\ManyToMany(targetEntity: Adventure::class, mappedBy: 'authorizedUsers')]
+    #[ORM\ManyToMany(targetEntity: Adventure::class, mappedBy: "authorizedUsers")]
     private Collection $authorizedAdventures;
 
     /**
