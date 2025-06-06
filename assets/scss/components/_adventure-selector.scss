@@ -27,3 +27,42 @@
 #adventure-input {
   cursor: pointer;
 }
+
+// icons - adventure type display
+
+.type-icon-container {
+    position: relative;
+    display: inline-block;
+    transition: transform 0.15s;
+    cursor: pointer;
+    font-size: clamp(1rem, 3vw, 2.5rem);
+    width: clamp(16px, 3vw, 40px);
+}
+.type-icon-container:focus,
+.type-icon-container:hover {
+    transform: scale(1.2);
+    z-index: 2;
+}
+.type-icon-container::after {
+    content: attr(data-label);
+    position: absolute;
+    left: 50%;
+    top: 110%;
+    transform: translateX(-50%);
+    opacity: 0;
+    pointer-events: none;
+    background: #222;
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 5px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    transition: opacity 0.15s;
+    margin-top: 4px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.type-icon-container:focus::after,
+.type-icon-container:hover::after {
+    opacity: 1;
+    pointer-events: auto;
+}

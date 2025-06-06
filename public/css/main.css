@@ -1669,6 +1669,46 @@ footer section nav ul li {
   cursor: pointer;
 }
 
+.type-icon-container {
+  position: relative;
+  display: inline-block;
+  transition: transform 0.15s;
+  cursor: pointer;
+  font-size: clamp(1rem, 3vw, 2.5rem);
+  width: clamp(16px, 3vw, 40px);
+}
+
+.type-icon-container:focus,
+.type-icon-container:hover {
+  transform: scale(1.2);
+  z-index: 2;
+}
+
+.type-icon-container::after {
+  content: attr(data-label);
+  position: absolute;
+  left: 50%;
+  top: 110%;
+  transform: translateX(-50%);
+  opacity: 0;
+  pointer-events: none;
+  background: #222;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 5px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+  margin-top: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.type-icon-container:focus::after,
+.type-icon-container:hover::after {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 .button-type-1 {
   width: 30%;
   font-size: clamp(1.5rem, 3vw, 2rem);
@@ -2379,6 +2419,28 @@ label:hover .box-content {
   opacity: 1;
   transform: translateX(0);
   pointer-events: auto;
+}
+
+.slide-in-right {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  position: absolute;
+  top: 0;
+  left: 1400px;
+  min-width: 340px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s, transform 0.2s;
+  transform: translateX(20px);
+}
+.slide-in-right.active {
+  opacity: 1;
+  left: 50%;
+  pointer-events: auto;
+  transform: translateX(0);
 }
 
 form label {
@@ -3229,7 +3291,6 @@ main.adv-main {
 }
 main.adv-main h2, main.adv-main h3, main.adv-main h4 {
   color: black;
-  font-size: 2rem;
   padding-left: 1rem;
 }
 main.adv-main h4 {
@@ -3238,6 +3299,18 @@ main.adv-main h4 {
 }
 main.adv-main #adventure-file-upload-form .button-type-1 {
   width: 25%;
+}
+main.adv-main .file-empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  width: 100%;
+  font-size: clamp(1.5rem, 5vw, 3rem);
+}
+main.adv-main .like-input label {
+  padding: 0;
+  cursor: pointer;
 }
 main.adv-main #uploaded-files-container {
   min-height: 240px;

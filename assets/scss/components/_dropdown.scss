@@ -79,3 +79,22 @@
 
 }
 
+.slide-in-right {
+  @include flex(row, space-between);
+  gap: 2rem;
+  position: absolute;
+  top: 0;
+  left: 1400px;
+  min-width: 340px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s, transform 0.2s;
+  transform: translateX(20px);
+
+  &.active {
+    opacity: 1;
+    left: 50%;
+    pointer-events: auto;
+    transform: translateX(0);
+  }
+}

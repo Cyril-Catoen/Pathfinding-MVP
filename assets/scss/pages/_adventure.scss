@@ -6,7 +6,6 @@ main.adv-main {
 
     h2, h3, h4 {
         color: black;
-        font-size: 2rem;
         padding-left: 1rem;
     }
 
@@ -19,6 +18,19 @@ main.adv-main {
     #adventure-file-upload-form{
       .button-type-1{
         width: 25%;
+      }
+    }
+
+    .file-empty{
+      @include flex-center;
+      width: 100%;
+      font-size: clamp(1.5rem, 5vw, 3rem);
+    }
+
+    .like-input{
+      label{
+        padding: 0;
+        cursor: pointer;
       }
     }
 

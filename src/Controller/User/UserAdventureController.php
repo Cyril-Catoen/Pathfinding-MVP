@@ -97,6 +97,26 @@ class UserAdventureController extends AbstractController {
 		);
 
 		$points = $adventurePointRepository->findBy(['adventure' => $adventure], ['recordedAt' => 'ASC']);
+		// Valeur par défaut si pas de timer ou de endDate : 24:00:00
+		$timerDuration = '24:00:00';
+
+		$timerAlert = $adventure->getTimerAlert();
+		$endDate = $adventure->getEndDate();
+
+		if ($timerAlert && $endDate) {
+			$alertTime = $timerAlert->getAlertTime();
+			if ($alertTime) {
+				$diff = $endDate->diff($alertTime);
+				// Attention, $diff->invert = 1 si endDate > alertTime (donc résultat négatif)
+				// Pour l'UX, on affiche 00:00:00 si négatif
+				if ($diff->invert) {
+					$timerDuration = '00:00:00';
+				} else {
+					$totalHours = $diff->h + ($diff->days * 24);
+					$timerDuration = sprintf('%02d:%02d:%02d', $totalHours, $diff->i, $diff->s);
+				}
+			}
+		}
 
 		return $this->render('user/adventures/adventure.html.twig', [
 			'adventure' => $adventure,
@@ -107,6 +127,8 @@ class UserAdventureController extends AbstractController {
 			'contactLists' => $isOwner ? $contactListRepository->findBy(['owner' => $user]) : [],
 			'pictures' => $pictures,
 			'points' => $points,
+			'timerDuration' => $timerDuration,
+			'types' => $adventure->getTypes(),
 		]);
 
 	}

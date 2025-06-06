@@ -99,6 +99,11 @@ class TimerAlert
     {
         $this->adventure = $adventure;
 
+        // Synchronisation côté Adventure (optionnel mais recommandé)
+        if ($adventure && $adventure->getTimerAlert() !== $this) {
+            $adventure->setTimerAlert($this);
+        }
         return $this;
     }
+
 }

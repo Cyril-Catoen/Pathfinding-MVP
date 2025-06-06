@@ -420,6 +420,18 @@ class Adventure
         return $this->timerAlert;
     }
 
+    public function setTimerAlert(?TimerAlert $timerAlert): self
+    {
+        $this->timerAlert = $timerAlert;
+
+        if ($timerAlert !== null && $timerAlert->getAdventure() !== $this) {
+            $timerAlert->setAdventure($this);
+        }
+
+        return $this;
+    }
+
+
     public function hasActiveTimer(): bool
     {
         return $this->timerAlert !== null && $this->timerAlert->isActive();

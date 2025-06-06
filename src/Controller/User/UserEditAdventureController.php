@@ -559,4 +559,157 @@ class UserEditAdventureController extends AbstractController {
 		return new JsonResponse(['points' => $result]);
 	}
 
+	// SafetyAlert
+	#[Route('/user/adventure/{id}/safety-alert-toggle', name: 'safety_alert_toggle', methods: ['POST'])]
+	public function toggleSafetyAlert(
+		int $id,
+		Request $request,
+		AdventureRepository $adventureRepo,
+		TimerAlertRepository $timerRepo,
+		ContactListRepository $contactListRepo,
+		EntityManagerInterface $em,
+		Security $security
+	): JsonResponse {
+		$adventure = $adventureRepo->find($id);
+		$user = $security->getUser();
+		$defaultList = null;
+		
+		if (!$adventure || !$user || $adventure->getOwner() !== $user) {
+			return new JsonResponse(['success' => false, 'error' => 'Not allowed'], 403);
+		}
+
+		$enabled = filter_var($request->request->get('enabled'), FILTER_VALIDATE_BOOLEAN);
+		if ($enabled) {
+			$endDate = $adventure->getEndDate();
+			if (!$endDate) {
+				return new JsonResponse(['success' => false, 'error' => 'No endDate'], 400);
+			}
+			// Création/réactivation du Timer = endDate + 24h
+        	$alertTime = (clone $endDate)->add(new \DateInterval('PT24H'));
+			if (!$adventure->getTimerAlert()) {
+				$timer = new TimerAlert();
+				$timer->setAdventure($adventure);
+				$timer->setIsActive(true);
+				$timer->setAlertTime($alertTime);
+				$timer->setUpdatedAt(new \DateTimeImmutable());
+				$timer->setUpdatedByUser($user);
+				$em->persist($timer);
+			} else {
+				$timer = $adventure->getTimerAlert();
+				$timer->setIsActive(true);
+				$timer->setAlertTime($alertTime);
+				$timer->setUpdatedAt(new \DateTimeImmutable());
+				$timer->setUpdatedByUser($user);
+			}
+			// ContactList par défaut
+			$defaultList = $contactListRepo->findOneBy(['owner' => $user, 'isDefault' => true]);
+			$adventure->setContactList($defaultList);
+		} else {
+			// Suppression du timer
+			if ($adventure->getTimerAlert()) {
+			$timer = $adventure->getTimerAlert();
+
+			// Casse le lien dans les deux sens // DISSOCIE LA RELATION !! BDD EN CASCADE, si pas de dissociation => supprime l'aventure en même temps que le timer
+			$adventure->setTimerAlert(null); 
+			$timer->setAdventure(null);      
+
+			$em->remove($timer);
+		}
+		}
+		$em->flush();
+		$alertTime = $timer->getAlertTime();
+		$endDate = $adventure->getEndDate();
+
+		$interval = $endDate ? $endDate->diff($alertTime) : null;
+
+		$duration = $interval
+			? sprintf('%02d:%02d:%02d', $interval->h + ($interval->days * 24), $interval->i, $interval->s)
+			: '00:00:00';
+
+		return new JsonResponse([
+			'success' => true,
+			'alertTime' => $alertTime->format('Y-m-d H:i:s'),
+			'timerDuration' => $duration, // C’est cette valeur qu’on veut afficher !
+			'defaultListId' => $defaultList ? $defaultList->getId() : null,
+		]);
+	}
+
+	#[Route('/user/adventure/{id}/timer-alert-update', name: 'timer_alert_update', methods: ['POST'])]
+	public function updateTimer(
+		int $id,
+		Request $request,
+		AdventureRepository $adventureRepo,
+		EntityManagerInterface $em,
+		Security $security
+	): JsonResponse {
+		$adventure = $adventureRepo->find($id);
+		$user = $security->getUser();
+		if (!$adventure || !$user || $adventure->getOwner() !== $user) {
+			return new JsonResponse(['success' => false, 'error' => 'Not allowed'], 403);
+		}
+		$timer = $adventure->getTimerAlert();
+		if (!$timer) {
+			return new JsonResponse(['success' => false, 'error' => 'No timer alert'], 400);
+		}
+		$hours = (int)$request->request->get('hours', 24);
+		$minutes = (int)$request->request->get('minutes', 0);
+		$seconds = (int)$request->request->get('seconds', 0);
+
+		// Prendre endDate comme base !
+		$endDate = $adventure->getEndDate();
+		if (!$endDate) {
+			return new JsonResponse(['success' => false, 'error' => 'No endDate'], 400);
+		}
+
+		$intervalStr = sprintf('PT%dH%dM%dS', $hours, $minutes, $seconds);
+		try {
+			$interval = new \DateInterval($intervalStr);
+			$alertTime = (clone $endDate)->add($interval);
+		} catch (\Exception $e) {
+			return new JsonResponse(['success' => false, 'error' => 'Interval error'], 400);
+		}
+		$timer->setAlertTime($alertTime);
+		$timer->setUpdatedAt(new \DateTimeImmutable());
+		$timer->setUpdatedByUser($user);
+
+		// Calcul de la durée affichable
+		$diff = $endDate->diff($alertTime);
+
+		// Ajout de jours éventuels en heures (cas >24h)
+		$totalHours = $diff->h + ($diff->days * 24);
+		$timerDuration = sprintf('%02d:%02d:%02d', $totalHours, $diff->i, $diff->s);
+
+		$em->flush();
+		return new JsonResponse([
+			'success' => true,
+			'alertTime' => $alertTime->format('Y-m-d H:i:s'),
+			'timerDuration' => $timerDuration
+		]);
+	}
+
+
+	#[Route('/user/adventure/{id}/contact-list-update', name: 'contact_list_update', methods: ['POST'])]
+	public function updateContactList(
+		int $id,
+		Request $request,
+		AdventureRepository $adventureRepo,
+		ContactListRepository $contactListRepo,
+		EntityManagerInterface $em,
+		Security $security
+	): JsonResponse {
+		$adventure = $adventureRepo->find($id);
+		$user = $security->getUser();
+		if (!$adventure || !$user || $adventure->getOwner() !== $user) {
+			return new JsonResponse(['success' => false, 'error' => 'Not allowed'], 403);
+		}
+		$listId = $request->request->get('contact_list_id');
+		$list = $contactListRepo->findOneBy(['id' => $listId, 'owner' => $user]);
+		if (!$list) {
+			return new JsonResponse(['success' => false, 'error' => 'Invalid list'], 400);
+		}
+		$adventure->setContactList($list);
+		$em->flush();
+		return new JsonResponse(['success' => true]);
+	}
+
 }

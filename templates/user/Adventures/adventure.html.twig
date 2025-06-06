@@ -36,6 +36,35 @@
                             </div>
                         </div>
 
+                        {% set typeIcons = {
+                            'hiking':    '<i class="fas fa-person-hiking"></i>',
+                            'camping':   '<i class="fas fa-campground"></i>',
+                            'alpinism':  '<img src="'~asset('assets/img/icon_ice_axe.png')~'" alt="Alpinism">',
+                            'climbing':  '<img src="'~asset('assets/img/icon_climber.png')~'" alt="Climbing">',
+                            'whitewater':'<i class="fas fa-water"></i>',
+                            'skiing':    '<i class="fas fa-person-skiing"></i>',
+                            'caving':    '<img src="'~asset('assets/img/icon_cave2.png')~'" alt="Caving">',
+                            'hunting':   '<i class="fas fa-crosshairs"></i>',
+                            'fishing':   '<img src="'~asset('assets/img/icon_fishing.svg')~'" alt="Fishing">',
+                            'off road':  '<i class="fas fa-motorcycle"></i>',
+                            'biking':    '<i class="fas fa-bicycle"></i>',
+                            'other(s)':  '<i class="fas fa-pen"></i>'
+                        } %}
+
+                        {% if adventure.types|length > 0 %}
+                            <div class="adventure-types d-flex gap-2 mt-1 pdl-2">
+                                {% for type in adventure.types %}
+                                    {% set key = type.name|lower %}
+                                    <div class="type-icon-container" 
+                                        tabindex="0" 
+                                        data-label="{{ type.name|capitalize }}">
+                                        {{ typeIcons[key]|raw }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+
                         {# Bloc d’édition (masqué par défaut) #}
                         <div id="title-edit-container" class="d-none">
                             <div class="flex-between gap-2">
@@ -237,9 +266,9 @@
             </div>
             {% if isOwner %}
             <form id="adventure-track-upload-form" class="flex-between gap-2 mb-2" method="post" action="{{ path('upload_adventure_track', { id: adventure.id }) }}" enctype="multipart/form-data" class="mb-2">
-                <div for="track-file-input" class="like-input">
-                    Select a GPS track
-                    <input type="file" class="d-none" name="track" id="track-file-input" accept=".gpx,.csv,.json" required>
+                <div class="like-input">
+                    <label for="track-file-input" >Select a GPS track</label>
+                    <input type="file" class="upload-input" name="track" id="track-file-input" accept=".gpx,.csv,.json" required>
                 </div>       
                 <button type="submit" class="button-type-1 button-green">Upload</button>
                 <span id="track-upload-feedback"></span>
@@ -257,53 +286,55 @@
         </div>
 
         {% if isOwner %}
-        <form class="w100" action="{{ path('update_alert_settings', {'id': adventure.id}) }}" method="post">
-            <div class="w100 flex-between mt-4">
-                <div class="flex-start w30">
+        <form id="safety-alert-toggle-form" 
+                data-timer-url="{{ path('timer_alert_update', {'id': adventure.id}) }}"
+                data-contact-url="{{ path('contact_list_update', {'id': adventure.id}) }}"
+                data-toggle-url="{{ path('safety_alert_toggle', {'id': adventure.id}) }}">
+            <div class="flex-between relative mb-8 mt-4">
+                <div class="flex-start">
                     <h3 class="mt-2 mb-2 gap-2">SAFETY ALERT</h3>
                     <label class="toggle-btn">
-                        <input type="checkbox" name="safetyEnabled" {{ adventure.timerAlert and adventure.timerAlert.isActive ? 'checked' : '' }}>
+                        <input type="checkbox"
+                            name="safetyEnabled"
+                            id="safetyEnabled"
+                            {{ adventure.timerAlert and adventure.timerAlert.isActive ? 'checked' : '' }}>
                         <div class="slider"><div class="ball"></div></div>
                     </label>
                 </div>
-                <div class="w30">
-                    <label for="timerAlert">Timer Alert</label>
-                    <!-- Formulaire pour définir la durée -->
-                    <div class="duration-wrapper">
-                        <input type="text" id="duration-input" name="duration-input" readonly placeholder="HH:MM:SS" class="duration-display" />
-
-                        <div class="duration-picker" id="duration-picker">
-                            <div class="picker-column">
-                            {% for h in 0..72 %}
-                                <div class="picker-option" data-type="h">{{ "%02d"|format(h) }}</div>
-                            {% endfor %}
-                            </div>
-                            <div class="divider"></div>
-                            <div class="picker-column">
-                            {% for m in 0..59 %}
-                                <div class="picker-option" data-type="m">{{ "%02d"|format(m) }}</div>
-                            {% endfor %}
-                            </div>
-                            <div class="divider"></div>
-                            <div class="picker-column">
-                            {% for s in 0..59 %}
-                                <div class="picker-option" data-type="s">{{ "%02d"|format(s) }}</div>
-                            {% endfor %}
-                            </div>
-                        </div>
+                <div id="safety-details" class="slide-in-right{% if adventure.timerAlert and adventure.timerAlert.isActive %} active{% endif %} w50">
+                <div class="duration-wrapper w45">
+                    <label for="duration-input">Timer Alert</label>
+                    <input type="text" id="duration-input" readonly placeholder="HH:MM:SS"
+                    class="duration-display" value="{{ timerDuration }}" />
+                    <div class="duration-picker" id="duration-picker" style="display:none;">
+                    <div class="picker-column">
+                        {% for h in 0..72 %}
+                        <div class="picker-option" data-type="h">{{ "%02d"|format(h) }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="divider"></div>
+                    <div class="picker-column">
+                        {% for m in 0..59 %}
+                        <div class="picker-option" data-type="m">{{ "%02d"|format(m) }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="divider"></div>
+                    <div class="picker-column">
+                        {% for s in 0..59 %}
+                        <div class="picker-option" data-type="s">{{ "%02d"|format(s) }}</div>
+                        {% endfor %}
+                    </div>
                     </div>
                 </div>
-                <div class="w30">
-                    <label>Contact list</label>
-                    <select name="contact_list_id">
-                        {% for list in contactLists %}
-                            <option value="{{ list.id }}">{{ list.name }}</option>
-                        {% endfor %}
+                <div class="w45">
+                    <label for="contact-list-select">Contact list</label>
+                    <select id="contact-list-select" name="contact_list_id">
+                    {% for list in contactLists %}
+                        <option value="{{ list.id }}" {{ adventure.contactList and adventure.contactList.id == list.id ? 'selected' : '' }}>{{ list.name }}</option>
+                    {% endfor %}
                     </select>
                 </div>
-            </div>
-            <div class="w100 pdt-4 pdb-4 flex-end">
-                <button class="button-type-4" type="submit">SAVE</button>
+                </div>
             </div>
         </form>
         {% endif %}
@@ -424,7 +455,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const spinner = document.getElementById('dates-update-spinner');
     let updateTimeout = null;
 
-    // Récupère adventureId (à définir quelque part dans ton template JS)
     const adventureId = document.querySelector('[data-adventure-id]')?.dataset.adventureId;
 
     function updateDatesAJAX() {
@@ -489,5 +519,6 @@ document.addEventListener('DOMContentLoaded', function () {
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
 <script src="{{ asset('js/gps-track.js') }}" defer></script>
 <script src="{{ asset('js/timer-picker.js') }}" defer></script>
+<script src="{{ asset('js/safety-settings.js') }}" defer></script>
 
 {% endblock script %}

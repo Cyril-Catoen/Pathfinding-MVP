@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         let html = `<div class="file-list-header">Fichiers (${files.length}/5, ${(totalSize/1024/1024).toFixed(1)} Mo / 50 Mo)</div>`;
         if (files.length === 0) {
-            html += `<div class="file-empty">Aucun fichier ajouté.</div>`;
+            html += `<div class="file-empty">No files added.</div>`;
         } else {
             html += `<ul class="file-list">`;
             files.forEach(f => {
