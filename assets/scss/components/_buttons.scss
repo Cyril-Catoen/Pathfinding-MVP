@@ -24,6 +24,12 @@
     
 }
 
+.button-edit {
+    min-height: clamp(2.5rem, 5vw, 3rem);
+    @include button-type (clamp(2.5rem, 5vw, 3rem), clamp(1.325rem, 3vw, 1.5rem), 0, 50%, transform 0.3s ease, 1rem);
+    @include flex-center;
+}
+
 .manage-btn {
     @include flex-center;
     width: 100%;

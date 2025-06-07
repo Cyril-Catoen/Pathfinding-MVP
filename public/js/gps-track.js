@@ -1,8 +1,13 @@
+let map; // 👈 portée globale
+
 document.addEventListener('DOMContentLoaded', function() {
-    // UPLOAD TRACK (AJAX)
     const trackForm = document.getElementById('adventure-track-upload-form');
     const trackInput = document.getElementById('track-file-input');
+    const mapEl = document.getElementById('mapid');
+    if (!mapEl) return;
+    const pointsUrl = mapEl.dataset.pointsUrl;
     const feedback = document.getElementById('track-upload-feedback');
+
     if (trackForm) {
         trackForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -18,16 +23,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (res.success) {
                     feedback.textContent = "Fichier GPS ajouté avec succès !";
 
-                    // Recharge les points depuis le serveur (route twig renvoyant du JSON)
-                    fetch(`/Pathfinding-MVP/public/user/adventure/${adventureId}/points`)
+                    fetch(pointsUrl)
                         .then(r => r.json())
                         .then(data => {
-                            // Mets à jour la carte et/ou la liste en front JS
-                            updateMapWithPoints(data.points);
+                            updateMapWithPoints(data.points); // 👈 map est maintenant accessible
                         });
 
-                    // Reset le formulaire d’upload
-                    form.reset();
+                    trackForm.reset(); // ✅ corrigé ici
                 } else {
                     feedback.textContent = res.error || "Erreur.";
                 }
@@ -35,13 +37,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // LEAFLET MAP
-    let map = L.map('mapid');
+    map = L.map('mapid'); // 👈 plus de let ici, on utilise la variable globale
+
     let points = [];
     try {
-        points = JSON.parse(document.getElementById('mapid').dataset.points);
+        points = JSON.parse(mapEl.dataset.points);
     } catch(e) {}
-    let defaultLatLng = [42, 43]; // Géorgie !
+
+    let defaultLatLng = [42, 43];
     if (points.length > 0) {
         let latlngs = points.map(pt => [pt.latitude, pt.longitude]);
         map.setView(latlngs[0], 13);
@@ -50,9 +53,9 @@ document.addEventListener('DOMContentLoaded', function() {
         L.marker(latlngs.at(-1)).addTo(map).bindPopup("Arrivée");
         map.fitBounds(latlngs);
     } else {
-        // fallback : Géorgie !
         map.setView([42.3154, 43.3569], 6);
     }
+
     L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
         maxZoom: 17,
         attribution: 'Map data © OpenTopoMap'
@@ -60,17 +63,25 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function updateMapWithPoints(points) {
-    // Supprime l’ancien tracé
     if (window.gpsTrackLayer) {
-        map.removeLayer(window.gpsTrackLayer);
+        map.removeLayer(window.gpsTrackLayer); // ✅ map maintenant visible ici
     }
     if (!points.length) return;
 
-    // Construit un array de LatLng
     const latlngs = points.map(pt => [pt.lat, pt.lng]);
+    // Supprimer les anciens marqueurs s'ils existent
+    if (window.startMarker) map.removeLayer(window.startMarker);
+    if (window.endMarker) map.removeLayer(window.endMarker);
+
+    // Nouveau tracé
     window.gpsTrackLayer = L.polyline(latlngs, {color: 'blue'}).addTo(map);
 
-    // Fit bounds (zoom auto)
+    // Marqueurs dynamique
+    window.startMarker = L.marker(latlngs[0]).addTo(map).bindPopup("Départ");
+    window.endMarker = L.marker(latlngs.at(-1)).addTo(map).bindPopup("Arrivée");
+
+    // Zoom automatique
     map.fitBounds(window.gpsTrackLayer.getBounds());
+
 }
 

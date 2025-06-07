@@ -2,6 +2,22 @@
 
 namespace App\Controller\User;
 
+
+use App\Entity\Adventure;
+use App\Repository\AdventureRepository;
+
+use App\Entity\AdventurePicture;
+use App\Repository\AdventurePictureRepository;
+
+use App\Entity\ContactList;
+use App\Repository\ContactListRepository;
+use App\Entity\SafetyContact;
+use App\Repository\SafetyContactRepository;
+use App\Entity\TimerAlert;
+use App\Repository\TimerAlertRepository;
+
+use App\Enum\Status;
+use App\Enum\ViewAuthorization;
 use Exception;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,11 +43,49 @@ class UserPageController extends AbstractController {
 		return new Response($html, 404);
 	}
 
-    #[Route('/user/dashboard', name: "dashboard", methods: ['GET'])]
-	public function displayDashboard(): Response {
+   #[Route('/user/dashboard', name: "dashboard", methods: ['GET'])]
+	public function displayDashboard(
+		AdventureRepository $adventureRepo,
+		SafetyContactRepository $contactRepo,
+		EntityManagerInterface $em
+	): Response {
+		/** @var User|null $user */
+		$user = $this->getUser();
+		$isOwner = $user !== null;
 
-        return $this->render('user/dashboard.html.twig');
+		$adventure = null;
+
+		if ($isOwner) {
+			$adventure = $adventureRepo->findOneBy(['owner' => $user, 'status' => Status::Ongoing->value]);
+			if (!$adventure) {
+				$adventure = $adventureRepo->findOneBy(['owner' => $user], ['createdAt' => 'DESC']);
+			}
+		} else {
+			$adventure = $adventureRepo->findOneBy(['viewAuthorization' => ViewAuthorization::Public->value], ['createdAt' => 'DESC']);
+		}
+
+		$timer = $adventure && $adventure->getTimerAlert() && $adventure->getTimerAlert()->isActive()
+			? $adventure->getTimerAlert()
+			: null;
+
+		$contacts = [];
+		if ($isOwner) {
+			$contacts = $contactRepo->findBy(
+				['user' => $user],
+				['isFavorite' => 'DESC', 'createdAt' => 'ASC'],
+				2
+			);
+		}
+
+		return $this->render('user/dashboard.html.twig', [
+			'userData' => $user,
+			'isOwner' => $isOwner,
+			'mainAdventure' => $adventure,
+			'timerAlert' => $timer,
+			'contacts' => $contacts,
+		]);
 	}
+
 
 	#[Route('/user/profile', name: 'user_profile')]
 	public function editProfile(Request $request, EntityManagerInterface $em, SluggerInterface $slugger): Response
@@ -78,6 +132,11 @@ class UserPageController extends AbstractController {
 		]);
 	}
 
+	#[Route('/user/discover', name: "discover", methods: ['GET'])]
+	public function displayDiscover(): Response {
+
+		return $this->render('user/discover.html.twig');
+	}
 
 }
 

@@ -9,12 +9,14 @@ use App\Repository\AdventurePictureRepository;
 use App\Repository\AdventurePointRepository;
 use App\Entity\AdventureType;
 use App\Repository\AdventureTypeRepository;
+use App\Service\AdventureTypeIconHelper;
 use App\Entity\ContactList;
 use App\Repository\ContactListRepository;
 use App\Entity\TimerAlert;
 use App\Repository\TimerAlertRepository;
 use App\Enum\Status;
 use App\Enum\ViewAuthorization;
+use App\Enum\AdventureTypeList;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -128,7 +130,9 @@ class UserAdventureController extends AbstractController {
 			'pictures' => $pictures,
 			'points' => $points,
 			'timerDuration' => $timerDuration,
-			'types' => $adventure->getTypes(),
+			'types' => $adventure->getTypes(), // liste des types sélectionnés par l'user à la création
+			'adventureTypes' => AdventureTypeList::cases(), // afficher la liste complète pour édition
+			'typeIcons' => AdventureTypeIconHelper::getIconMap(),
 		]);
 
 	}
@@ -139,6 +143,7 @@ class UserAdventureController extends AbstractController {
 		EntityManagerInterface $entityManager,
 		Security $security,
 		AdventureTypeRepository $adventureTypeRepository,
+		ContactListRepository $contactListRepository,
 		ValidatorInterface $validator
 	): Response {
 		if ($request->isMethod('POST')) {
@@ -152,7 +157,7 @@ class UserAdventureController extends AbstractController {
 			$adventure->setEndDate(new \DateTimeImmutable($data->get('end_date')));
 			$adventure->setStatus(Status::Preparation);
 
-			// ✅ Générer le lien partageable ici
+			// Générer le lien partageable
 			$adventure->setShareLink(bin2hex(random_bytes(16)));
 
 			// Visibilité
@@ -168,39 +173,56 @@ class UserAdventureController extends AbstractController {
 			// Types d'aventure
 			$adventureTypes = $data->all('adventures');
 			foreach ($adventureTypes as $typeName) {
-				$typeEntity = $adventureTypeRepository->findOneBy(['name' => ucfirst(strtolower($typeName))]);
+				$typeEntity = $adventureTypeRepository->findOneBy(['name' => $typeName]);
 				if ($typeEntity) {
 					$adventure->addType($typeEntity);
 				}
 			}
 
-			// Live Track
+			// Live Track (à compléter)
 			if ($data->getBoolean('statusLive')) {
-				// à compléter : ajout dans une future table ou champ booléen
+				// ...
 			}
 
-			// Safety Alert
+			// Safety Alert bloc
 			if ($data->getBoolean('statusSafety')) {
-				// à compléter aussi
-			}
-
-			// Timer Alert (si durée définie)
-			$durationStr = $data->get('duration-input'); // format attendu : HH:MM:SS
-			if ($durationStr) {
+				// TIMER ALERT
+				$durationStr = $data->get('duration-input') ?: '24:00:00';
 				$parts = explode(':', $durationStr);
+
 				if (count($parts) === 3) {
 					[$h, $m, $s] = array_map('intval', $parts);
+
+					// Sécurité : bloque la valeur max à 72h00:00
+					if ($h > 72) $h = 72;
+					if ($m > 59) $m = 59;
+					if ($s > 59) $s = 59;
+
+					// Si tout est à zéro, refuse (ou force 24h)
+					if ($h === 0 && $m === 0 && $s === 0) {
+						$h = 24; $m = 0; $s = 0;
+					}
+
 					$interval = new \DateInterval("PT{$h}H{$m}M{$s}S");
 					$alertTime = (new \DateTimeImmutable($data->get('end_date')))->add($interval);
-					
+
 					$timerAlert = new TimerAlert();
 					$timerAlert->setAdventure($adventure);
 					$timerAlert->setAlertTime($alertTime);
 					$timerAlert->setIsActive(true);
 					$timerAlert->setUpdatedByUser($user);
 					$timerAlert->setUpdatedAt(new \DateTimeImmutable());
-
 					$entityManager->persist($timerAlert);
+				}
+
+				// CONTACT LIST
+				$contactListId = $data->get('contact_list');
+				if ($contactListId) {
+					$contactList = $contactListRepository->find($contactListId);
+					if ($contactList) {
+						$adventure->setContactList($contactList); // association (à adapter selon ton modèle)
+						// Tu peux aussi associer à $timerAlert si tu préfères.
+					}
 				}
 			}
 
@@ -210,7 +232,6 @@ class UserAdventureController extends AbstractController {
 				foreach ($errors as $error) {
 					$messages[] = $error->getPropertyPath() . ': ' . $error->getMessage();
 				}
-				// à adapter : afficher ou retourner les messages
 				return new Response(implode('<br>', $messages), 400);
 			}
 
@@ -220,8 +241,14 @@ class UserAdventureController extends AbstractController {
 			return $this->redirectToRoute('adventures-manager');
 		}
 
-		return $this->render('user/Adventures/create-adventure.html.twig');
+		// ... Récupère les contactLists de l'utilisateur
+		$contactLists = $contactListRepository->findBy(['owner' => $security->getUser()]);
+
+		return $this->render('user/Adventures/create-adventure.html.twig', [
+			'contactLists' => $contactLists
+		]);
 	}
+
 
 
     #[Route('/user/delete-adventure/{id}', name: 'delete-adventure', methods: ['GET', 'POST'])]

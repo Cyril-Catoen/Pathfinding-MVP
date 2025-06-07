@@ -9,83 +9,154 @@
 <main class="dashboard">
         <section class="container">
             <div class="flex-between pdt-8">
+                {% if isOwner %}
                 <div class="container-circle-1">
-                    <img src="{{ asset('assets/img/LiveTrack.jpeg') }}" alt="LiveTrack">
-                </div> 
+                    <a href="{{ path('user_profile') }}" class="container-circle-1 relative d-flex">
+                    {% if userData.picturePath %}
+                        <img src="{{ asset('uploads/user-picture/' ~ userData.picturePath) }}" alt="User photo">
+                    {% else %}
+                        <img src="{{ asset('assets/img/default-profile.png') }}" alt="Default">
+                    {% endif %}
+                        <div class="profile-hover-text"><i class="fa fa-cog"></i></div>
+                    </a>
+                    
+                {% else %}
+                <div class="container-circle-1">
+                    {% if userData.picturePath %}
+                        <img src="{{ asset('uploads/user-picture/' ~ userData.picturePath) }}" alt="User photo">
+                    {% else %}
+                        <img src="{{ asset('assets/img/default-profile.png') }}" alt="Default">
+                    {% endif %}
+                {% endif %}
+                </div>
+
                 <div class="w35">
-                    <div class="flex-start"><h2>Cyril CATOEN</h2>
-                    <img src="https://flagcdn.com/24x18/fr.png" alt="France" width="24px" height="18px">
+                    <div class="flex-start">
+                        <h2>{{ userData.surname ~ ' ' ~ userData.name }}</h2>
+                        {% if userData.country %}
+                            <img src="https://flagcdn.com/24x18/{{ userData.country|lower }}.png" alt="{{ userData.country }}" width="24px" height="18px">
+                        {% endif %}
                     </div>
-                    <p class="pdt-1 text-justify">Outdoors and tech entoushiat. Transitioning into Web Develoment to build an international company using React, React Native, PostGres, Symfony and more. Let’s go !   
+                    <p class="pdt-1 text-justify">
+                        {{ userData.description ?? 'No bio available yet.' }}
                     </p>
                 </div>
-                <div class="w25 vh30 flex-cl-between pdt-2 pdb-2">
-                    <a class="button-type-2 button-green" href="{{ path('create-adventure') }}#newAdv">Create a new Adventure</a>
-                    <button class="button-type-2 button-red">Reset Safety Alert</button>
-                    <p>08.04.2025 14:06 (UTC+2)</p>
+
+                {% if isOwner and timerAlert %}
+                <div class="w25 vh30 flex-cl-start pdt-2 pdb-2 gap-2">
+                    <button class="button-type-2 button-red">Reset <i class="fa fa-refresh"></i></button>
+                    <p id="timer-countdown"
+                    class="text-center"
+                    data-alert-time="{{ timerAlert.alertTime|date('c') }}">
+                    Loading timer...
+                    </p>                      
                 </div>
+                {% endif %}   
             </div>
 
             <div class="w100 vh60 flex-between mt-8">
                 <div class="container-dash-1">
-                    <h2 class="w100">LAST ADVENTURES</h2>
-                    <div class="adventure-cards w100">
-                        <div>
-                            <div class="adventure-card">
-                            <img src="{{ asset('assets/img/shiretoko3.jpg') }}" alt="Shiretoko">
-                            </div>
-                            <div>
-                                <p class="bold">Shiretoko National Park</p>
-                                <p>Achieved</p>
-                            </div>
-                        </div>
+                    <div class="flex-between-top w100 mt-2 mb-2">
+                        <h2>LAST ADVENTURE</h2>
+                    {% if isOwner %}
+                        <a class="button-edit button-green" href="{{ path('create-adventure') }}#newAdv"><i class="fa-solid fa-square-plus"></i></a>
+                    {% endif %}
+                    </div>
 
-                        <div>
-                            <div class="adventure-card">
-                            <img src="{{ asset('assets/img/akanMashu4.jpg') }}" alt="akanMashu">
+                    <div class="adventure-cards w100 flex-cl-between-start">
+                        {% if mainAdventure %}
+                            <div class="w100 d-flex gap-2">
+                                <div class="w80">
+                                    <a href="{{ path('adventure', {id: mainAdventure.id}) }}" class="adventure-card-xl">
+                                            {% set pic = mainAdventure.pictures|first %}
+                                            {% if pic %}
+                                                <img src="{{ asset('' ~ pic.picturePath) }}" alt="{{ mainAdventure.title }}">
+                                            {% else %}
+                                                <img src="{{ asset('assets/img/default-adventure.jpeg') }}" alt="Default">
+                                            {% endif %}
+                                    </a>
+                                </div>
+                                <a href="{{ path('discover') }}" class="button-type-2 button-blue text-center">See more</a>
                             </div>
-                            <div>
-                                <p class="bold">Into the Georgian Wild</p>
-                                <p>Preparation</p>
+                            <div class="pdl-2 mb-2">
+                                <p class="bold">{{ mainAdventure.title }}</p>
+                                <p>{{ mainAdventure.status.value|capitalize }}</p>
                             </div>
-                        </div>
-                        <div>
-                            <div class="adventure-card">
-                            <img src="{{ asset('assets/img/rishiri_island2.jpg') }}" alt="RishiriIsland">
-                            </div>
-                            <div>
-                                <p class="bold">Entrepreneurship</p>
-                                <p>In progress</p>
-                            </div>
-                        </div>
+                        {% else %}
+                            <p>No adventure found.</p>
+                        {% endif %}
                     </div>
+
+                    
+
                 </div>
-                <div class="container-dash-2">
-                    <h2 class="w100">SAFETY CONTACTS</h2>
-                    <div>
-                        <ul>
-                            <li>
-                                <img class="container-circle-2" src="{{ asset('assets/img/Natsuka.png')}}" alt="">
-                                <p>Natsuka SUZUKI</p>
-                            </li>
-                            <li>
-                                <img class="container-circle-2" src="{{ asset('assets/img/aurelien.png')}}" alt="">
-                                <p>Aurélien CATOEN</p>
-                            </li>
-                            <li>
-                                <img class="container-circle-2" src="{{ asset('assets/img/Anton.png')}}" alt="">
-                                <p>Anton SMITH</p>
-                            </li>
-                        </ul>
-                    </div>
-                    <a class="manage-btn" href="{{ path('contacts-manager')}}">
+                {% if isOwner %}
+                    <div class="container-dash-2">
+                        <h2 class="w100">SAFETY CONTACTS</h2>
+                        <div>
+                            {% if contacts is empty %}
+                                <p>No contacts available.</p>
+                            {% else %}
+                                <ul>
+                                    {% for contact in contacts %}
+                                        <li>
+                                            <a href="{{ path('update-contact', {id: contact.id}) }}" class="flex-center gap-1">
+                                                <img class="container-circle-2"
+                                                    src="{{ contact.picturePath ? asset('uploads/contact-picture/' ~ contact.picturePath) : asset('assets/img/default-contact.png') }}"
+                                                    alt="{{ contact.firstName }}">
+                                                <p>{{ contact.firstName ~ ' ' ~ contact.lastName }}</p>
+                                            </a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                        <a class="manage-btn" href="{{ path('contacts-manager')}}">
                             <i class="fas fa-users-gear"></i>
                             <p>Manage Contacts<p>
-                    </a>
-                </div>
+                        </a>
+                    </div>
+                {% endif %}
             </div>
 
         </section>
 </main>
 
 {% endblock main %}
+
+{% block script %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const timerEl = document.getElementById('timer-countdown');
+        if (!timerEl) return;
+
+        const targetTimeStr = timerEl.dataset.alertTime;
+        const targetDate = new Date(targetTimeStr); // Date JS
+        const updateCountdown = () => {
+            const now = new Date();
+            const diff = targetDate - now;
+
+            if (diff <= 0) {
+                timerEl.textContent = "Timer expired.";
+                return;
+            }
+
+            const totalSeconds = Math.floor(diff / 1000);
+            const days = Math.floor(totalSeconds / 86400);
+            const hours = Math.floor((totalSeconds % 86400) / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+
+            const localTimeString = targetDate.toLocaleString(undefined, {
+                dateStyle: 'short',
+                timeStyle: 'short'
+            });
+
+            timerEl.innerHTML = `${localTimeString} (local time)<br>${days}d ${hours}h ${minutes}m ${seconds}s left`;
+        };
+
+        updateCountdown(); // initial call
+        setInterval(updateCountdown, 1000); // update every second
+    });
+</script>
+{% endblock script %} 

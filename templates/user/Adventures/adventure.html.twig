@@ -24,49 +24,34 @@
                     <i class="fas fa-arrow-left"></i>
                 </a> 
                  {% if isOwner %}
-                    <form method="post" action="{{ path('update_adventure_title', { id: adventure.id }) }}" id="title-form">
-                        
-                        {# Affichage normal (titre + bouton) #}
-                        <div id="title-view">
-                            <div class="flex-between gap-2">
-                                <h2>{{ adventure.title ?: 'No title' }}</h2>
-                                <button type="button" class="btn-icon" onclick="toggleTitleEdit(true)">
-                                    <i class="fas fa-pen"></i>
-                                </button>
-                            </div>
+                    {# Affichage normal (titre + bouton) #}
+                    <div id="title-view">
+                        <div class="flex-between gap-2">
+                            <h2>{{ adventure.title ?: 'No title' }}</h2>
+                            <button type="button" class="btn-icon" onclick="toggleTitleEdit(true)">
+                                <i class="fas fa-pen"></i>
+                            </button>
                         </div>
-
-                        {% set typeIcons = {
-                            'hiking':    '<i class="fas fa-person-hiking"></i>',
-                            'camping':   '<i class="fas fa-campground"></i>',
-                            'alpinism':  '<img src="'~asset('assets/img/icon_ice_axe.png')~'" alt="Alpinism">',
-                            'climbing':  '<img src="'~asset('assets/img/icon_climber.png')~'" alt="Climbing">',
-                            'whitewater':'<i class="fas fa-water"></i>',
-                            'skiing':    '<i class="fas fa-person-skiing"></i>',
-                            'caving':    '<img src="'~asset('assets/img/icon_cave2.png')~'" alt="Caving">',
-                            'hunting':   '<i class="fas fa-crosshairs"></i>',
-                            'fishing':   '<img src="'~asset('assets/img/icon_fishing.svg')~'" alt="Fishing">',
-                            'off road':  '<i class="fas fa-motorcycle"></i>',
-                            'biking':    '<i class="fas fa-bicycle"></i>',
-                            'other(s)':  '<i class="fas fa-pen"></i>'
-                        } %}
-
                         {% if adventure.types|length > 0 %}
                             <div class="adventure-types d-flex gap-2 mt-1 pdl-2">
                                 {% for type in adventure.types %}
                                     {% set key = type.name|lower %}
-                                    <div class="type-icon-container" 
-                                        tabindex="0" 
-                                        data-label="{{ type.name|capitalize }}">
-                                        {{ typeIcons[key]|raw }}
+                                    {% set iconData = typeIcons[key] %}
+                                    <div class="type-icon-container" tabindex="0" data-label="{{ type.name|capitalize }}">
+                                        {% if iconData.isImg %}
+                                            <img src="{{ asset('assets/img/' ~ iconData.icon) }}" alt="{{ type.name|capitalize }}">
+                                        {% else %}
+                                            <i class="{{ iconData.icon }}"></i>
+                                        {% endif %}
                                     </div>
                                 {% endfor %}
                             </div>
                         {% endif %}
+                    </div>
 
-
-                        {# Bloc d’édition (masqué par défaut) #}
-                        <div id="title-edit-container" class="d-none">
+                    {# Bloc d’édition (masqué par défaut) #}
+                    <div id="title-edit-container" class="d-none">
+                        <form method="post" action="{{ path('update_adventure_title_types', { id: adventure.id }) }}">
                             <div class="flex-between gap-2">
                                 <input 
                                     type="text"
@@ -79,22 +64,62 @@
                                 <button type="submit" class="btn-icon">💾</button>
                                 <button type="button" class="btn-icon text-red" onclick="toggleTitleEdit(false)">❌</button>
                             </div>
-                        </div>
-                    </form>
-                {% else %}
-                    <h2>{{ adventure.title ?: 'No title' }}</h2>
-                {% endif %}
+                            <div class="adventure-selector mt-2">
+                                <label for="adventure-edit-input">Type(s) :</label>
+                                <input type="text" id="adventure-edit-input" placeholder="Type 1, Type 2, ..." readonly>
+                                <div class="adventure-popup" id="adventure-edit-popup">
+                                    {% for typeEnum in adventureTypes %}
+                                        {% set key = typeEnum.value %}
+                                        {% set iconData = typeIcons[key] %}
+                                        <label class="adventure-box">
+                                            <input type="checkbox" name="adventures[]" value="{{ key }}"
+                                                {% if adventure.types|filter(v => v.name|lower == key)|length %}checked{% endif %}>
+                                            <div class="box-content">
+                                                {% if iconData.isImg %}
+                                                    <img src="{{ asset('assets/img/' ~ iconData.icon) }}" alt="{{ key|capitalize }}">
+                                                {% else %}
+                                                    <i class="{{ iconData.icon }}"></i>
+                                                {% endif %}
+                                            </div>
+                                            <p>{{ key|capitalize }}</p>
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </form>
+                    </div>
 
+                {% else %}
+                <div id="title-view">
+                    <div class="flex-between gap-2">
+                        <h2>{{ adventure.title ?: 'No title' }}</h2>
+                    </div>
+                    {% if adventure.types|length > 0 %}
+                        <div class="adventure-types d-flex gap-2 mt-1 pdl-2">
+                            {% for type in adventure.types %}
+                                {% set key = type.name|lower %}
+                                <div class="type-icon-container" tabindex="0" data-label="{{ type.name|capitalize }}">
+                                    {{ typeIcons[key]|raw }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                {% endif %}
             </div>
+
             {% if isOwner %}
             <div class="flex-end gap-4">
                 <div>
                     <label for="visibility"></label>
-                    <select name="visibility" id="visibility">
-                        <option value="private" {{ adventure.viewAuthorization == 'private' ? 'selected' }}>Private</option>
-                        <option value="public" {{ adventure.viewAuthorization == 'public' ? 'selected' }}>Public</option>
-                        <option value="selection" {{ adventure.viewAuthorization == 'selection' ? 'selected' }}>Selection</option>
+                    <select name="visibility" id="visibility"
+                            data-update-url="{{ path('update_adventure_visibility', {'id': adventure.id}) }}">
+                        <option value="private"   {{ adventure.viewAuthorization.value == 'private'   ? 'selected' }}>Private</option>
+                        <option value="public"    {{ adventure.viewAuthorization.value == 'public'    ? 'selected' }}>Public</option>
+                        <option value="selection" {{ adventure.viewAuthorization.value == 'selection' ? 'selected' }}>Selection</option>
                     </select>
+                    <span id="visibility-status" style="margin-left:1em;color:#337ab7;"></span>
+
                 </div>
                 <div>
                     <form method="post" action="{{ path('update_adventure_status', {'id': adventure.id}) }}">
@@ -242,8 +267,8 @@
                                 <option value="readme">Readme / Note</option>
                                 <option value="other">Other</option>
                             </select>
-                            <div for="adventure-file-input" class="w40 like-input">
-                                Choose a file
+                            <div class="w40 like-input">
+                                <label for="adventure-file-input">Choose a file</label>
                                 <input type="file" name="file" id="adventure-file-input" class="d-none" accept=".pdf,.txt,.doc,.docx,.odt,.csv,.json" required>
                             </div>
                             
@@ -277,6 +302,8 @@
         </div>
         <div id="mapid"
             class="container-type-3 shadow-black"
+            data-adv-id="{{ adventure.id }}"
+            data-points-url="{{ path('adventure_points', { 'id': adventure.id }) }}"
             data-points='{{ points|map(p => {
                 "latitude": p.latitude,
                 "longitude": p.longitude,
@@ -344,34 +371,90 @@
 
 {% block script %}
 
-<!-- Script Title -->
+<!-- Script Title & Types -->
+
 <script>
-    let isEditingTitle = false;
+let isEditingTitle = false;
 
-    function toggleTitleEdit(submitIfEditing = false) {
-        const form = document.getElementById('title-form');
-        const view = document.getElementById('title-view');
-        const edit = document.getElementById('title-edit-container');
-        const input = document.getElementById('title-edit');
+function toggleTitleEdit(submitIfEditing = false) {
+    const view = document.getElementById('title-view');
+    const edit = document.getElementById('title-edit-container');
+    const input = document.getElementById('title-edit');
+    if (!view || !edit || !input) return;
 
-        if (!form || !view || !edit || !input) return;
-
-        if (isEditingTitle && submitIfEditing) {
-            form.submit();
-            return;
-        }
-
-        isEditingTitle = !isEditingTitle;
-
-        if (isEditingTitle) {
-            view.classList.add('d-none');
-            edit.classList.remove('d-none');
-            input.focus();
-        } else {
-            edit.classList.add('d-none');
-            view.classList.remove('d-none');
-        }
+    if (isEditingTitle && submitIfEditing) {
+        edit.querySelector('form').submit();
+        return;
     }
+
+    isEditingTitle = !isEditingTitle;
+    if (isEditingTitle) {
+        view.classList.add('d-none');
+        edit.classList.remove('d-none');
+        input.focus();
+    } else {
+        edit.classList.add('d-none');
+        view.classList.remove('d-none');
+    }
+}
+
+// Popup gestion pour le choix des types (édition)
+const adventureEditInput = document.getElementById('adventure-edit-input');
+const adventureEditPopup = document.getElementById('adventure-edit-popup');
+const checkboxes = adventureEditPopup?.querySelectorAll('input[type="checkbox"]') || [];
+
+adventureEditInput?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    adventureEditPopup?.classList.toggle('visible');
+});
+
+// MAJ du champ readonly en fonction des cases cochées
+function updateEditInputValue() {
+    if (!adventureEditInput) return;
+    const selected = [...checkboxes]
+        .filter(cb => cb.checked)
+        .map(cb => cb.value);
+    adventureEditInput.value = selected.join(', ');
+}
+checkboxes.forEach(cb => cb.addEventListener('change', updateEditInputValue));
+document.addEventListener('click', (e) => {
+    if (!adventureEditPopup.contains(e.target) && e.target !== adventureEditInput) {
+        adventureEditPopup.classList.remove('visible');
+        updateEditInputValue();
+    }
+});
+// Init affichage champ
+updateEditInputValue();
+</script>
+
+<!-- Script ViewAuthorization -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const select = document.getElementById('visibility');
+    const visibilityUrl = select.dataset.updateUrl;
+    const statusSpan = document.getElementById('visibility-status');
+
+    select.addEventListener('change', function() {
+        const val = select.value;
+
+        fetch(visibilityUrl, {
+            method: 'POST',
+            headers: {'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'visibility=' + encodeURIComponent(val)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                statusSpan.textContent = "Visibility updated!";
+                statusSpan.style.color = "#228B22";
+            } else {
+                statusSpan.textContent = data.error || "Error";
+                statusSpan.style.color = "#D84315";
+            }
+            setTimeout(() => { statusSpan.textContent = ""; }, 2500);
+        });
+    });
+});
 </script>
 
 <!-- Script carrousel display-->

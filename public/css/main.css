@@ -1415,7 +1415,7 @@ footer section nav ul li {
 }
 
 .container-dash-1 {
-  height: 50vh;
+  height: 55vh;
   width: 55vw;
   margin: 0 auto;
   display: flex;
@@ -1427,7 +1427,7 @@ footer section nav ul li {
 }
 
 .container-dash-2 {
-  height: 50vh;
+  height: 55vh;
   width: 30vw;
   margin: 0 auto;
   display: flex;
@@ -1463,14 +1463,20 @@ footer section nav ul li {
 }
 @media (min-width: 992px) {
   .adventure-card, .adventure-card-xl {
-    max-width: 25vh;
-    height: 25vh;
+    max-width: 100%;
+    height: 25vw;
   }
 }
 
 .adventure-card-xl {
-  height: 35vh;
-  max-width: 80vh;
+  max-height: 35vh;
+  width: 80vw;
+  max-width: 100%;
+}
+@media (min-width: 992px) {
+  .adventure-card-xl {
+    height: 25vw;
+  }
 }
 
 .adventure-card-empty {
@@ -1641,7 +1647,7 @@ footer section nav ul li {
   min-width: 5rem;
 }
 
-#adventure-popup {
+#adventure-popup, #adventure-edit-popup {
   display: none;
   position: absolute;
   background: #fff;
@@ -1652,7 +1658,7 @@ footer section nav ul li {
   margin-top: 0.5rem;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
-#adventure-popup.visible {
+#adventure-popup.visible, #adventure-edit-popup.visible {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
@@ -1765,6 +1771,22 @@ footer section nav ul li {
   color: white;
   text-decoration: none;
   transition: transform 0.3 ease;
+  gap: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+}
+
+.button-edit {
+  min-height: clamp(2.5rem, 5vw, 3rem);
+  width: clamp(2.5rem, 5vw, 3rem);
+  font-size: clamp(1.325rem, 3vw, 1.5rem);
+  padding: 0;
+  border-radius: 50%;
+  color: white;
+  text-decoration: none;
+  transition: transform 0.3s ease;
   gap: 1rem;
   display: flex;
   justify-content: center;
@@ -3249,10 +3271,31 @@ main.dashboard section div.w35 img {
   width: 24px;
   height: 18px;
 }
+main.dashboard .container-circle-1.relative:hover .profile-hover-text {
+  opacity: 1;
+}
+main.dashboard .container-circle-1.relative:hover img {
+  filter: brightness(50%);
+}
+main.dashboard .container-circle-1.relative img {
+  transition: filter 0.3s ease;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+main.dashboard .container-circle-1.relative .profile-hover-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-weight: bold;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
 
 div.container-dash-1 h2 {
   padding-left: 1rem;
-  margin: 2rem 0 3rem 0;
 }
 div.container-dash-1 .adventure-card {
   height: 15vw;

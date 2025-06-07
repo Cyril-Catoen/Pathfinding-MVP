@@ -21,7 +21,9 @@ document.querySelectorAll('.picker-option').forEach(el => {
     if (type === 'm') parts[1] = val;
     if (type === 's') parts[2] = val;
 
+    if (parseInt(parts[0],10) > 72) parts[0] = "72";
     durationInput.value = parts.join(':');
+    document.getElementById('duration-picker').style.display = 'none';
   });
 });
 

@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', function () {
   const toggleUrl = form.dataset.toggleUrl;
   const safetyToggle = document.getElementById('safetyEnabled');
   const safetyDetails = document.getElementById('safety-details');
-  const adventureId = document.querySelector('[data-adventure-id]')?.dataset.adventureId;
   const durationInput = document.getElementById('duration-input');
   const contactSelect = document.getElementById('contact-list-select');
   const durationPicker = document.getElementById('duration-picker');

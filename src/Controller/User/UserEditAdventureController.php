@@ -13,7 +13,9 @@ use App\Repository\AdventurePictureRepository;
 use App\Entity\AdventurePoint;
 use App\Repository\AdventurePointRepository;
 use App\Entity\AdventureType;
+use App\Enum\AdventureTypeList;
 use App\Repository\AdventureTypeRepository;
+use App\Service\AdventureTypeIconHelper;
 use App\Entity\ContactList;
 use App\Repository\ContactListRepository;
 use App\Entity\SafetyAlert;
@@ -68,24 +70,73 @@ class UserEditAdventureController extends AbstractController {
 		}
 
 		$adventure->setStatus($statusEnum);
+		$adventure->setUpdatedAt(new \DateTimeImmutable());
 		$em->flush();
 
 		return $this->redirectToRoute('adventure', ['id' => $adventure->getId()]);
 	}
 
-	#[Route('/user/adventure/{id}/update-title', name: 'update_adventure_title', methods: ['POST'])]
-	public function updateTitle(Request $request, Adventure $adventure, EntityManagerInterface $em): Response {
+	#[Route('/user/adventure/{id}/update-title-types', name: 'update_adventure_title_types', methods: ['POST'])]
+	public function updateTitleTypes(
+		Request $request, 
+		Adventure $adventure, 
+		AdventureTypeRepository $adventureTypeRepository, 
+		EntityManagerInterface $em
+	): Response {
 		$this->denyAccessUnlessGranted('EDIT', $adventure);
 
 		$title = trim($request->request->get('title', ''));
+		$typeNames = $request->request->all('adventures');
+
+		// Titre
 		if ($title !== '' && mb_strlen($title) <= 100) {
 			$adventure->setTitle($title);
-			$adventure->setUpdatedAt(new \DateTimeImmutable());
-			$em->flush();
 		}
+
+		// Types (on reset tous)
+		foreach ($adventure->getTypes() as $t) {
+			$adventure->removeType($t);
+		}
+		foreach ($typeNames as $typeName) {
+			$typeEntity = $adventureTypeRepository->findOneBy(['name' => $typeName]);
+			if ($typeEntity) {
+				$adventure->addType($typeEntity);
+			}
+		}
+		$adventure->setUpdatedAt(new \DateTimeImmutable());
+		$em->flush();
 
 		return $this->redirectToRoute('adventure', ['id' => $adventure->getId()]);
 	}
+
+
+	#[Route('/user/adventure/{id}/update-visibility', name: 'update_adventure_visibility', methods: ['POST'])]
+	public function updateAdventureVisibility(
+		int $id,
+		Request $request,
+		AdventureRepository $adventureRepository,
+		EntityManagerInterface $em,
+		Security $security
+	): JsonResponse {
+		$adventure = $adventureRepository->find($id);
+		$user = $security->getUser();
+
+		if (!$adventure || !$user || $adventure->getOwner() !== $user) {
+			return new JsonResponse(['success' => false, 'error' => 'Not allowed'], 403);
+		}
+
+		$visibility = $request->request->get('visibility');
+		if (!in_array($visibility, ['public', 'private', 'selection'])) {
+			return new JsonResponse(['success' => false, 'error' => 'Invalid value'], 400);
+		}
+
+		$adventure->setViewAuthorization(\App\Enum\ViewAuthorization::from($visibility));
+		$adventure->setUpdatedAt(new \DateTimeImmutable());
+		$em->flush();
+
+		return new JsonResponse(['success' => true, 'newValue' => $visibility]);
+	}
+
 
 	#[Route('/user/adventure/{id}/upload-photos', name: 'upload_adventure_photos', methods: ['POST'])]
 	public function uploadAdventurePhotos(
@@ -118,6 +169,7 @@ class UserEditAdventureController extends AbstractController {
 					$em->persist($picture);
 				}
 			}
+			$adventure->setUpdatedAt(new \DateTimeImmutable());
 			$em->flush();
 		}
 
@@ -153,6 +205,7 @@ class UserEditAdventureController extends AbstractController {
 
 			// Supprime l'entité
 			$em->remove($picture);
+			$adventure->setUpdatedAt(new \DateTimeImmutable());
 			$em->flush();
 
 			// Log temporaire (peut être retiré après debug)
@@ -187,26 +240,11 @@ class UserEditAdventureController extends AbstractController {
 		}
 
 		$adventure->setDescription($description);
+		$adventure->setUpdatedAt(new \DateTimeImmutable());
 		$em->flush();
 
 		return $this->redirectToRoute('adventure', ['id' => $adventure->getId()]);
 	}
-
-
-
-	// #[Route('/user/adventure/{id}/update', name: 'update_adventure', methods: ['POST'])]
-	// public function updateAdventure(Request $request, Adventure $adventure, EntityManagerInterface $em): Response {
-	// 	$this->denyAccessUnlessGranted('EDIT', $adventure);
-
-	// 	// Exemples de champs
-	// 	$adventure->setStartDate(new \DateTime($request->request->get('start_date')));
-	// 	$adventure->setEndDate(new \DateTime($request->request->get('end_date')));
-	// 	$adventure->setViewAuthorization($request->request->get('visibility'));
-
-	// 	$em->flush();
-
-	// 	return $this->redirectToRoute('adventure', ['id' => $adventure->getId()]);
-	// }
 
 	#[Route('/user/adventure/{id}/update-alert-settings', name: 'update_alert_settings', methods: ['POST'])]
 	public function updateAlertSettings(Request $request, Adventure $adventure, EntityManagerInterface $em, TimerAlertRepository $timerRepo): Response {
@@ -230,6 +268,7 @@ class UserEditAdventureController extends AbstractController {
 			}
 		}
 
+		$adventure->setUpdatedAt(new \DateTimeImmutable());
 		$em->flush();
 
 		return $this->redirectToRoute('adventure', ['id' => $adventure->getId()]);
@@ -273,6 +312,7 @@ class UserEditAdventureController extends AbstractController {
 
 		if ($startDate) $adventure->setStartDate($startDate);
 		if ($endDate) $adventure->setEndDate($endDate);
+		$adventure->setUpdatedAt(new \DateTimeImmutable());
 		$em->flush();
 
 		return new JsonResponse([
@@ -385,6 +425,7 @@ class UserEditAdventureController extends AbstractController {
 				->setUploadedAt(new \DateTimeImmutable());
 			$adventureFile->setExternalUrl('uploads/adventure_files/' . $uniqueName);
 			$em->persist($adventureFile);
+			$adventure->setUpdatedAt(new \DateTimeImmutable());
 			$em->flush();
 
 			$logger->info('Fichier adventure uploadé', [
@@ -438,6 +479,7 @@ class UserEditAdventureController extends AbstractController {
         $filePath = $this->getParameter('kernel.project_dir') . '/public/' . $file->getExternalUrl();
         if (file_exists($filePath)) unlink($filePath);
         $em->remove($file);
+		$adventure->setUpdatedAt(new \DateTimeImmutable());
         $em->flush();
 
         return new JsonResponse(['success' => true]);
@@ -533,6 +575,7 @@ class UserEditAdventureController extends AbstractController {
 				->setRecordedAt($pt['time']);
 			$em->persist($adventurePoint);
 		}
+		$adventure->setUpdatedAt(new \DateTimeImmutable());
 		$em->flush();
 
 		return new JsonResponse(['success' => true, 'count' => count($points)]);
@@ -573,7 +616,7 @@ class UserEditAdventureController extends AbstractController {
 		$adventure = $adventureRepo->find($id);
 		$user = $security->getUser();
 		$defaultList = null;
-		
+
 		if (!$adventure || !$user || $adventure->getOwner() !== $user) {
 			return new JsonResponse(['success' => false, 'error' => 'Not allowed'], 403);
 		}
@@ -616,6 +659,7 @@ class UserEditAdventureController extends AbstractController {
 			$em->remove($timer);
 		}
 		}
+		$adventure->setUpdatedAt(new \DateTimeImmutable());
 		$em->flush();
 		$alertTime = $timer->getAlertTime();
 		$endDate = $adventure->getEndDate();
@@ -679,6 +723,7 @@ class UserEditAdventureController extends AbstractController {
 		$totalHours = $diff->h + ($diff->days * 24);
 		$timerDuration = sprintf('%02d:%02d:%02d', $totalHours, $diff->i, $diff->s);
 
+		$adventure->setUpdatedAt(new \DateTimeImmutable());
 		$em->flush();
 		return new JsonResponse([
 			'success' => true,
@@ -708,6 +753,7 @@ class UserEditAdventureController extends AbstractController {
 			return new JsonResponse(['success' => false, 'error' => 'Invalid list'], 400);
 		}
 		$adventure->setContactList($list);
+		$adventure->setUpdatedAt(new \DateTimeImmutable());
 		$em->flush();
 		return new JsonResponse(['success' => true]);
 	}

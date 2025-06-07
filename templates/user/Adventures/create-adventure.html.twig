@@ -151,53 +151,50 @@
                             <label class="toggle-btn">
                                 <input type="checkbox" id="toggleButtonSafety" name="statusSafety">
                                 <div class="slider">
-                                <div class="ball"></div>
-                                <span class="btn-text"></span>
+                                    <div class="ball"></div>
+                                    <span class="btn-text"></span>
                                 </div>
                             </label>
                         </div>
 
-                        
-                        
-
-                        <div class="w100 d-flex mt-2">
+                        <div id="safety-settings" class="w100 d-flex mt-2 d-none">
                             <div class="w45">
-                                <label for="timerAlert">Timer Alert</label>
-                                <!-- Formulaire pour définir la durée -->
+                                <label for="duration-input">Timer Alert</label>
                                 <div class="duration-wrapper">
-                                    <input type="text" id="duration-input" name="duration-input" readonly placeholder="HH:MM:SS" class="duration-display" />
+                                    <input type="text" id="duration-input" name="duration-input"
+                                        readonly placeholder="HH:MM:SS" class="duration-display" value="24:00:00" />
 
-                                    <div class="duration-picker" id="duration-picker">
+                                    <div class="duration-picker" id="duration-picker" style="display:none;">
                                         <div class="picker-column">
-                                        {% for h in 0..72 %}
-                                            <div class="picker-option" data-type="h">{{ "%02d"|format(h) }}</div>
-                                        {% endfor %}
+                                            {% for h in 0..72 %}
+                                                <div class="picker-option" data-type="h">{{ "%02d"|format(h) }}</div>
+                                            {% endfor %}
                                         </div>
                                         <div class="divider"></div>
                                         <div class="picker-column">
-                                        {% for m in 0..59 %}
-                                            <div class="picker-option" data-type="m">{{ "%02d"|format(m) }}</div>
-                                        {% endfor %}
+                                            {% for m in 0..59 %}
+                                                <div class="picker-option" data-type="m">{{ "%02d"|format(m) }}</div>
+                                            {% endfor %}
                                         </div>
                                         <div class="divider"></div>
                                         <div class="picker-column">
-                                        {% for s in 0..59 %}
-                                            <div class="picker-option" data-type="s">{{ "%02d"|format(s) }}</div>
-                                        {% endfor %}
+                                            {% for s in 0..59 %}
+                                                <div class="picker-option" data-type="s">{{ "%02d"|format(s) }}</div>
+                                            {% endfor %}
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="w45">
-                                    <label for="objet">Contact list</label>
-                                    <select name="objet" id="objet">
-                                        <option value="" selected>Default list</option>
-                                        <option value="object1">List 1</option>
-                                        <option value="object1">List 2</option>
-                                        <option value="object2">List 3</option>
-                                    </select>
+                                <label for="contact-list-select">Contact list</label>
+                                <select name="contact_list" id="contact-list-select">
+                                    {% for list in contactLists %}
+                                        <option value="{{ list.id }}" {{ list.isDefault ? 'selected' : '' }}>{{ list.name }}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
                         </div>
+
                         <div class="w100 pdt-4 flex-end">
                         <button id="submitBtn" class="button-type-4" type="submit">CREATE</button>
                         </div>
@@ -213,5 +210,37 @@
 <script src="{{ asset('js/adventure-selector.js') }}" defer></script>
 <script src="{{ asset('js/timer-picker.js') }}" defer></script>
 <script src="{{ asset('js/features_check.js') }}" defer></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const toggleSafety = document.getElementById('toggleButtonSafety');
+    const safetySettings = document.getElementById('safety-settings');
+    const durationInput = document.getElementById('duration-input');
+    const contactSelect = document.getElementById('contact-list-select');
+
+    // Par défaut, settings cachés, valeur 24:00:00, contact list à Default
+    function resetSafetyDefaults() {
+        durationInput.value = "24:00:00";
+        if (contactSelect) {
+            const defaultOption = contactSelect.querySelector('option[selected]');
+            if (defaultOption) contactSelect.value = defaultOption.value;
+            else contactSelect.selectedIndex = 0;
+        }
+    }
+
+    // Toggle affichage
+    toggleSafety.addEventListener('change', function() {
+        if (this.checked) {
+            safetySettings.classList.remove('d-none');
+            resetSafetyDefaults();
+        } else {
+            safetySettings.classList.add('d-none');
+        }
+    });
+});
+</script>
+
+
+
 <script src="{{ asset('js/validatorCreateAdvForm.js') }}" defer></script>
 {% endblock script %}
