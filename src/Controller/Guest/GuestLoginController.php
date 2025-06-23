@@ -35,17 +35,12 @@ class GuestLoginController extends AbstractController {
 	}
 
     #[Route('/register', name: "register", methods: ['GET', 'POST'])]
-	public function displayRegister(
-		Request $request, 
-		UserPasswordHasherInterface $userPasswordHasher, 
-		EntityManagerInterface $entityManager,
-		ContactListManager $contactListManager
+	public function displayRegister(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager, ContactListManager $contactListManager
 		): Response {
 
         // On utilise les composants de Symfony pour gérer le hash du Password et la création de l'utilisateur
 
 		if ($request->isMethod('POST')) {
-
             // Si le formulaire est soumis, on récupère dans deux variables distinctes l'email (identifiant futur de l'user) et le hash du mot de passe généré
 			$email = $request->request->get('email');
 			$confirmEmail = $request->request->get('confirmEmail');
@@ -62,14 +57,7 @@ class GuestLoginController extends AbstractController {
             	// Le mot de passe est hashé par la fonction intégrée par Symfony
 				$passwordHashed = $userPasswordHasher->hashPassword($user, $password);
 
-				$user->createUser(
-					$email,
-					$passwordHashed,
-					$name,
-					$surname,
-					new \DateTime($birthdate)
-				);
-
+				$user->createUser($email, $passwordHashed, $name, $surname, new \DateTime($birthdate));
 
 				try {
 					$entityManager->persist($user);
@@ -90,9 +78,7 @@ class GuestLoginController extends AbstractController {
 				}
         	}
 		}
-
 		return $this->render('/guest/register.html.twig');
 	}
 }
-
 ?>

@@ -105,11 +105,7 @@ class UserContactsController extends AbstractController {
     }
 
 	#[Route('/user/contacts-ajax', name: 'contacts-ajax', methods: ['GET'])]
-	public function ajaxContactList(
-		Request $request,
-		SafetyContactRepository $safetyContactRepository,
-		ContactListRepository $contactListRepository
-	): Response {
+	public function ajaxContactList(Request $request, SafetyContactRepository $safetyContactRepository, ContactListRepository $contactListRepository): Response {
 		$user = $this->getUser();
 		$selectedListId = $request->query->get('list');
 		$sort = $request->query->get('sort', 'recent');

@@ -1,0 +1,252 @@
+{% extends 'user/base.html.twig' %}
+
+{% block link %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+{% endblock link %}
+
+{% block metatitle %}
+<title>
+    PathSharing - 
+    {% if adventure.title %} 
+        {{ adventure.title }}  
+    {% else %}
+        Adventure not found
+    {% endif %}
+</title>
+{% endblock metatitle %}
+
+
+{% block main %}
+<main class="adv-main">
+    <section class="container">
+        <div class="w100 flex-between pdt-8">
+            <div class="flex-start gap-2">
+                    <a class="arrow-return-button" href="{{ path('admin/adventure-manager')}}">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                <div id="title-view">
+                    <div class="flex-between gap-2">
+                        <h2>{{ adventure.title ?: 'No title' }}</h2>
+                    </div>
+                        {% if adventure.types|length > 0 %}
+                            <div class="adventure-types d-flex gap-2 mt-1 pdl-2">
+                                {% for type in adventure.types %}
+                                    {% set key = type.name|lower %}
+                                    {% set iconData = typeIcons[key] %}
+                                    <div class="type-icon-container" tabindex="0" data-label="{{ type.name|capitalize }}">
+                                        {% if iconData.isImg %}
+                                            <img src="{{ asset('assets/img/' ~ iconData.icon) }}" alt="{{ type.name|capitalize }}">
+                                        {% else %}
+                                            <i class="{{ iconData.icon }}"></i>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                </div>
+            </div>
+            <div class="w25">
+                <p class="button-type-2 button-green">{{ adventure.status.value|capitalize }}</p>
+            </div>
+        </div>
+
+        <div class="w100 flex-between mt-8">
+            <div id="photo-data" 
+                data-adventure-id="{{ adventure.id }}"
+                data-uploaded-count="{{ pictures|length }}"
+                data-pictures2='{{ pictures|map(p => { id: p.id, path: asset(p.picturePath) })|json_encode|e("html_attr") }}'
+                data-pictures='{{ pictures|map(p => asset(p.picturePath))|json_encode(constant("JSON_UNESCAPED_SLASHES"))|e("html_attr") }}'
+                data-delete-url-template="{{ path('adventure_photo_delete', { adventureId: '__AID__', photoId: '__PID__' }) }}">
+            </div>
+            {% set isAchieved = adventure.status.value == 'achieved' %}
+            {% set hasPictures = pictures is not empty %}
+
+            {% if isAchieved %}
+                <div class="photo-section w100">
+                    {% include 'admin/adventures/partials/_photo-display-admin.html.twig' %}
+                </div>
+            {% else %}
+                <div class="adventure-card-empty">
+                    <i class="fas fa-hiking"></i>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="w100 mt-4">
+            <h3 class="d-flex gap-2">
+                <span>Description</span>
+            </h3>
+            <p class="{{ adventure.description is not empty ? '' : 'italic text-muted pdl-2' }}">
+                {{ adventure.description ?: 'No description.' }}
+            </p>
+        </div>
+
+        <div class="line-x-separator"></div>
+
+         <div class="w100 flex-between wrap mt-4">
+            
+            <div class="w100 flex-between">
+                <div class="w45">
+                    <label>START DATE</label>
+                    <input type="datetime-local" value="{{ adventure.startDate ? adventure.startDate|date('Y-m-d\\TH:i') : '' }}" readonly disabled />
+                </div>
+                <div class="w45">
+                    <label>END DATE</label>
+                    <input type="datetime-local" value="{{ adventure.endDate ? adventure.endDate|date('Y-m-d\\TH:i') : '' }}" readonly disabled />
+                </div>
+            </div>
+
+            <div class="w100 flex-cl-end mb-4">
+                <div class="w100 flex-cl-start">
+                    <h3 class="mt-2">FILES</h3>
+                </div>
+                <div class="uploaded-files" id="uploaded-files-container" data-uploaded-files='{{ adventure.adventureFiles|map(f => {
+                    id: f.id,
+                    name: f.fileName,
+                    type: f.type.value,
+                    typeLabel: f.type.label(),
+                    typeIcon: f.type.icon(),
+                    size: f.size,
+                    url: path('download_adventure_file', { id: f.id })
+                })|json_encode|e("html_attr") }}'>
+                    <!-- Liste générée par JS -->
+                </div>
+            </div>
+    </section>
+
+    <section id="GPSTrack" class="container">
+        <div class="line-x-separator"></div>
+        <div class="w100 flex-between mt-4">
+            <div class="flex-start w45">
+                <h2>GPS TRACK</h2>
+            </div>
+        </div>
+        <div id="mapid"
+            class="container-type-3 shadow-black"
+            data-adv-id="{{ adventure.id }}"
+            data-points-url="{{ path('adventure_points', { 'id': adventure.id }) }}"
+            data-points='{{ points|map(p => {
+                "latitude": p.latitude,
+                "longitude": p.longitude,
+                "elevation": p.elevation,
+                "recordedAt": p.recordedAt|date("c")
+            })|json_encode|e("html_attr") }}'>
+        </div>
+
+        <div class="w100 flex-between mt-4 mb-8">
+            <div class="flex-start w30">
+                <h3 class="mt-2 mb-2 gap-2">SAFETY ALERT</h3>
+                <label class="toggle-btn">
+                    <input type="checkbox" name="safetyEnabled" {{ adventure.timerAlert and adventure.timerAlert.isActive ? 'checked' : '' }} disabled>
+                    <div class="slider"><div class="ball"></div></div>
+                </label>
+            </div>
+            <div id="safety-details" class="w50 flex-between">
+                <div class="duration-wrapper w45">
+                    <label for="duration-input">Timer Alert</label>
+                    <input type="text" id="duration-input" readonly placeholder="HH:MM:SS"
+                    class="duration-display" value="{{ timerDuration }}" />
+                    <div class="duration-picker" id="duration-picker" style="display:none;">
+                    <div class="picker-column">
+                        {% for h in 0..72 %}
+                        <div class="picker-option" data-type="h">{{ "%02d"|format(h) }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="divider"></div>
+                    <div class="picker-column">
+                        {% for m in 0..59 %}
+                        <div class="picker-option" data-type="m">{{ "%02d"|format(m) }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="divider"></div>
+                    <div class="picker-column">
+                        {% for s in 0..59 %}
+                        <div class="picker-option" data-type="s">{{ "%02d"|format(s) }}</div>
+                        {% endfor %}
+                    </div>
+                    </div>
+                </div>
+                <div class="w45 flex-cl-start">
+                    <label>Contact list</label>
+                    <select name="contact_list_id" disabled>
+                    {% for list in contactLists %}
+                        <option value="{{ list.id }}"
+                            {% if selectedContactList and list.id == selectedContactList.id %}selected{% endif %}>
+                            {{ list.name }}
+                        </option>
+                    {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock main %}
+
+{% block script %}
+
+<!-- Script carrousel display-->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const photoData = document.getElementById('photo-data');
+    if (!photoData || !photoData.dataset.pictures) return;
+
+    const displayPictures = JSON.parse(photoData.dataset.pictures);
+    let displayCarouselIndex = 0;
+
+    function updateDisplayCarousel() {
+        const left = document.getElementById('carousel-left');
+        const center = document.getElementById('carousel-center');
+        const right = document.getElementById('carousel-right');
+
+        const total = displayPictures.length;
+        if (total < 4 || !left || !center || !right) return;
+
+        const indexes = [
+            (displayCarouselIndex - 1 + total) % total,
+            displayCarouselIndex % total,
+            (displayCarouselIndex + 1) % total
+        ];
+
+        left.src = displayPictures[indexes[0]];
+        center.src = displayPictures[indexes[1]];
+        right.src = displayPictures[indexes[2]];
+    }
+
+    window.prevDisplayCarousel = function () {
+        displayCarouselIndex = (displayCarouselIndex - 1 + displayPictures.length) % displayPictures.length;
+        updateDisplayCarousel();
+    };
+
+    window.nextDisplayCarousel = function () {
+        displayCarouselIndex = (displayCarouselIndex + 1) % displayPictures.length;
+        updateDisplayCarousel();
+    };
+
+    updateDisplayCarousel(); // Appel initial pour afficher les images
+});
+
+function openImagePreview(src) {
+    const overlay = document.getElementById('image-overlay');
+    const img = document.getElementById('overlay-image');
+    img.src = src;
+    overlay?.classList.remove('d-none');
+}
+
+function closeImagePreview() {
+    const overlay = document.getElementById('image-overlay');
+    overlay?.classList.add('d-none');
+}
+
+function handleCarouselClick() {
+    const center = document.getElementById('carousel-center');
+    if (center?.src) {
+        openImagePreview(center.src);
+    }
+}
+
+</script>
+<script src="{{ asset('js/fileManager-display.js') }}" defer></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+<script src="{{ asset('js/gps-track-display.js') }}" defer></script>
+{% endblock script %}

@@ -88,7 +88,11 @@ class UserAdventureController extends AbstractController {
 			$anotherOngoing = $otherOngoing && $otherOngoing->getId() !== $adventure->getId();
 		}
 
-		if (!$isOwner && $adventure->getViewAuthorization() === 'private') {
+		// if (!$isOwner && $adventure->getViewAuthorization() === 'private') {
+		// 	throw $this->createAccessDeniedException('This adventure is private.');
+		// }
+
+		if (!$adventure->isVisibleTo($user)) {
 			throw $this->createAccessDeniedException('This adventure is private.');
 		}
 
@@ -284,15 +288,56 @@ class UserAdventureController extends AbstractController {
 
 
 	#[Route('/share/{shareLink}', name: 'adventure_share')]
-	public function share(string $shareLink, AdventureRepository $repo): Response {
+	public function share(string $shareLink, AdventureRepository $repo, AdventurePictureRepository $pictureRepository,
+        AdventurePointRepository $adventurePointRepository, ContactListRepository $contactListRepository): Response {
 		$adventure = $repo->findOneBy(['shareLink' => $shareLink]);
 
-		if (!$adventure || !$adventure->isVisibleTo(null)) {
+		if (!$adventure || !$adventure->ifSharedisVisibleTo(null)) {
 			throw $this->createNotFoundException();
 		}
 
-		return $this->render('adventure/public_view.html.twig', [
-			'adventure' => $adventure
+		// 🖼️ Récupération des images liées à l'aventure
+		$pictures = $pictureRepository->findBy(
+			['adventure' => $adventure],
+			['position' => 'ASC', 'uploadedAt' => 'ASC']);
+
+		// Supposons que $adventure->getOwner() existe et que getContactLists() renvoie ses listes.
+        $owner = $adventure->getOwner();
+        $contactLists = $owner ? $contactListRepository->findBy(['owner' => $owner]) : [];
+        $selectedContactList = $adventure->getContactList(); // ou le champ équivalent
+
+        $points = $adventurePointRepository->findBy(['adventure' => $adventure], ['recordedAt' => 'ASC']);
+		// Valeur par défaut si pas de timer ou de endDate : 24:00:00
+		$timerDuration = '24:00:00';
+
+		$timerAlert = $adventure->getTimerAlert();
+		$endDate = $adventure->getEndDate();
+
+		if ($timerAlert && $endDate) {
+			$alertTime = $timerAlert->getAlertTime();
+			if ($alertTime) {
+				$diff = $endDate->diff($alertTime);
+				// Attention, $diff->invert = 1 si endDate > alertTime (donc résultat négatif)
+				// Pour l'UX, on affiche 00:00:00 si négatif
+				if ($diff->invert) {
+					$timerDuration = '00:00:00';
+				} else {
+					$totalHours = $diff->h + ($diff->days * 24);
+					$timerDuration = sprintf('%02d:%02d:%02d', $totalHours, $diff->i, $diff->s);
+				}
+            }
+		}
+
+		return $this->render('user/Adventures/share-adventure.html.twig', [
+			'adventure' => $adventure,
+            'contactLists' => $contactLists,
+            'selectedContactList' => $selectedContactList,
+            'pictures' => $pictures,
+            'points' => $points,
+			'timerDuration' => $timerDuration,
+            'types' => $adventure->getTypes(), // liste des types sélectionnés par l'user à la création
+			'adventureTypes' => AdventureTypeList::cases(), // afficher la liste complète pour édition
+			'typeIcons' => AdventureTypeIconHelper::getIconMap(),
 		]);
 }
 

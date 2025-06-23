@@ -8,8 +8,10 @@ use App\Entity\AdventureFile;
 use App\Repository\AdventureFileRepository;
 use App\Entity\AdventurePicture;
 use App\Repository\AdventurePictureRepository;
+use App\Repository\AdventurePointRepository;
 use App\Entity\AdventureType;
 use App\Repository\AdventureTypeRepository;
+use App\Service\AdventureTypeIconHelper;
 use App\Entity\ContactList;
 use App\Repository\ContactListRepository;
 use App\Entity\SafetyAlert;
@@ -19,6 +21,8 @@ use App\Repository\SafetyContactRepository;
 use App\Entity\TimerAlert;
 use App\Repository\TimerAlertRepository;
 use App\Enum\Status;
+use App\Enum\ViewAuthorization;
+use App\Enum\AdventureTypeList;
 use Exception;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -61,6 +65,7 @@ class AdminAdventureController extends AbstractController {
 		Adventure $adventure,
 		AdventureRepository $adventureRepository,
 		AdventurePictureRepository $pictureRepository,
+        AdventurePointRepository $adventurePointRepository,
 		ContactListRepository $contactListRepository,
 		Security $security
 	): Response {
@@ -76,13 +81,39 @@ class AdminAdventureController extends AbstractController {
         $contactLists = $owner ? $contactListRepository->findBy(['owner' => $owner]) : [];
         $selectedContactList = $adventure->getContactList(); // ou le champ équivalent
 
+        $points = $adventurePointRepository->findBy(['adventure' => $adventure], ['recordedAt' => 'ASC']);
+		// Valeur par défaut si pas de timer ou de endDate : 24:00:00
+		$timerDuration = '24:00:00';
+
+		$timerAlert = $adventure->getTimerAlert();
+		$endDate = $adventure->getEndDate();
+
+		if ($timerAlert && $endDate) {
+			$alertTime = $timerAlert->getAlertTime();
+			if ($alertTime) {
+				$diff = $endDate->diff($alertTime);
+				// Attention, $diff->invert = 1 si endDate > alertTime (donc résultat négatif)
+				// Pour l'UX, on affiche 00:00:00 si négatif
+				if ($diff->invert) {
+					$timerDuration = '00:00:00';
+				} else {
+					$totalHours = $diff->h + ($diff->days * 24);
+					$timerDuration = sprintf('%02d:%02d:%02d', $totalHours, $diff->i, $diff->s);
+				}
+            }
+
         return $this->render('admin/adventures/display-adventure.html.twig', [
             'adventure' => $adventure,
             'contactLists' => $contactLists,
             'selectedContactList' => $selectedContactList,
             'pictures' => $pictures,
+            'points' => $points,
+			'timerDuration' => $timerDuration,
+            'types' => $adventure->getTypes(), // liste des types sélectionnés par l'user à la création
+			'adventureTypes' => AdventureTypeList::cases(), // afficher la liste complète pour édition
+			'typeIcons' => AdventureTypeIconHelper::getIconMap(),
         ]);
-    }
+    }}
 
     #[Route('/admin/delete-adventure/{id}', name: 'admin/delete-adventure', methods: ['GET', 'POST'])]
     public function displayDeleteAdventure(

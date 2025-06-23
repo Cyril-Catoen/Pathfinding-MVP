@@ -8,7 +8,6 @@ testFormBeforeSubmit.addEventListener("click", function(event) {
     }
 })
 
-
 /*functions*/
 
 /*Check that all the form is completed and true*/

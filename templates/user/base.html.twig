@@ -33,11 +33,12 @@
 
     <!-- ! Import de la bibliothèque externe JS - SweetAlert2 pour les messages pop-ups -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
+    <!-- ! Empêche d'afficher les données utilisateurs après déconnexion en cas d'utilisation de la flèche retour en arrière du navigateur
+            en redirigeant vers la page login -->
     <script src="{{ asset('js/antibackForward.js') }}" defer></script>
     <script src="{{ asset('js/main.js') }}" defer></script>
     <script src="{{ asset('js/menu.js') }}" defer></script>
     <script src="{{ asset('js/components/confirmDeleteButton.js') }}" defer></script>
-
 
     {% block script %}
     {% endblock script %}

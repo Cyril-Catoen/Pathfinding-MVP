@@ -29,3 +29,4 @@ function setupSearchBar(inputId, clearId, rowSelector) {
 }
 
 window.setupSearchBar = setupSearchBar;
+

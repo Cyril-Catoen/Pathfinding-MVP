@@ -95,14 +95,19 @@
                         <h2>{{ adventure.title ?: 'No title' }}</h2>
                     </div>
                     {% if adventure.types|length > 0 %}
-                        <div class="adventure-types d-flex gap-2 mt-1 pdl-2">
-                            {% for type in adventure.types %}
-                                {% set key = type.name|lower %}
-                                <div class="type-icon-container" tabindex="0" data-label="{{ type.name|capitalize }}">
-                                    {{ typeIcons[key]|raw }}
-                                </div>
-                            {% endfor %}
-                        </div>
+                    <div class="adventure-types d-flex gap-2 mt-1 pdl-2">
+                        {% for type in adventure.types %}
+                            {% set key = type.name|lower %}
+                            {% set iconData = typeIcons[key] %}
+                            <div class="type-icon-container" tabindex="0" data-label="{{ type.name|capitalize }}">
+                                {% if iconData.isImg %}
+                                    <img src="{{ asset('assets/img/' ~ iconData.icon) }}" alt="{{ type.name|capitalize }}">
+                                {% else %}
+                                    <i class="{{ iconData.icon }}"></i>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
                     {% endif %}
                 </div>
                 {% endif %}
@@ -214,9 +219,7 @@
 
         <div class="line-x-separator"></div>
 
-        {% if isOwner %}
-        <div class="w100 flex-between wrap mt-4">
-            
+        <div class="w100 flex-between wrap mt-4"> 
             <div class="w100 flex-between">
                 {% if isOwner %}
                 <div class="w45">
@@ -242,7 +245,7 @@
                 </div>
                 {% endif %}
             </div>
-
+        {% if isOwner %}
             <div class="w100 flex-cl-end mb-4">
                 <div class="w100 flex-cl-start">
                     <h3 class="mt-2">FILES</h3>
@@ -364,6 +367,8 @@
                 </div>
             </div>
         </form>
+        {% else %}
+        <div class="mb-8"></div>
         {% endif %}
     </section>
 </main>

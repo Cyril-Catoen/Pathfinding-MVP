@@ -122,25 +122,55 @@ class Adventure
     }
 
     public function isVisibleTo(?User $user): bool {
-        if ($this->viewAuthorization === ViewAuthorization::PUBLIC) {
+        // Le propriétaire peut toujours voir
+        if ($this->getOwner() === $user) {
             return true;
+        }
+        
+        if ($this->viewAuthorization === ViewAuthorization::Public) {
+            return true;
+        }
+
+        if ($this->viewAuthorization === ViewAuthorization::Private) {
+            return false;
         }
 
         if (!$user) {
             return false; // accès impossible si non connecté
         }
 
+        // Si visibilité par sélection, vérifier si l’utilisateur est autorisé
+        if ($this->viewAuthorization === ViewAuthorization::Selection) {
+            return $this->authorizedUsers->contains($user);
+        }
+
+        return false;
+    }
+
+    public function ifSharedisVisibleTo(?User $user): bool {
         // Le propriétaire peut toujours voir
         if ($this->getOwner() === $user) {
             return true;
         }
+        
+        if ($this->viewAuthorization === ViewAuthorization::Public) {
+            return true;
+        }
+
+        if ($this->viewAuthorization === ViewAuthorization::Private) {
+            return true;
+        }
+
+        if (!$user) {
+            return true; 
+        }
 
         // Si visibilité par sélection, vérifier si l’utilisateur est autorisé
-        if ($this->viewAuthorization === ViewAuthorization::SELECTION) {
+        if ($this->viewAuthorization === ViewAuthorization::Selection) {
             return $this->authorizedUsers->contains($user);
         }
 
-        return false; // PRIVATE
+        return false;
     }
 
     public function getId(): ?int

@@ -1,5 +1,9 @@
 {% extends 'admin/base.html.twig' %}
 
+{% block link %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+{% endblock link %}
+
 {% block metatitle %}
 <title>
     PathAdmin - 
@@ -11,15 +15,35 @@
 </title>
 {% endblock metatitle %}
 
+
 {% block main %}
 <main class="adv-main">
     <section class="container">
         <div class="w100 flex-between pdt-8">
             <div class="flex-start gap-2">
-                <a class="arrow-return-button" href="{{ path('admin/adventure-manager')}}">
-                    <i class="fas fa-arrow-left"></i>
-                </a> 
-                <h2>{{ adventure.title ?: 'No title' }}</h2>
+                    <a class="arrow-return-button" href="{{ path('admin/adventure-manager')}}">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                <div id="title-view">
+                    <div class="flex-between gap-2">
+                        <h2>{{ adventure.title ?: 'No title' }}</h2>
+                    </div>
+                        {% if adventure.types|length > 0 %}
+                            <div class="adventure-types d-flex gap-2 mt-1 pdl-2">
+                                {% for type in adventure.types %}
+                                    {% set key = type.name|lower %}
+                                    {% set iconData = typeIcons[key] %}
+                                    <div class="type-icon-container" tabindex="0" data-label="{{ type.name|capitalize }}">
+                                        {% if iconData.isImg %}
+                                            <img src="{{ asset('assets/img/' ~ iconData.icon) }}" alt="{{ type.name|capitalize }}">
+                                        {% else %}
+                                            <i class="{{ iconData.icon }}"></i>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                </div>
             </div>
             <div class="w25">
                 <p class="button-type-2 button-green">{{ adventure.status.value|capitalize }}</p>
@@ -59,30 +83,35 @@
 
         <div class="line-x-separator"></div>
 
-        <div class="flex-between">
-            <div class="w60 flex-cl-end mb-4">
-                <div class="w100 flex-between-top">
+         <div class="w100 flex-between wrap mt-4">
+            
+            <div class="w100 flex-between">
+                <div class="w45">
+                    <label>START DATE</label>
+                    <input type="datetime-local" value="{{ adventure.startDate ? adventure.startDate|date('Y-m-d\\TH:i') : '' }}" readonly disabled />
+                </div>
+                <div class="w45">
+                    <label>END DATE</label>
+                    <input type="datetime-local" value="{{ adventure.endDate ? adventure.endDate|date('Y-m-d\\TH:i') : '' }}" readonly disabled />
+                </div>
+            </div>
+
+            <div class="w100 flex-cl-end mb-4">
+                <div class="w100 flex-cl-start">
                     <h3 class="mt-2">FILES</h3>
                 </div>
-                <div class="uploaded-files" id="uploaded-files-container">
-                    <!-- Uploaded files preview -->
+                <div class="uploaded-files" id="uploaded-files-container" data-uploaded-files='{{ adventure.adventureFiles|map(f => {
+                    id: f.id,
+                    name: f.fileName,
+                    type: f.type.value,
+                    typeLabel: f.type.label(),
+                    typeIcon: f.type.icon(),
+                    size: f.size,
+                    url: path('download_adventure_file', { id: f.id })
+                })|json_encode|e("html_attr") }}'>
+                    <!-- Liste générée par JS -->
                 </div>
             </div>
-            <div class="w35 h100 flex-end">
-                <div class="vh30 flex-cl-between">
-                    <div class="w60">
-                        <label for="start_date">START DATE</label>
-                        <input type="datetime-local" name="start_date"
-                            value="{{ adventure.startDate ? adventure.startDate|date('Y-m-d\\TH:i') : '' }}" readonly>
-                    </div>
-                    <div class="w60">
-                        <label for="end_date">END DATE</label>
-                        <input type="datetime-local" name="end_date"
-                            value="{{ adventure.endDate ? adventure.endDate|date('Y-m-d\\TH:i') : '' }}" readonly>
-                    </div>
-                </div>
-            </div>
-        </div>
     </section>
 
     <section id="GPSTrack" class="container">
@@ -92,8 +121,16 @@
                 <h2>GPS TRACK</h2>
             </div>
         </div>
-        <div class="container-type-3 shadow-black">
-            <!-- Carte topographique avec tracé si existant -->
+        <div id="mapid"
+            class="container-type-3 shadow-black"
+            data-adv-id="{{ adventure.id }}"
+            data-points-url="{{ path('adventure_points', { 'id': adventure.id }) }}"
+            data-points='{{ points|map(p => {
+                "latitude": p.latitude,
+                "longitude": p.longitude,
+                "elevation": p.elevation,
+                "recordedAt": p.recordedAt|date("c")
+            })|json_encode|e("html_attr") }}'>
         </div>
 
         <div class="w100 flex-between mt-4 mb-8">
@@ -104,16 +141,42 @@
                     <div class="slider"><div class="ball"></div></div>
                 </label>
             </div>
-            <div class="w30">
-                <label>Contact list</label>
-                <select name="contact_list_id" disabled>
-                {% for list in contactLists %}
-                    <option value="{{ list.id }}"
-                        {% if selectedContactList and list.id == selectedContactList.id %}selected{% endif %}>
-                        {{ list.name }}
-                    </option>
-                {% endfor %}
-            </select>
+            <div id="safety-details" class="w50 flex-between">
+                <div class="duration-wrapper w45">
+                    <label for="duration-input">Timer Alert</label>
+                    <input type="text" id="duration-input" readonly placeholder="HH:MM:SS"
+                    class="duration-display" value="{{ timerDuration }}" />
+                    <div class="duration-picker" id="duration-picker" style="display:none;">
+                    <div class="picker-column">
+                        {% for h in 0..72 %}
+                        <div class="picker-option" data-type="h">{{ "%02d"|format(h) }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="divider"></div>
+                    <div class="picker-column">
+                        {% for m in 0..59 %}
+                        <div class="picker-option" data-type="m">{{ "%02d"|format(m) }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="divider"></div>
+                    <div class="picker-column">
+                        {% for s in 0..59 %}
+                        <div class="picker-option" data-type="s">{{ "%02d"|format(s) }}</div>
+                        {% endfor %}
+                    </div>
+                    </div>
+                </div>
+                <div class="w45 flex-cl-start">
+                    <label>Contact list</label>
+                    <select name="contact_list_id" disabled>
+                    {% for list in contactLists %}
+                        <option value="{{ list.id }}"
+                            {% if selectedContactList and list.id == selectedContactList.id %}selected{% endif %}>
+                            {{ list.name }}
+                        </option>
+                    {% endfor %}
+                    </select>
+                </div>
             </div>
         </div>
     </section>
@@ -183,5 +246,7 @@ function handleCarouselClick() {
 }
 
 </script>
-
+<script src="{{ asset('js/fileManager-display.js') }}" defer></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+<script src="{{ asset('js/gps-track-display.js') }}" defer></script>
 {% endblock script %}

@@ -14,6 +14,10 @@
         <!-- Défini l'icône à gauche du titre de l'onglet du navigateur - de base une planète + message d'erreur dans l'inspecteur si rien de défini -->
         <link rel="icon" href="{{ asset('assets/img/favicon.ico') }}" type="image/x-icon">
         
+
+        {% block link %}
+        {% endblock link %}
+
         <!-- Nomme l'onglet du navigateur -->
         {% block metatitle %}
         {% endblock metatitle %}
